@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { MdEdit, MdDelete } from 'react-icons/md';
+import { MdEdit, MdDelete, MdContentCopy } from 'react-icons/md';
 import type { Project } from '../../types/domain';
 import type { ColumnConfig } from '../../types/table';
 import PriorityBadge from './PriorityBadge';
@@ -46,6 +46,7 @@ interface ProjectsTableProps {
   onSelectProject: (project: Project) => void;
   onEdit: (project: Project) => void;
   onDelete: (project: Project) => void;
+  onDuplicate: (project: Project) => void;
   visibleColumns: ColumnConfig<ProjectColumnKey>[];
 }
 
@@ -56,6 +57,7 @@ export default function ProjectsTable({
   onSelectProject,
   onEdit,
   onDelete,
+  onDuplicate,
   visibleColumns,
 }: ProjectsTableProps) {
   const { t } = useTranslation();
@@ -174,6 +176,13 @@ export default function ProjectsTable({
                 title={t('common.edit')}
               >
                 <MdEdit size={18} />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onDuplicate(project); }}
+                className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
+                title={t('projects.actions.duplicate')}
+              >
+                <MdContentCopy size={18} />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(project); }}

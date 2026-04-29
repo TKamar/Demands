@@ -5,6 +5,7 @@ import PageHeader from '../components/layout/PageHeader';
 import ProjectsTable, { projectColumnConfig, type ProjectColumnKey } from '../components/projects/ProjectsTable';
 import ProjectDetailSidebar from '../components/projects/ProjectDetailSidebar';
 import CreateProjectModal from '../components/projects/CreateProjectModal';
+import DuplicateProjectModal from '../components/projects/DuplicateProjectModal';
 import ColumnSettingsDropdown from '../components/common/ColumnSettingsDropdown';
 import { FilterSort } from '../components/common/filters';
 import { useProjects } from '../hooks/useProjects';
@@ -13,7 +14,7 @@ import { useDebounce } from '../hooks/useDebounce';
 import { useDelayedLoading } from '../hooks/useDelayedLoading';
 import { useTableColumns } from '../hooks/useTableColumns';
 import { useToast } from '../components/common/Toast';
-import type { CreateProjectPayload, UpdateProjectPayload } from '../api/types';
+import type { CreateProjectPayload, UpdateProjectPayload, DuplicateProjectPayload } from '../api/types';
 import type { Project } from '../types/domain';
 import Pagination from '../components/common/Pagination';
 import {
@@ -56,7 +57,7 @@ export default function ProjectsPage() {
   const debouncedFilters = useDebounce(filters, 300);
 
   // Only pass name filter to server (that's what the API supports)
-  const { projects: allProjects, isLoading, error, createProject, updateProject, deleteProject } = useProjects(
+  const { projects: allProjects, isLoading, error, createProject, updateProject, deleteProject, duplicateProject } = useProjects(
     { name: debouncedFilters.name },
     { page: 1, limit: 1000 } // Fetch all for client-side filtering
   );
@@ -73,6 +74,7 @@ export default function ProjectsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [duplicatingProject, setDuplicatingProject] = useState<Project | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   // Build filter groups with dynamic options
@@ -280,6 +282,11 @@ export default function ProjectsPage() {
     }
   }
 
+  async function handleDuplicateProject(sourceName: string, payload: DuplicateProjectPayload) {
+    await duplicateProject(sourceName, payload);
+    setCurrentPage(1);
+  }
+
   function handleCloseModal() {
     setIsModalOpen(false);
     setEditingProject(null);
@@ -360,6 +367,7 @@ export default function ProjectsPage() {
             onSelectProject={setSelectedProject}
             onEdit={handleEditProject}
             onDelete={handleDeleteProject}
+            onDuplicate={(p) => setDuplicatingProject(p)}
             visibleColumns={orderedVisibleColumns}
           />
         </div>
@@ -391,6 +399,15 @@ export default function ProjectsPage() {
         onEdit={handleEditProject}
         onDelete={handleDeleteProject}
       />
+
+      {duplicatingProject && (
+        <DuplicateProjectModal
+          isOpen={true}
+          onClose={() => setDuplicatingProject(null)}
+          sourceProject={duplicatingProject}
+          onSubmit={handleDuplicateProject}
+        />
+      )}
     </div>
   );
 }

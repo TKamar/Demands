@@ -287,8 +287,19 @@
     "editProject": {
       "title": "עריכת פרויקט"
     },
+    "duplicateProject": {
+      "title": "שכפול פרויקט",
+      "demandsTitle": "דרישות להעברה",
+      "approvedDemands": "דרישות מאושרות (נבחרו מראש)",
+      "optionalDemands": "דרישות אחרות (אופציונלי)",
+      "noDemands": "לפרויקט זה אין דרישות.",
+      "submit": "שכפל",
+      "failedToLoadDemands": "טעינת הדרישות נכשלה"
+    },
+    "duplicateSuccess": "הפרויקט שוכפל בהצלחה",
     "actions": {
-      "cannotDeleteWithDemands": "לא ניתן למחוק פרויקט עם דרישות קיימות"
+      "cannotDeleteWithDemands": "לא ניתן למחוק פרויקט עם דרישות קיימות",
+      "duplicate": "שכפל פרויקט"
     },
     "confirmDelete": "האם אתה בטוח שברצונך למחוק פרויקט זה?",
     "deleteSuccess": "הפרויקט נמחק בהצלחה",
