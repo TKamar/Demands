@@ -339,4 +339,134 @@ export const projectController = {
       res.status(400).json({ error: "Failed to delete project" });
     }
   },
+
+  duplicate: async (req: Request, res: Response) => {
+    try {
+      const { username, fullName, isPrivileged } = getUserContext(req);
+      const sourceName = req.params.name;
+      const {
+        name, purpose, relatedTo, type, kind, locationId,
+        year, median, priority, emergencyOption,
+        centerName, branchName, sectionName,
+        demands,
+      } = req.body;
+
+      // Validate: name and purpose are required
+      if (!name || !name.trim()) {
+        return res.status(400).json({ error: "name is required" });
+      }
+      if (!purpose) {
+        return res.status(400).json({ error: "purpose is required" });
+      }
+
+      // Verify source exists and caller owns it
+      const sourceProject = await projectService.findByName(sourceName);
+      if (!sourceProject) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      if (!isPrivileged && sourceProject.createdBy !== username) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+
+      // New name must be unique
+      const nameConflict = await prisma.project.findUnique({
+        where: { name },
+        select: { name: true },
+      });
+      if (nameConflict) {
+        return res.status(400).json({ error: "A project with this name already exists" });
+      }
+
+      // Type-specific validation
+      if (type === ProjectType.Semiannual) {
+        if (year === undefined || year === null) {
+          return res.status(400).json({ error: "year is required for Semiannual projects" });
+        }
+        if (!median) {
+          return res.status(400).json({ error: "median is required for Semiannual projects" });
+        }
+      }
+      if (type === ProjectType.Emergency && !emergencyOption) {
+        return res.status(400).json({ error: "emergencyOption is required for Emergency projects" });
+      }
+
+      // Validate location
+      const location = await prisma.location.findUnique({
+        where: { id: locationId },
+        include: { base: true, environment: true, network: true },
+      });
+      if (!location) {
+        return res.status(400).json({ error: "Location not found" });
+      }
+      if (!location.isActive) {
+        return res.status(400).json({ error: "Location is not active" });
+      }
+      if (!location.base.isActive) {
+        return res.status(400).json({ error: "Base is not active" });
+      }
+      if (!location.environment.isActive) {
+        return res.status(400).json({ error: "Environment is not active" });
+      }
+      if (!location.network.isActive) {
+        return res.status(400).json({ error: "Network is not active" });
+      }
+
+      // Validate org fields
+      if (!centerName || !branchName || !sectionName) {
+        return res.status(400).json({ error: "centerName, branchName, and sectionName are required" });
+      }
+      const center = await prisma.center.findUnique({ where: { name: centerName } });
+      if (!center) {
+        return res.status(400).json({ error: "Center not found" });
+      }
+      if (!center.isActive) {
+        return res.status(400).json({ error: "Center is not active" });
+      }
+      const branch = await prisma.branch.findUnique({
+        where: { name_centerName: { name: branchName, centerName } },
+      });
+      if (!branch) {
+        return res.status(400).json({ error: "Branch not found" });
+      }
+      if (!branch.isActive) {
+        return res.status(400).json({ error: "Branch is not active" });
+      }
+      const section = await prisma.section.findUnique({
+        where: { name_branchName_branchCenter: { name: sectionName, branchName, branchCenter: centerName } },
+      });
+      if (!section) {
+        return res.status(400).json({ error: "Section not found" });
+      }
+      if (!section.isActive) {
+        return res.status(400).json({ error: "Section is not active" });
+      }
+
+      const project = await projectService.duplicate(
+        sourceName,
+        {
+          name,
+          purpose,
+          relatedTo: relatedTo || undefined,
+          type,
+          kindName: kind,
+          locationId,
+          year: type === ProjectType.Semiannual ? year : undefined,
+          median: type === ProjectType.Semiannual ? median : undefined,
+          priority: priority || undefined,
+          emergencyOptionName: type === ProjectType.Emergency ? emergencyOption : undefined,
+          centerName,
+          branchName,
+          sectionName,
+          createdBy: username,
+          createdByName: fullName,
+        },
+        demands || []
+      );
+
+      res.status(201).json(project);
+    } catch (error) {
+      console.error("projectController.duplicate error:", error);
+      res.status(400).json({ error: "Failed to duplicate project" });
+    }
+  },
 };
