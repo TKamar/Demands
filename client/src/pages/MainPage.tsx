@@ -1,5 +1,5 @@
 // client/src/pages/MainPage.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useModal } from '../contexts/ModalContext';
@@ -12,10 +12,14 @@ export default function MainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { openModal } = useModal();
 
-  const initialTab: MainTab =
-    searchParams.get('tab') === 'requirements' ? 'requirements' : 'projects';
+  const [activeTab, setActiveTab] = useState<MainTab>(
+    searchParams.get('tab') === 'requirements' ? 'requirements' : 'projects'
+  );
 
-  const [activeTab, setActiveTab] = useState<MainTab>(initialTab);
+  useEffect(() => {
+    const tabFromUrl: MainTab = searchParams.get('tab') === 'requirements' ? 'requirements' : 'projects';
+    setActiveTab(tabFromUrl);
+  }, [searchParams]);
   const [selectedCenters, setSelectedCenters] = useState<string[]>([]);
   const [resourceSummaryOpen, setResourceSummaryOpen] = useState(false);
 

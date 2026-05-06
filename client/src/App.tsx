@@ -6,9 +6,6 @@ import { useAuthToken } from './hooks/useAuthToken';
 import { ToastProvider } from './components/common/Toast';
 import Layout from './components/layout/Layout';
 import DashboardPage from './pages/DashboardPage';
-import ProjectsPage from './pages/ProjectsPage'; // Task 9: remove
-import DemandsPage from './pages/DemandsPage'; // Task 9: remove
-import ManagementPage from './pages/ManagementPage'; // Task 9: remove
 import SettingsPage from './pages/SettingsPage';
 import MainPage from './pages/MainPage';
 import NotFoundPage from './pages/NotFoundPage';
