@@ -50,3 +50,6 @@ dist-ssr/
 *.local
 
 *.vite
+
+# Superpowers brainstorm session files
+.superpowers/
