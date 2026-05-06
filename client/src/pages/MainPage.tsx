@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useModal } from '../contexts/ModalContext';
 import { MdAdd, MdSearch } from 'react-icons/md';
+import CenterFilter from '../components/main/CenterFilter';
 
 type MainTab = 'projects' | 'requirements';
 
@@ -56,11 +57,10 @@ export default function MainPage() {
         })}
       </div>
 
-      {/* Center filter + resource summary strip placeholder */}
-      <div className="bg-bg-paper border-b border-divider px-6 py-3">
-        <p className="text-xs text-text-secondary italic">
-          Center filter + resource summary — Task 4 &amp; 5
-        </p>
+      {/* Center filter + resource summary strip */}
+      <div className="bg-bg-paper border-b border-divider px-6 py-3 flex items-center gap-4 flex-wrap">
+        <CenterFilter selectedCenters={selectedCenters} onChange={setSelectedCenters} />
+        <p className="text-xs text-text-secondary italic">Resource summary — Task 5</p>
       </div>
 
       {/* Search + create buttons */}
