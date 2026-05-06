@@ -60,8 +60,12 @@ export default function ResourceSummaryStrip({ selectedCenters, open, onToggle }
     // Center-specific: use wallet allocations
     const relevantWallets = wallets.filter((w) => selectedCenters.includes(w.centerName));
     const byResource = new Map<string, ResourceSummary>();
+    const capacityById = new Map(capacities.map((c) => [c.id, c]));
+    // NOTE: cap.allocated is the total across all centers sharing this capacity.
+    // Per-wallet demand consumption is not available from the current API.
+    // These figures are approximate when a capacity is shared across multiple centers.
     for (const wallet of relevantWallets) {
-      const cap = capacities.find((c) => c.id === wallet.capacityId);
+      const cap = capacityById.get(wallet.capacityId);
       if (!cap) continue;
       const key = `${cap.resourceService}/${cap.resourceName}`;
       const existing = byResource.get(key);
