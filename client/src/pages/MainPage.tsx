@@ -6,6 +6,7 @@ import { useModal } from '../contexts/ModalContext';
 import { MdAdd, MdSearch } from 'react-icons/md';
 import CenterFilter from '../components/main/CenterFilter';
 import ResourceSummaryStrip from '../components/main/ResourceSummaryStrip';
+import RequirementsView from '../components/main/RequirementsView';
 
 type MainTab = 'projects' | 'requirements';
 
@@ -99,9 +100,7 @@ export default function MainPage() {
             Projects accordion — Task 7
           </div>
         ) : (
-          <div className="text-sm text-text-secondary italic">
-            Requirements table — Task 6
-          </div>
+          <RequirementsView selectedCenters={selectedCenters} />
         )}
       </div>
     </div>
