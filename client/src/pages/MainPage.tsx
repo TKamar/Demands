@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useModal } from '../contexts/ModalContext';
 import { MdAdd, MdSearch } from 'react-icons/md';
 import CenterFilter from '../components/main/CenterFilter';
+import ResourceSummaryStrip from '../components/main/ResourceSummaryStrip';
 
 type MainTab = 'projects' | 'requirements';
 
@@ -60,7 +61,11 @@ export default function MainPage() {
       {/* Center filter + resource summary strip */}
       <div className="bg-bg-paper border-b border-divider px-6 py-3 flex items-center gap-4 flex-wrap">
         <CenterFilter selectedCenters={selectedCenters} onChange={setSelectedCenters} />
-        <p className="text-xs text-text-secondary italic">Resource summary — Task 5</p>
+        <ResourceSummaryStrip
+          selectedCenters={selectedCenters}
+          open={resourceSummaryOpen}
+          onToggle={() => setResourceSummaryOpen(!resourceSummaryOpen)}
+        />
       </div>
 
       {/* Search + create buttons */}
