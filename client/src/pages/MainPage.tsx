@@ -7,6 +7,7 @@ import { MdAdd, MdSearch } from 'react-icons/md';
 import CenterFilter from '../components/main/CenterFilter';
 import ResourceSummaryStrip from '../components/main/ResourceSummaryStrip';
 import RequirementsView from '../components/main/RequirementsView';
+import ProjectsAccordion from '../components/main/ProjectsAccordion';
 
 type MainTab = 'projects' | 'requirements';
 
@@ -96,9 +97,7 @@ export default function MainPage() {
       {/* Tab content */}
       <div className="flex-1 overflow-auto p-6">
         {activeTab === 'projects' ? (
-          <div className="text-sm text-text-secondary italic">
-            Projects accordion — Task 7
-          </div>
+          <ProjectsAccordion selectedCenters={selectedCenters} />
         ) : (
           <RequirementsView selectedCenters={selectedCenters} />
         )}
