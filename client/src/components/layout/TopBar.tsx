@@ -3,9 +3,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { MdStorage, MdPersonOutline, MdLogout, MdExpandMore } from 'react-icons/md';
+import { MdStorage, MdPersonOutline, MdLogout, MdExpandMore, MdOutlineSettings } from 'react-icons/md';
 import { GiQueenCrown } from 'react-icons/gi';
-import { MdOutlineSettings } from 'react-icons/md';
 import type { UserProfile } from '../../types/navigation';
 import LanguageSwitcher from '../LanguageSwitcher';
 
@@ -53,6 +52,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
             onClick={() => navigate('/settings')}
             className="p-1.5 rounded-lg hover:bg-gray-100 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
             title={t('nav.settings', 'Settings')}
+            aria-label={t('nav.settings', 'Settings')}
           >
             {isAdmin ? (
               <GiQueenCrown size={20} className="text-amber-500" />
@@ -67,11 +67,13 @@ export default function TopBar({ userProfile }: TopBarProps) {
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-100 transition-colors bg-transparent border-none cursor-pointer"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
           >
             <div className="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center">
               <MdPersonOutline size={18} />
             </div>
-            <span className="text-sm font-medium text-text-primary max-w-[140px] truncate">
+            <span className="text-sm font-medium text-text-primary max-w-[140px] truncate" title={userProfile.name}>
               {userProfile.name}
             </span>
             <MdExpandMore
