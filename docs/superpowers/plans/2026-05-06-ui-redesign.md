@@ -894,7 +894,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
 
   const {
     demands, isLoading, total, totalPages, totalValue, totalApprovedValue,
-    approveDemand, rejectDemand, bulkApproveDemands, bulkRejectDemands,
+    updateDemand, cancelDemand, approveDemand, rejectDemand, bulkApproveDemands, bulkRejectDemands,
   } = useDemands(effectiveFilters, { page: currentPage, limit: itemsPerPage });
 
   const showLoading = useDelayedLoading(isLoading);
@@ -994,11 +994,11 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
       <FilterSort
         filterGroups={filterGroupsWithOptions}
         sortOptions={demandSortOptions}
-        filters={filters}
+        filterValues={filters}
         sortState={sortState}
         onFilterChange={handleFilterChange}
         onSortChange={handleSortChange}
-        onClearFilters={() => { setFilters(initialDemandFilters); setCurrentPage(1); }}
+        onClearAllFilters={() => { setFilters(initialDemandFilters); setCurrentPage(1); }}
       />
 
       <div className="flex items-center justify-between">
@@ -1022,7 +1022,8 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
         </div>
         <ColumnSettingsDropdown
           columns={allColumns}
-          onToggle={toggleColumn}
+          visibleColumns={orderedVisibleColumns.map((c) => c.key)}
+          onToggleColumn={toggleColumn}
           onReorder={reorderColumns}
           onReset={resetToDefaults}
         />
@@ -1073,25 +1074,29 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
 
       {editingDemand && (
         <CreateDemandModal
-          demand={editingDemand}
+          isOpen={editingDemand !== null}
           onClose={() => setEditingDemand(null)}
-          onSuccess={() => setEditingDemand(null)}
+          onSubmit={async (payload, demandId) => {
+            if (demandId) await updateDemand(demandId, payload as any);
+            setEditingDemand(null);
+          }}
+          editingDemand={editingDemand}
         />
       )}
 
-      {decidingDemand && (
-        <DecisionModal
-          open={!!decidingDemand}
-          demand={decidingDemand}
-          onClose={() => setDecidingDemand(null)}
-          onApprove={async (payload) => {
-            await (useDemands as any); // approveDemand is on useDemands — read ManagementPage for the pattern
-          }}
-          onReject={async (payload) => {
-            await (useDemands as any);
-          }}
-        />
-      )}
+      <DecisionModal
+        open={decidingDemand !== null}
+        demand={decidingDemand}
+        onClose={() => setDecidingDemand(null)}
+        onApprove={async (payload: ApproveDemandPayload) => {
+          await approveDemand(decidingDemand!.id, payload);
+          setDecidingDemand(null);
+        }}
+        onReject={async (payload: RejectDemandPayload) => {
+          await rejectDemand(decidingDemand!.id, payload);
+          setDecidingDemand(null);
+        }}
+      />
 
       {bulkModalOpen && (
         <BulkDecisionModal
@@ -1106,8 +1111,6 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   );
 }
 ```
-
-> **Important:** The `DecisionModal` `onApprove`/`onReject` handlers need to call `approveDemand`/`rejectDemand` from `useDemands`. Read `client/src/pages/ManagementPage.tsx` lines 1–100 to see the exact pattern used there for single demand approval — mirror that in the `onApprove`/`onReject` callbacks above.
 
 - [ ] **Step 3: Wire RequirementsView into MainPage**
 
