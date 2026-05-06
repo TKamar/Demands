@@ -16,6 +16,8 @@ export default function MainPage() {
     searchParams.get('tab') === 'requirements' ? 'requirements' : 'projects';
 
   const [activeTab, setActiveTab] = useState<MainTab>(initialTab);
+  const [selectedCenters, setSelectedCenters] = useState<string[]>([]);
+  const [resourceSummaryOpen, setResourceSummaryOpen] = useState(false);
 
   const handleTabChange = (tab: MainTab) => {
     setActiveTab(tab);
