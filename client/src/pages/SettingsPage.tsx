@@ -1,5 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from 'react-oidc-context';
+import CapacityManagement from '../components/management/CapacityManagement';
+import WalletManagement from '../components/management/WalletManagement';
 import EntityManager from '../components/common/EntityManager';
 import { useReferenceData } from '../hooks/useReferenceData';
 
@@ -384,7 +387,14 @@ function ServicesSettings({ serviceOptions, onSuccess }: { serviceOptions: { val
 
 export default function SettingsPage() {
     const { t } = useTranslation();
-    const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services'>('infrastructure');
+    const auth = useAuth();
+    const role = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase() || 'user';
+    const isAdmin = role === 'admin';
+    const isModerator = role === 'moderator';
+
+    const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services' | 'capacity' | 'wallets'>(
+        isAdmin ? 'infrastructure' : 'services'
+    );
 
     // Fetch all reference data for dropdowns
     const {
@@ -403,10 +413,16 @@ export default function SettingsPage() {
     const serviceOptions = useMemo(() => services.map(s => ({ value: s.name, label: s.name })), [services]);
 
     const mainTabs = [
-        { id: 'infrastructure', label: t('settings.mainTabs.infrastructure', 'Infrastructure') },
-        { id: 'organization', label: t('settings.mainTabs.organization', 'Organization') },
-        { id: 'options', label: t('settings.mainTabs.options', 'Options') },
+        ...(isAdmin ? [
+            { id: 'infrastructure', label: t('settings.mainTabs.infrastructure', 'Infrastructure') },
+            { id: 'organization', label: t('settings.mainTabs.organization', 'Organization') },
+            { id: 'options', label: t('settings.mainTabs.options', 'Options') },
+        ] : []),
         { id: 'services', label: t('settings.mainTabs.services', 'Services') },
+        ...((isAdmin || isModerator) ? [
+            { id: 'capacity', label: t('settings.mainTabs.capacity', 'Capacity') },
+            { id: 'wallets', label: t('settings.mainTabs.wallets', 'Wallets') },
+        ] : []),
     ];
 
     return (
@@ -455,6 +471,8 @@ export default function SettingsPage() {
                 )}
                 {mainTab === 'options' && <OptionsSettings onSuccess={refreshData} />}
                 {mainTab === 'services' && <ServicesSettings serviceOptions={serviceOptions} onSuccess={refreshData} />}
+                {mainTab === 'capacity' && <CapacityManagement />}
+                {mainTab === 'wallets' && <WalletManagement />}
             </div>
         </div>
     );
