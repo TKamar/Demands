@@ -75,9 +75,11 @@ function AppContent() {
   }
 
   // Extract user profile from token
+  const VALID_ROLES: UserProfile['role'][] = ['admin', 'moderator', 'user'];
+  const rawRole = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase();
   const userProfile: UserProfile = {
     name: `${auth.user?.profile.given_name || ''} ${auth.user?.profile.family_name || ''}`.trim() || auth.user?.profile.email || 'User',
-    role: ((auth.user?.profile.groups as string[])?.[0]?.toLowerCase() as UserProfile['role']) || 'user',
+    role: VALID_ROLES.includes(rawRole as UserProfile['role']) ? (rawRole as UserProfile['role']) : 'user',
   };
 
   return (
