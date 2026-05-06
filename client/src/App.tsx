@@ -6,10 +6,11 @@ import { useAuthToken } from './hooks/useAuthToken';
 import { ToastProvider } from './components/common/Toast';
 import Layout from './components/layout/Layout';
 import DashboardPage from './pages/DashboardPage';
-import ProjectsPage from './pages/ProjectsPage';
-import DemandsPage from './pages/DemandsPage';
-import ManagementPage from './pages/ManagementPage';
+import ProjectsPage from './pages/ProjectsPage'; // Task 9: remove
+import DemandsPage from './pages/DemandsPage'; // Task 9: remove
+import ManagementPage from './pages/ManagementPage'; // Task 9: remove
 import SettingsPage from './pages/SettingsPage';
+import MainPage from './pages/MainPage';
 import NotFoundPage from './pages/NotFoundPage';
 import GlobalModals from './components/layout/GlobalModals';
 import { RefreshProvider } from './contexts/RefreshContext';
@@ -89,9 +90,9 @@ function AppContent() {
         <Route element={<Layout userProfile={userProfile} />}>
           <Route index element={<Navigate to="/projects" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/demands" element={<DemandsPage />} />
-          <Route path="/management" element={<ManagementPage />} />
+          <Route path="/projects" element={<MainPage />} />
+          <Route path="/demands" element={<Navigate to="/projects?tab=requirements" replace />} />
+          <Route path="/management" element={<Navigate to="/projects" replace />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
