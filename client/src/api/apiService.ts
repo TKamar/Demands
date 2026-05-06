@@ -9,6 +9,7 @@ import type {
   ResourceItem,
   CreateProjectPayload,
   UpdateProjectPayload,
+  DuplicateProjectPayload,
   CreateDemandPayload,
   UpdateDemandPayload,
   PaginationParams,
@@ -120,6 +121,11 @@ export async function updateProject(name: string, payload: UpdateProjectPayload)
 
 export async function deleteProject(name: string): Promise<void> {
   await api.delete(`/projects/${encodeURIComponent(name)}`);
+}
+
+export async function duplicateProject(sourceName: string, payload: DuplicateProjectPayload): Promise<Project> {
+  const { data } = await api.post(`/projects/${encodeURIComponent(sourceName)}/duplicate`, payload);
+  return mapProject(data);
 }
 
 // --- Demands ---

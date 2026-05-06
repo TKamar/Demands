@@ -1,26 +1,21 @@
+// client/src/components/layout/Layout.tsx
 import { Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import type { NavSection, UserProfile } from '../../types/navigation';
+import TopBar from './TopBar';
+import type { UserProfile } from '../../types/navigation';
 
 interface LayoutProps {
-  navSections: NavSection[];
   userProfile: UserProfile;
 }
 
-export default function Layout({ navSections, userProfile }: LayoutProps) {
+export default function Layout({ userProfile }: LayoutProps) {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-bg-default">
       {/* Top accent bar */}
-      <div className="h-2 bg-topbar shrink-0" />
-
-      <div className="flex flex-1">
-        <Sidebar sections={navSections} userProfile={userProfile} />
-        <main className="flex-1 min-w-0 bg-bg-default flex flex-col">
-          <div className="flex-1 p-8">
-            <Outlet />
-          </div>
-        </main>
-      </div>
+      <div className="h-1 bg-topbar shrink-0" />
+      <TopBar userProfile={userProfile} />
+      <main className="flex-1 min-w-0 flex flex-col">
+        <Outlet />
+      </main>
     </div>
   );
 }

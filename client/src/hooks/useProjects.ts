@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchProjects, createProject as apiCreateProject, updateProject as apiUpdateProject, deleteProject as apiDeleteProject } from '../api/apiService';
+import { fetchProjects, createProject as apiCreateProject, updateProject as apiUpdateProject, deleteProject as apiDeleteProject, duplicateProject as apiDuplicateProject } from '../api/apiService';
 import { useRefresh } from '../contexts/RefreshContext';
 import type { Project } from '../types/domain';
-import type { CreateProjectPayload, UpdateProjectPayload, PaginationParams, ProjectFilterParams } from '../api/types';
+import type { CreateProjectPayload, UpdateProjectPayload, DuplicateProjectPayload, PaginationParams, ProjectFilterParams } from '../api/types';
 
 interface UseProjectsResult {
   projects: Project[];
@@ -13,6 +13,7 @@ interface UseProjectsResult {
   createProject: (payload: CreateProjectPayload) => Promise<void>;
   updateProject: (name: string, payload: UpdateProjectPayload) => Promise<void>;
   deleteProject: (name: string) => Promise<void>;
+  duplicateProject: (name: string, payload: DuplicateProjectPayload) => Promise<void>;
 }
 
 export function useProjects(
@@ -71,5 +72,10 @@ export function useProjects(
     triggerRefreshProjects();
   }, [triggerRefreshProjects]);
 
-  return { projects, isLoading, error, total, totalPages, createProject, updateProject, deleteProject };
+  const duplicateProject = useCallback(async (name: string, payload: DuplicateProjectPayload) => {
+    await apiDuplicateProject(name, payload);
+    triggerRefreshProjects();
+  }, [triggerRefreshProjects]);
+
+  return { projects, isLoading, error, total, totalPages, createProject, updateProject, deleteProject, duplicateProject };
 }

@@ -2,26 +2,22 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { MdFolder, MdDescription, MdRemoveRedEye, MdSettings, MdAddCircleOutline } from 'react-icons/md';
 import { useAuthToken } from './hooks/useAuthToken';
 import { ToastProvider } from './components/common/Toast';
 import Layout from './components/layout/Layout';
 import DashboardPage from './pages/DashboardPage';
-import ProjectsPage from './pages/ProjectsPage';
-import DemandsPage from './pages/DemandsPage';
-import ManagementPage from './pages/ManagementPage';
 import SettingsPage from './pages/SettingsPage';
+import MainPage from './pages/MainPage';
 import NotFoundPage from './pages/NotFoundPage';
 import GlobalModals from './components/layout/GlobalModals';
 import { RefreshProvider } from './contexts/RefreshContext';
-import { ModalProvider, useModal } from './contexts/ModalContext';
+import { ModalProvider } from './contexts/ModalContext';
 import { ReferenceDataProvider } from './context/ReferenceDataContext';
-import type { NavSection, UserProfile } from './types/navigation';
+import type { UserProfile } from './types/navigation';
 
 function AppContent() {
   const { t, i18n } = useTranslation();
   const auth = useAuth();
-  const { openModal } = useModal();
   useAuthToken();
 
   useEffect(() => {
@@ -77,78 +73,23 @@ function AppContent() {
   }
 
   // Extract user profile from token
+  const VALID_ROLES: UserProfile['role'][] = ['admin', 'moderator', 'user'];
+  const rawRole = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase();
   const userProfile: UserProfile = {
     name: `${auth.user?.profile.given_name || ''} ${auth.user?.profile.family_name || ''}`.trim() || auth.user?.profile.email || 'User',
-    role: (auth.user?.profile.groups as string[])?.[0] || 'user',
+    role: VALID_ROLES.includes(rawRole as UserProfile['role']) ? (rawRole as UserProfile['role']) : 'user',
   };
-
-  // Role-based navigation
-  const getNavItems = (role: string) => {
-    // Add Create Tab
-    const createItem = {
-      label: t('nav.create', 'Create'), // Use fallback key if missing
-      icon: MdAddCircleOutline,
-      children: [
-        {
-          label: t('nav.project', 'Project'),
-          icon: MdFolder,
-          onClick: () => openModal('project'),
-        },
-        {
-          label: t('nav.demand', 'Demand'),
-          icon: MdDescription,
-          onClick: () => openModal('demand'),
-        },
-      ],
-    };
-
-    const commonItems = [
-      createItem,
-      { label: t('nav.projects'), path: '/projects', icon: MdFolder },
-      { label: t('nav.demands'), path: '/demands', icon: MdDescription },
-    ];
-
-    const moderatorItems = [
-      ...commonItems,
-      { label: t('nav.moderator'), path: '/management', icon: MdRemoveRedEye },
-    ];
-
-    const adminItems = [
-      ...moderatorItems,
-      { label: t('nav.settings'), path: '/settings', icon: MdSettings },
-    ];
-
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return adminItems;
-      case 'moderator':
-        return moderatorItems;
-      case 'user':
-      default:
-        return commonItems;
-    }
-  };
-
-  const navSections: NavSection[] = [
-    {
-      items: getNavItems(userProfile.role),
-    },
-  ];
 
   return (
     <BrowserRouter>
       <GlobalModals />
       <Routes>
-        <Route
-          element={
-            <Layout navSections={navSections} userProfile={userProfile} />
-          }
-        >
+        <Route element={<Layout userProfile={userProfile} />}>
           <Route index element={<Navigate to="/projects" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/demands" element={<DemandsPage />} />
-          <Route path="/management" element={<ManagementPage />} />
+          <Route path="/projects" element={<MainPage />} />
+          <Route path="/demands" element={<Navigate to="/projects?tab=requirements" replace />} />
+          <Route path="/management" element={<Navigate to="/projects" replace />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

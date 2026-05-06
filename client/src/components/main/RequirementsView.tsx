@@ -1,33 +1,50 @@
+// client/src/components/main/RequirementsView.tsx
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import DemandsTable, { demandColumnConfig, type DemandColumnKey } from '../components/projects/DemandsTable';
-import DemandDetailSidebar from '../components/demands/DemandDetailSidebar';
-import DecisionModal from '../components/management/DecisionModal';
-import BulkDecisionModal from '../components/management/BulkDecisionModal';
-import PageHeader from '../components/layout/PageHeader';
-import ColumnSettingsDropdown from '../components/common/ColumnSettingsDropdown';
-import { FilterSort } from '../components/common/filters';
-import { useDemands } from '../hooks/useDemands';
-import { useCachedProjects } from '../hooks/useCachedProjects';
-import { useReferenceData } from '../hooks/useReferenceData';
-import { useDebounce } from '../hooks/useDebounce';
-import { useDelayedLoading } from '../hooks/useDelayedLoading';
-import { useTableColumns } from '../hooks/useTableColumns';
-import type { ApproveDemandPayload, RejectDemandPayload, BulkDemandFilters } from '../api/types';
-import type { Demand, Project } from '../types/domain';
-import { useToast } from '../components/common/Toast';
-import Pagination from '../components/common/Pagination';
+import { useAuth } from 'react-oidc-context';
+import DemandsTable, { demandColumnConfig, type DemandColumnKey } from '../projects/DemandsTable';
+import DemandDetailSidebar from '../demands/DemandDetailSidebar';
+import ColumnSettingsDropdown from '../common/ColumnSettingsDropdown';
+import { FilterSort } from '../common/filters';
+import BulkDecisionModal from '../management/BulkDecisionModal';
+import CreateDemandModal from '../projects/CreateDemandModal';
+import DecisionModal from '../management/DecisionModal';
+import { useDemands } from '../../hooks/useDemands';
+import { useCachedProjects } from '../../hooks/useCachedProjects';
+import { useReferenceData } from '../../hooks/useReferenceData';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useDelayedLoading } from '../../hooks/useDelayedLoading';
+import { useTableColumns } from '../../hooks/useTableColumns';
+import { useToast } from '../common/Toast';
+import Pagination from '../common/Pagination';
 import {
   demandFilterGroups,
   demandSortOptions,
   initialDemandFilters,
   type DemandFilterKey,
   type DemandSortKey,
-} from '../configs/demandFilters';
-import type { FilterGroupConfig, SortState, SortDirection } from '../types/filter';
+} from '../../configs/demandFilters';
+import type {
+  ApproveDemandPayload,
+  RejectDemandPayload,
+  UpdateDemandPayload,
+  CreateDemandPayload,
+  BulkDemandFilters,
+  DemandFilterParams,
+} from '../../api/types';
+import type { Demand, Project } from '../../types/domain';
+import type { FilterGroupConfig, SortState, SortDirection } from '../../types/filter';
 
-export default function ManagementPage() {
+interface RequirementsViewProps {
+  selectedCenters: string[];
+}
+
+export default function RequirementsView({ selectedCenters }: RequirementsViewProps) {
   const { t } = useTranslation();
+  const auth = useAuth();
+  const { showToast } = useToast();
+  const role = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase() || 'user';
+  const isModerator = role === 'admin' || role === 'moderator';
 
   // Column settings
   const {
@@ -37,7 +54,7 @@ export default function ManagementPage() {
     reorderColumns,
     resetToDefaults,
   } = useTableColumns<DemandColumnKey>({
-    tableId: 'management-demands',
+    tableId: 'main-requirements',
     columns: demandColumnConfig,
   });
 
@@ -61,54 +78,87 @@ export default function ManagementPage() {
     [filters, debouncedFilters]
   );
 
-  // Sidebar State
+  // Sidebar / modal state
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
-
-  // Decision Modal State
+  const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
   const [decisionDemand, setDecisionDemand] = useState<Demand | null>(null);
   const [isDecisionModalLoading, setIsDecisionModalLoading] = useState(false);
 
-  // Bulk Selection State
+  // Bulk Selection State (moderator only)
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [excludedIds, setExcludedIds] = useState<Set<number>>(new Set());
   const [isAllAcrossPagesSelected, setIsAllAcrossPagesSelected] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isBulkLoading, setIsBulkLoading] = useState(false);
 
-  const { showToast } = useToast();
+  // Build the demand filter params used by useDemands. Center selection from the
+  // outer page is layered on top of the in-view "center" filter — when multiple
+  // centers are selected we comma-join the names (the API accepts comma separated
+  // lists for *Name params).
+  const demandFilterParams: DemandFilterParams = useMemo(() => {
+    const centerFromFilter = debouncedFilters.center || undefined;
+    const centerFromTabs = selectedCenters.length > 0 ? selectedCenters.join(',') : undefined;
+    const centerName = centerFromFilter ?? centerFromTabs;
 
-  const { demands, total, totalPending, totalPages, totalValue, totalApprovedValue, isLoading, error, approveDemand, rejectDemand, bulkApproveDemands, bulkRejectDemands } = useDemands(
-    {
-      ...debouncedFilters,
-      baseName: debouncedFilters.base,
-      environmentName: debouncedFilters.environment,
-      networkName: debouncedFilters.network,
+    return {
+      projectName: debouncedFilters.projectName || undefined,
+      serviceName: debouncedFilters.serviceName || undefined,
+      resourceName: debouncedFilters.resourceName || undefined,
+      baseName: debouncedFilters.base || undefined,
+      environmentName: debouncedFilters.environment || undefined,
+      networkName: debouncedFilters.network || undefined,
       clusterName: debouncedFilters.cluster || undefined,
-      type: debouncedFilters.type as any,
-      status: debouncedFilters.status as any,
-      projectType: (debouncedFilters.projectType as any) || undefined,
-      median: (debouncedFilters.median as any) || undefined,
+      type: (debouncedFilters.type || undefined) as DemandFilterParams['type'],
+      status: (debouncedFilters.status || undefined) as DemandFilterParams['status'],
+      projectType: (debouncedFilters.projectType || undefined) as DemandFilterParams['projectType'],
+      median: (debouncedFilters.median || undefined) as DemandFilterParams['median'],
       year: debouncedFilters.year ? Number(debouncedFilters.year) : undefined,
       relatedTo: debouncedFilters.relatedTo || undefined,
       emergencyOption: debouncedFilters.emergencyOption || undefined,
-      centerName: debouncedFilters.center || undefined,
+      centerName,
       branchName: debouncedFilters.branch || undefined,
       sectionName: debouncedFilters.section || undefined,
-      projectPriority: (debouncedFilters.priority as any) || undefined,
-      managed: true,
-    },
-    {
-      page: currentPage,
-      limit: itemsPerPage,
-      sortBy: sortState.field || undefined,
-      sortDir: sortState.direction,
-    }
-  );
+      projectPriority: (debouncedFilters.priority || undefined) as DemandFilterParams['projectPriority'],
+    };
+  }, [debouncedFilters, selectedCenters]);
+
+  const {
+    demands,
+    total,
+    totalPending,
+    totalPages,
+    totalValue,
+    totalApprovedValue,
+    isLoading,
+    error,
+    createDemand,
+    updateDemand,
+    cancelDemand,
+    approveDemand,
+    rejectDemand,
+    bulkApproveDemands,
+    bulkRejectDemands,
+  } = useDemands(demandFilterParams, {
+    page: currentPage,
+    limit: itemsPerPage,
+    sortBy: sortState.field || undefined,
+    sortDir: sortState.direction,
+  });
 
   const showLoading = useDelayedLoading(isLoading);
 
-  const { bases, environments, networks, clusters, services, resources, emergencyOptions, centers, branches, sections } =
-    useReferenceData();
+  const {
+    bases,
+    environments,
+    networks,
+    clusters,
+    services,
+    resources,
+    emergencyOptions,
+    centers,
+    branches,
+    sections,
+  } = useReferenceData();
   const { projects: allProjects } = useCachedProjects();
 
   // Project map for table lookups
@@ -125,7 +175,10 @@ export default function ManagementPage() {
   }, [selectedDemand, allProjects]);
 
   // Bulk selection derived state — only Pending demands are selectable
-  const currentPageIds = useMemo(() => demands.filter((d) => d.status === 'Pending').map((d) => d.id), [demands]);
+  const currentPageIds = useMemo(
+    () => demands.filter((d) => d.status === 'Pending').map((d) => d.id),
+    [demands]
+  );
 
   const isAllPageSelected = isAllAcrossPagesSelected
     ? currentPageIds.length > 0 && currentPageIds.every((id) => !excludedIds.has(id))
@@ -136,8 +189,12 @@ export default function ManagementPage() {
   const selectedCount = isAllAcrossPagesSelected ? totalPending - excludedIds.size : selectedIds.size;
   const hasSelection = isAllAcrossPagesSelected || selectedIds.size > 0;
 
-  // When filters/page change, clear "all across pages" flag but keep explicit selections
-  // that are still on the current page
+  const clearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+    setExcludedIds(new Set());
+    setIsAllAcrossPagesSelected(false);
+  }, []);
+
   const handleFilterChange = useCallback((key: DemandFilterKey, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
@@ -245,7 +302,7 @@ export default function ManagementPage() {
         options: optionsMap[field.key],
       })),
     }));
-  }, [allProjects, services, resources, bases, environments, networks, clusters, centers, branches, sections, emergencyOptions]);
+  }, [allProjects, services, resources, bases, environments, networks, clusters, centers, branches, sections, emergencyOptions, t]);
 
   // Bulk selection handlers
   const handleToggleSelect = useCallback((id: number) => {
@@ -289,12 +346,6 @@ export default function ManagementPage() {
     setExcludedIds(new Set());
   }, []);
 
-  const handleClearSelection = useCallback(() => {
-    setSelectedIds(new Set());
-    setExcludedIds(new Set());
-    setIsAllAcrossPagesSelected(false);
-  }, []);
-
   // Build filters payload for "select all" bulk operations
   const bulkFilters = useMemo((): BulkDemandFilters => ({
     project: debouncedFilters.projectName || undefined,
@@ -314,10 +365,39 @@ export default function ManagementPage() {
     priority: debouncedFilters.priority || undefined,
   }), [debouncedFilters]);
 
-  function handleMakeDecision(demand: Demand) {
+  const handleMakeDecision = useCallback((demand: Demand) => {
     setDecisionDemand(demand);
     setSelectedDemand(null);
-  }
+  }, []);
+
+  const handleEditDemand = useCallback((demand: Demand) => {
+    setEditingDemand(demand);
+    setSelectedDemand(null);
+  }, []);
+
+  const handleCancelDemand = useCallback(async (demand: Demand) => {
+    if (window.confirm(t('demands.confirmCancel'))) {
+      try {
+        await cancelDemand(demand.id);
+        showToast(t('demands.cancelSuccess'), 'success');
+        setSelectedDemand(null);
+      } catch (err: any) {
+        showToast(err?.response?.data?.error || t('demands.cancelFailed'), 'error');
+      }
+    }
+  }, [cancelDemand, showToast, t]);
+
+  const handleSubmitDemand = useCallback(
+    async (payload: CreateDemandPayload | UpdateDemandPayload, demandId?: number) => {
+      if (demandId) {
+        await updateDemand(demandId, payload as UpdateDemandPayload);
+      } else {
+        await createDemand(payload as CreateDemandPayload);
+      }
+      setEditingDemand(null);
+    },
+    [createDemand, updateDemand]
+  );
 
   async function handleApprove(payload: ApproveDemandPayload) {
     if (!decisionDemand) return;
@@ -352,11 +432,17 @@ export default function ManagementPage() {
     try {
       const count = await bulkApproveDemands(
         isAllAcrossPagesSelected
-          ? { selectAll: true, filters: bulkFilters, excludedIds: excludedIds.size > 0 ? Array.from(excludedIds) : undefined, ...payload }
+          ? {
+              selectAll: true,
+              filters: bulkFilters,
+              excludedIds: excludedIds.size > 0 ? Array.from(excludedIds) : undefined,
+              ...payload,
+            }
           : { ids: Array.from(selectedIds), ...payload }
       );
       showToast(t('management.bulkDecision.successApproved', { count }), 'success');
-      handleClearSelection();
+      clearSelection();
+      setIsBulkModalOpen(false);
     } catch (err: any) {
       showToast(err?.response?.data?.error || t('management.error.approveFailed'), 'error');
     } finally {
@@ -369,11 +455,17 @@ export default function ManagementPage() {
     try {
       const count = await bulkRejectDemands(
         isAllAcrossPagesSelected
-          ? { selectAll: true, filters: bulkFilters, excludedIds: excludedIds.size > 0 ? Array.from(excludedIds) : undefined, reason: payload.reason }
+          ? {
+              selectAll: true,
+              filters: bulkFilters,
+              excludedIds: excludedIds.size > 0 ? Array.from(excludedIds) : undefined,
+              reason: payload.reason,
+            }
           : { ids: Array.from(selectedIds), reason: payload.reason }
       );
       showToast(t('management.bulkDecision.successRejected', { count }), 'success');
-      handleClearSelection();
+      clearSelection();
+      setIsBulkModalOpen(false);
     } catch (err: any) {
       showToast(err?.response?.data?.error || t('management.error.rejectFailed'), 'error');
     } finally {
@@ -382,20 +474,7 @@ export default function ManagementPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <PageHeader title={t('management.demandsTitle')} />
-        <div className="flex gap-3">
-          <ColumnSettingsDropdown
-            columns={allColumns}
-            visibleColumns={orderedVisibleColumns.map((c) => c.key)}
-            onToggleColumn={toggleColumn}
-            onReorder={reorderColumns}
-            onReset={resetToDefaults}
-          />
-        </div>
-      </div>
-
+    <div className="flex flex-col gap-4">
       {/* Filters */}
       <FilterSort
         filterGroups={filterGroupsWithOptions}
@@ -407,8 +486,8 @@ export default function ManagementPage() {
         onSortChange={handleSortChange}
       />
 
-      {/* Bulk Action Bar */}
-      {(hasSelection || totalPending > 0) && (
+      {/* Bulk action bar (moderators only) */}
+      {isModerator && (hasSelection || totalPending > 0) && (
         <div className="flex items-center gap-3 px-4 py-3 bg-primary/5 border border-primary/20 rounded-xl">
           <span className="text-sm font-medium text-primary flex-1">
             {hasSelection
@@ -434,7 +513,7 @@ export default function ManagementPage() {
                 {t('management.bulk.changeStatus')}
               </button>
               <button
-                onClick={handleClearSelection}
+                onClick={clearSelection}
                 className="px-4 py-1.5 bg-gray-100 text-text-primary rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer border-none"
               >
                 {t('management.bulk.clearSelection')}
@@ -444,13 +523,23 @@ export default function ManagementPage() {
         </div>
       )}
 
-      {/* Table Card */}
+      {/* Toolbar: column settings */}
+      <div className="flex items-center justify-end">
+        <ColumnSettingsDropdown
+          columns={allColumns}
+          visibleColumns={orderedVisibleColumns.map((c) => c.key)}
+          onToggleColumn={toggleColumn}
+          onReorder={reorderColumns}
+          onReset={resetToDefaults}
+        />
+      </div>
+
+      {/* Table card */}
       <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
         {error ? (
           <div className="p-12 text-center text-danger">{error}</div>
         ) : (
           <>
-            {/* Table */}
             <div
               className={`overflow-x-auto transition-opacity duration-200 ${isFiltersPending || showLoading ? 'opacity-50' : 'opacity-100'}`}
             >
@@ -458,14 +547,16 @@ export default function ManagementPage() {
                 demands={demands}
                 projectMap={projectMap}
                 isLoading={false}
+                visibleColumns={orderedVisibleColumns}
                 selectedDemand={selectedDemand}
                 onSelectDemand={setSelectedDemand}
-                visibleColumns={orderedVisibleColumns}
-                isModerator
-                onMakeDecision={handleMakeDecision}
+                onEdit={handleEditDemand}
+                onCancel={handleCancelDemand}
+                onMakeDecision={isModerator ? handleMakeDecision : undefined}
+                isModerator={isModerator}
                 totalValue={totalValue}
                 totalApprovedValue={totalApprovedValue}
-                showCheckboxes
+                showCheckboxes={isModerator}
                 selectedIds={selectedIds}
                 onToggleSelect={handleToggleSelect}
                 isAllPageSelected={isAllPageSelected}
@@ -476,7 +567,6 @@ export default function ManagementPage() {
               />
             </div>
 
-            {/* Pagination */}
             {!isLoading && (
               <Pagination
                 currentPage={currentPage}
@@ -495,9 +585,20 @@ export default function ManagementPage() {
         project={selectedProject}
         isOpen={selectedDemand !== null}
         onClose={() => setSelectedDemand(null)}
-        isModerator
-        onMakeDecision={handleMakeDecision}
+        onEdit={handleEditDemand}
+        onCancel={handleCancelDemand}
+        isModerator={isModerator}
+        onMakeDecision={isModerator ? handleMakeDecision : undefined}
       />
+
+      {editingDemand && (
+        <CreateDemandModal
+          isOpen={editingDemand !== null}
+          onClose={() => setEditingDemand(null)}
+          onSubmit={handleSubmitDemand}
+          editingDemand={editingDemand}
+        />
+      )}
 
       <DecisionModal
         open={decisionDemand !== null}

@@ -285,8 +285,19 @@
     "editProject": {
       "title": "Edit Project"
     },
+    "duplicateProject": {
+      "title": "Duplicate Project",
+      "demandsTitle": "Demands to carry forward",
+      "approvedDemands": "Approved demands (pre-selected)",
+      "optionalDemands": "Other demands (optional)",
+      "noDemands": "This project has no demands.",
+      "submit": "Duplicate",
+      "failedToLoadDemands": "Failed to load demands"
+    },
+    "duplicateSuccess": "Project duplicated successfully",
     "actions": {
-      "cannotDeleteWithDemands": "Cannot delete project with existing demands"
+      "cannotDeleteWithDemands": "Cannot delete project with existing demands",
+      "duplicate": "Duplicate project"
     },
     "confirmDelete": "Are you sure you want to delete this project?",
     "deleteSuccess": "Project deleted successfully",

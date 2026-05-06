@@ -15,6 +15,6 @@ export interface NavSection {
 
 export interface UserProfile {
   name: string;
-  role: string;
+  role: 'admin' | 'moderator' | 'user';
   avatarUrl?: string;
 }

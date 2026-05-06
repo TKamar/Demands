@@ -71,6 +71,23 @@ export interface UpdateProjectPayload {
   sectionName?: string;
 }
 
+export interface DuplicateProjectPayload {
+  name: string;
+  purpose: string;
+  relatedTo?: string;
+  type: ProjectType;
+  kind: ProjectKind;
+  locationId: number;
+  year?: number;
+  median?: Median;
+  emergencyOption?: string;
+  priority?: Priority;
+  centerName?: string;
+  branchName?: string;
+  sectionName?: string;
+  demands: { id: number; value: number }[];
+}
+
 export interface PaginationParams {
   page?: number;
   limit?: number;
