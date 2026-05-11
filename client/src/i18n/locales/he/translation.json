@@ -428,6 +428,14 @@
     "updateSuccess": "הדרישה עודכנה בהצלחה",
     "updateFailed": "עדכון הדרישה נכשל"
   },
+  "demand": {
+    "deleteConfirm": "למחוק דרישה זו?",
+    "deleted": "הדרישה נמחקה",
+    "deleteError": "מחיקת הדרישה נכשלה",
+    "cancelConfirm": "לבטל דרישה זו?",
+    "cancelled": "הדרישה בוטלה",
+    "cancelError": "ביטול הדרישה נכשל"
+  },
   "notFound": {
     "message": "העמוד המבוקש לא נמצא"
   },

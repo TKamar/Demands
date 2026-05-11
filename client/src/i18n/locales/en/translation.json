@@ -432,6 +432,14 @@
     "updateSuccess": "Demand updated successfully",
     "updateFailed": "Failed to update demand"
   },
+  "demand": {
+    "deleteConfirm": "Delete this requirement?",
+    "deleted": "Requirement deleted",
+    "deleteError": "Failed to delete requirement",
+    "cancelConfirm": "Cancel this requirement?",
+    "cancelled": "Requirement cancelled",
+    "cancelError": "Failed to cancel requirement"
+  },
   "notFound": {
     "message": "The requested page was not found"
   },
