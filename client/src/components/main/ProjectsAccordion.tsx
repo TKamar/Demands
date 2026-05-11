@@ -11,7 +11,11 @@ import {
   MdArrowUpward,
   MdArrowDownward,
   MdUnfoldMore,
+  MdCancel,
+  MdGavel,
 } from 'react-icons/md';
+import MoreActionsMenu from '../common/MoreActionsMenu';
+import type { MoreAction } from '../common/MoreActionsMenu';
 import { useProjects } from '../../hooks/useProjects';
 import { useDemands } from '../../hooks/useDemands';
 import PriorityBadge from '../projects/PriorityBadge';
@@ -153,13 +157,16 @@ function DemandSubTable({
   canDecide: boolean;
 }) {
   const { t } = useTranslation();
+  const auth = useAuth();
   const { showToast } = useToast();
+  const userSub = auth.user?.profile.sub ?? '';
+
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
   const [decidingDemand, setDecidingDemand] = useState<Demand | null>(null);
   const [isDecisionLoading, setIsDecisionLoading] = useState(false);
 
-  const { demands, isLoading, updateDemand, approveDemand, rejectDemand } = useDemands(
+  const { demands, isLoading, updateDemand, deleteDemand, cancelDemand, approveDemand, rejectDemand } = useDemands(
     { projectName },
     { page: 1, limit: 100 }
   );
@@ -171,6 +178,26 @@ function DemandSubTable({
     if (demandId) {
       await updateDemand(demandId, payload as UpdateDemandPayload);
       setEditingDemand(null);
+    }
+  }
+
+  async function handleDeleteDemand(demand: Demand) {
+    if (!window.confirm(t('demand.deleteConfirm', 'Delete this requirement?'))) return;
+    try {
+      await deleteDemand(demand.id);
+      showToast(t('demand.deleted', 'Requirement deleted'), 'success');
+    } catch {
+      showToast(t('demand.deleteError', 'Failed to delete requirement'), 'error');
+    }
+  }
+
+  async function handleCancelDemand(demand: Demand) {
+    if (!window.confirm(t('demand.cancelConfirm', 'Cancel this requirement?'))) return;
+    try {
+      await cancelDemand(demand.id);
+      showToast(t('demand.cancelled', 'Requirement cancelled'), 'success');
+    } catch {
+      showToast(t('demand.cancelError', 'Failed to cancel requirement'), 'error');
     }
   }
 
@@ -202,6 +229,43 @@ function DemandSubTable({
     }
   }
 
+  function buildActions(demand: Demand): MoreAction[] {
+    const isPending = demand.status === 'Pending';
+    const isOwner = demand.createdBy === userSub;
+
+    if (canDecide) {
+      if (!isPending) return [];
+      return [
+        {
+          label: t('management.decide', 'Decide'),
+          icon: <MdGavel size={12} />,
+          onClick: () => setDecidingDemand(demand),
+        },
+        {
+          label: t('common.delete', 'Delete'),
+          icon: <MdDelete size={12} />,
+          danger: true,
+          onClick: () => handleDeleteDemand(demand),
+        },
+      ];
+    }
+
+    if (!isPending || !isOwner) return [];
+    return [
+      {
+        label: t('common.edit', 'Edit'),
+        icon: <MdEdit size={12} />,
+        onClick: () => setEditingDemand(demand),
+      },
+      {
+        label: t('common.cancel', 'Cancel'),
+        icon: <MdCancel size={12} />,
+        danger: true,
+        onClick: () => handleCancelDemand(demand),
+      },
+    ];
+  }
+
   if (isLoading) {
     return (
       <div className="px-12 py-4 text-xs text-text-secondary border-t border-dashed border-primary/30">
@@ -231,53 +295,40 @@ function DemandSubTable({
           </tr>
         </thead>
         <tbody>
-          {demands.map((demand) => (
-            <tr
-              key={demand.id}
-              className="border-t border-divider/50 hover:bg-primary/5 cursor-pointer transition-colors"
-              onClick={() => setSelectedDemand(demand)}
-            >
-              <td className="ps-12 pe-3 py-2 text-text-primary">{demand.serviceName}</td>
-              <td className="px-3 py-2 text-text-secondary">{demand.resourceName}</td>
-              <td className="px-3 py-2 font-medium">{demand.value.toLocaleString()}</td>
-              <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                    demand.status === 'Approved'
-                      ? 'bg-green-100 text-green-700'
-                      : demand.status === 'Pending'
-                      ? 'bg-amber-100 text-amber-700'
-                      : demand.status === 'Rejected'
-                      ? 'bg-red-100 text-red-700'
-                      : demand.status === 'PartiallyApproved'
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}
-                >
-                  {demand.status}
-                </span>
-              </td>
-              <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => { setEditingDemand(demand); }}
-                    className="p-1 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
-                    title={t('common.edit', 'Edit')}
+          {demands.map((demand) => {
+            const rowActions = buildActions(demand);
+            return (
+              <tr
+                key={demand.id}
+                className="border-t border-divider/50 hover:bg-primary/5 cursor-pointer transition-colors"
+                onClick={() => setSelectedDemand(demand)}
+              >
+                <td className="ps-12 pe-3 py-2 text-text-primary">{demand.serviceName}</td>
+                <td className="px-3 py-2 text-text-secondary">{demand.resourceName}</td>
+                <td className="px-3 py-2 font-medium">{demand.value.toLocaleString()}</td>
+                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                      demand.status === 'Approved'
+                        ? 'bg-green-100 text-green-700'
+                        : demand.status === 'Pending'
+                        ? 'bg-amber-100 text-amber-700'
+                        : demand.status === 'Rejected'
+                        ? 'bg-red-100 text-red-700'
+                        : demand.status === 'PartiallyApproved'
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}
                   >
-                    <MdEdit size={14} />
-                  </button>
-                  {canDecide && demand.status === 'Pending' && (
-                    <button
-                      onClick={() => setDecidingDemand(demand)}
-                      className="px-2 py-0.5 text-[10px] bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 border-none cursor-pointer font-medium"
-                    >
-                      {t('management.decide', 'Decide')}
-                    </button>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
+                    {demand.status}
+                  </span>
+                </td>
+                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                  <MoreActionsMenu actions={rowActions} size="sm" />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
