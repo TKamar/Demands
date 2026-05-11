@@ -159,7 +159,7 @@ function DemandSubTable({
   const { t } = useTranslation();
   const auth = useAuth();
   const { showToast } = useToast();
-  const userSub = auth.user?.profile.sub ?? '';
+  const currentUsername = auth.user?.profile.preferred_username ?? '';
 
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
@@ -231,7 +231,7 @@ function DemandSubTable({
 
   function buildActions(demand: Demand): MoreAction[] {
     const isPending = demand.status === 'Pending';
-    const isOwner = demand.createdBy === userSub;
+    const isOwner = demand.createdBy === currentUsername;
 
     if (canDecide) {
       if (!isPending) return [];

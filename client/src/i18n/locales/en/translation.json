@@ -458,5 +458,20 @@
       "timeline": "Timeline",
       "other": "Other"
     }
+  },
+  "notifications": {
+    "title": "My Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications",
+    "loading": "Loading...",
+    "types": {
+      "NewDemand": "New Demand",
+      "DemandDecision": "Decision Received",
+      "DemandCancelled": "Demand Cancelled",
+      "DemandEdited": "Demand Edited",
+      "NewProject": "New Project",
+      "ProjectDeleted": "Project Deleted",
+      "ProjectEdited": "Project Edited"
+    }
   }
 }
