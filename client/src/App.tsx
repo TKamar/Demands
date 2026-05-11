@@ -82,20 +82,22 @@ function AppContent() {
   };
 
   return (
-    <BrowserRouter>
-      <GlobalModals />
-      <Routes>
-        <Route element={<Layout userProfile={userProfile} />}>
-          <Route index element={<Navigate to="/projects" replace />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/projects" element={<MainPage />} />
-          <Route path="/demands" element={<Navigate to="/projects?tab=requirements" replace />} />
-          <Route path="/management" element={<Navigate to="/projects" replace />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <NotificationProvider>
+      <BrowserRouter>
+        <GlobalModals />
+        <Routes>
+          <Route element={<Layout userProfile={userProfile} />}>
+            <Route index element={<Navigate to="/projects" replace />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/projects" element={<MainPage />} />
+            <Route path="/demands" element={<Navigate to="/projects?tab=requirements" replace />} />
+            <Route path="/management" element={<Navigate to="/projects" replace />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </NotificationProvider>
   );
 }
 
@@ -103,13 +105,11 @@ export default function App() {
   return (
     <ToastProvider>
       <RefreshProvider>
-        <NotificationProvider>
-          <ReferenceDataProvider>
-            <ModalProvider>
-              <AppContent />
-            </ModalProvider>
-          </ReferenceDataProvider>
-        </NotificationProvider>
+        <ReferenceDataProvider>
+          <ModalProvider>
+            <AppContent />
+          </ModalProvider>
+        </ReferenceDataProvider>
       </RefreshProvider>
     </ToastProvider>
   );
