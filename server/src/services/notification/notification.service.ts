@@ -89,19 +89,13 @@ export const notificationService = {
     });
 
     if (isAdmin) {
-      const unreadBroadcasts = await prisma.notification.findMany({
-        where: {
-          isAdminBroadcast: true,
-          NOT: { readByUsernames: { has: username } },
-        },
-        select: { id: true },
-      });
-      for (const n of unreadBroadcasts) {
-        await prisma.notification.update({
-          where: { id: n.id },
-          data: { readByUsernames: { push: username } },
-        });
-      }
+      // Batch-append username to readByUsernames for all unread admin broadcasts in one SQL round-trip
+      await prisma.$executeRaw`
+        UPDATE "Notification"
+        SET "readByUsernames" = array_append("readByUsernames", ${username})
+        WHERE "isAdminBroadcast" = true
+        AND NOT (${username} = ANY("readByUsernames"))
+      `;
     }
   },
 };

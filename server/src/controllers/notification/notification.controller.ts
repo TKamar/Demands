@@ -16,8 +16,9 @@ export const notificationController = {
         limit
       );
       res.json(result);
-    } catch (err: any) {
-      res.status(500).json({ error: err.message ?? "Failed to fetch notifications" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch notifications";
+      res.status(500).json({ error: message });
     }
   },
 
@@ -28,9 +29,12 @@ export const notificationController = {
       const user = req.auth!.user;
       const updated = await notificationService.markRead(id, user.username!);
       res.json(updated);
-    } catch (err: any) {
-      if (err.message === "Notification not found") return res.status(404).json({ error: err.message });
-      res.status(500).json({ error: err.message ?? "Failed to mark notification as read" });
+    } catch (err) {
+      if (err instanceof Error && err.message === "Notification not found") {
+        return res.status(404).json({ error: err.message });
+      }
+      const message = err instanceof Error ? err.message : "Failed to mark notification as read";
+      res.status(500).json({ error: message });
     }
   },
 
@@ -40,8 +44,9 @@ export const notificationController = {
       const isAdmin = user.hasRole("admin");
       await notificationService.markAllRead(user.username!, isAdmin);
       res.json({ ok: true });
-    } catch (err: any) {
-      res.status(500).json({ error: err.message ?? "Failed to mark all notifications as read" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to mark all notifications as read";
+      res.status(500).json({ error: message });
     }
   },
 };
