@@ -13,6 +13,7 @@ import GlobalModals from './components/layout/GlobalModals';
 import { RefreshProvider } from './contexts/RefreshContext';
 import { ModalProvider } from './contexts/ModalContext';
 import { ReferenceDataProvider } from './context/ReferenceDataContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import type { UserProfile } from './types/navigation';
 
 function AppContent() {
@@ -102,11 +103,13 @@ export default function App() {
   return (
     <ToastProvider>
       <RefreshProvider>
-        <ReferenceDataProvider>
-          <ModalProvider>
-            <AppContent />
-          </ModalProvider>
-        </ReferenceDataProvider>
+        <NotificationProvider>
+          <ReferenceDataProvider>
+            <ModalProvider>
+              <AppContent />
+            </ModalProvider>
+          </ReferenceDataProvider>
+        </NotificationProvider>
       </RefreshProvider>
     </ToastProvider>
   );
