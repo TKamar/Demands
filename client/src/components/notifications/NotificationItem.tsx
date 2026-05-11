@@ -1,15 +1,17 @@
 import type { AppNotification } from '../../api/notificationService';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { MdCheckCircle, MdCancel, MdEdit, MdAddCircle, MdFolder, MdFolderOff, MdFolderOpen, MdNotifications } from 'react-icons/md';
 
-function relativeTime(iso: string) {
+function relativeTime(iso: string, locale: string) {
   const diffMs = Date.now() - new Date(iso).getTime();
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  if (diffMin < 1) return rtf.format(0, 'minute');
+  if (diffMin < 60) return rtf.format(-diffMin, 'minute');
   const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24) return `${diffH}h ago`;
-  return `${Math.floor(diffH / 24)}d ago`;
+  if (diffH < 24) return rtf.format(-diffH, 'hour');
+  return rtf.format(-Math.floor(diffH / 24), 'day');
 }
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
@@ -30,6 +32,7 @@ interface Props {
 
 export default function NotificationItem({ notification, onMarkRead, onClose }: Props) {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
 
   function handleClick() {
     if (!notification.isRead) onMarkRead(notification.id);
@@ -56,7 +59,7 @@ export default function NotificationItem({ notification, onMarkRead, onClose }: 
         </p>
         <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{notification.message}</p>
         <p className="text-xs text-gray-400 mt-1">
-          {relativeTime(notification.createdAt)}
+          {relativeTime(notification.createdAt, i18n.language)}
         </p>
       </div>
       {!notification.isRead && (
