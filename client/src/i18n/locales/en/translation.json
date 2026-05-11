@@ -148,7 +148,8 @@
     "moderators": "Moderators",
     "typeAndEnter": "Type and press Enter...",
     "active": "Active",
-    "updated": "Updated successfully"
+    "updated": "Updated successfully",
+    "back": "Back"
   },
   "settings": {
     "subtitle": "Manage system entities and configurations",
