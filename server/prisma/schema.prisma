@@ -242,6 +242,7 @@ model Project {
   createdByName       String?
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
+  notifications       Notification[]
 
   @@index([createdBy])
 }
@@ -274,6 +275,7 @@ model Demand {
   createdByName      String?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
+  notifications      Notification[]
 
   @@index([createdBy])
 }
@@ -305,7 +307,9 @@ model Notification {
   title             String
   message           String
   demandId          Int?
+  demand            Demand?          @relation(fields: [demandId], references: [id], onDelete: SetNull)
   projectName       String?
+  project           Project?         @relation(fields: [projectName], references: [name], onDelete: SetNull)
   createdAt         DateTime         @default(now())
 
   @@index([recipientUsername, createdAt(sort: Desc)])
