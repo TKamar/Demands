@@ -163,11 +163,11 @@ export const demandService = {
       },
     });
 
-    const moderators = (demand.service as any)?.moderators as string[] ?? [];
+    const moderators = (demand.service?.moderators ?? []) as string[];
     const notifData = {
       type: "NewDemand" as const,
       title: "New Demand Submitted",
-      message: `New demand for ${demand.resourceName} (${demand.value} ${(demand.resource as any)?.unit ?? ""}) in project "${demand.projectName}" was submitted by ${demand.createdByName ?? demand.createdBy ?? "unknown"}.`,
+      message: `New demand for ${demand.resourceName} (${demand.value} ${demand.resource?.unit ?? ""}) in project "${demand.projectName}" was submitted by ${demand.createdByName ?? demand.createdBy ?? "unknown"}.`,
       demandId: demand.id,
       projectName: demand.projectName,
     };
@@ -221,10 +221,11 @@ export const demandService = {
       },
     });
 
-    const moderators = (demand.service as any)?.moderators as string[] ?? [];
+    const moderators = (demand.service?.moderators ?? []) as string[];
     const notifData = {
       type: "DemandEdited" as const,
       title: "Demand Edited",
+      // Uses original creator for attribution — service doesn't receive acting user separately
       message: `The demand for ${demand.resourceName} in project "${demand.projectName}" was edited by ${demand.createdByName ?? demand.createdBy ?? "unknown"}.`,
       demandId: demand.id,
       projectName: demand.projectName,
@@ -314,7 +315,7 @@ export const demandService = {
       },
     });
 
-    const moderators = (demand.service as any)?.moderators as string[] ?? [];
+    const moderators = (demand.service?.moderators ?? []) as string[];
     const notifData = {
       type: "DemandCancelled" as const,
       title: "Demand Cancelled by Creator",
@@ -372,7 +373,7 @@ export const demandService = {
           await notificationService.createForUser(demand.createdBy!, {
             type: "DemandDecision",
             title: "Decision Received on Your Demand",
-            message: `Your demand for ${demand.resourceName} in project "${demand.projectName}" was ${label}.${demand.approvedValue != null ? ` Approved value: ${demand.approvedValue} ${(demand.resource as any)?.unit ?? ""}.` : ""}`,
+            message: `Your demand for ${demand.resourceName} in project "${demand.projectName}" was ${label}.${demand.approvedValue != null ? ` Approved value: ${demand.approvedValue} ${demand.resource?.unit ?? ""}.` : ""}`,
             demandId: demand.id,
             projectName: demand.projectName,
           });
@@ -393,6 +394,7 @@ export const demandService = {
       reason?: string;
     }
   ) => {
+    // Bulk operations skip per-demand notifications intentionally — too noisy for batch decisions.
     return prisma.demand.updateMany({
       where: { ...where, status: "Pending" },
       data: {
@@ -405,6 +407,7 @@ export const demandService = {
   },
 
   bulkReject: async (where: any, reason: string) => {
+    // Bulk operations skip per-demand notifications intentionally — too noisy for batch decisions.
     return prisma.demand.updateMany({
       where: { ...where, status: "Pending" },
       data: {

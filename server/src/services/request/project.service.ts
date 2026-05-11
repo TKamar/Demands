@@ -172,7 +172,7 @@ export const projectService = {
         await notificationService.createAdminBroadcast({
           type: "ProjectEdited",
           title: "Project Edited",
-          message: `Project "${project.name}" was edited.`,
+          message: `Project "${project.name}" was edited by ${project.createdByName ?? project.createdBy ?? "unknown"}.`,
           projectName: project.name,
         });
       } catch (err) {
