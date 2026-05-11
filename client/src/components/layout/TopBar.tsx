@@ -7,6 +7,7 @@ import { MdStorage, MdPersonOutline, MdLogout, MdExpandMore, MdOutlineSettings }
 import { GiQueenCrown } from 'react-icons/gi';
 import type { UserProfile } from '../../types/navigation';
 import LanguageSwitcher from '../LanguageSwitcher';
+import NotificationBell from '../notifications/NotificationBell';
 
 interface TopBarProps {
   userProfile: UserProfile;
@@ -45,6 +46,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
       {/* Right side: language + role icon + user */}
       <div className="flex items-center gap-4">
         <LanguageSwitcher />
+        <NotificationBell />
 
         {/* Role icon — clicking navigates to settings */}
         {hasSettingsAccess && (

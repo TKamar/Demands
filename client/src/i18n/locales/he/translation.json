@@ -454,5 +454,20 @@
       "timeline": "לוח זמנים",
       "other": "אחר"
     }
+  },
+  "notifications": {
+    "title": "ההתראות שלי",
+    "markAllRead": "סמן הכל כנקרא",
+    "empty": "אין התראות",
+    "loading": "טוען...",
+    "types": {
+      "NewDemand": "דרישה חדשה",
+      "DemandDecision": "קבלת תשובה על הדרישה",
+      "DemandCancelled": "ביטול דרישה",
+      "DemandEdited": "עריכת דרישה",
+      "NewProject": "פרויקט חדש",
+      "ProjectDeleted": "מחיקת פרויקט",
+      "ProjectEdited": "עריכת פרויקט"
+    }
   }
 }

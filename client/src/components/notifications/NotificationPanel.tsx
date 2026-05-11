@@ -12,7 +12,7 @@ export default function NotificationPanel({ onClose }: Props) {
   const { notifications, unreadCount, markRead, markAllRead, isLoading } = useNotificationContext();
 
   return (
-    <div className="absolute end-0 top-full mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white border border-gray-200 rounded-2xl shadow-xl z-50 flex flex-col max-h-[80vh]">
+    <div role="dialog" aria-label={t('notifications.title')} className="absolute end-0 top-full mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white border border-gray-200 rounded-2xl shadow-xl z-50 flex flex-col max-h-[80vh]">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
         <h2 className="text-sm font-semibold text-text-primary">
