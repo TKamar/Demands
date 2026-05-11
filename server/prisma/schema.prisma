@@ -284,3 +284,30 @@ model EmergencyOption {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
+
+enum NotificationType {
+  NewDemand
+  DemandDecision
+  DemandCancelled
+  DemandEdited
+  NewProject
+  ProjectDeleted
+  ProjectEdited
+}
+
+model Notification {
+  id                Int              @id @default(autoincrement())
+  type              NotificationType
+  recipientUsername String?
+  isAdminBroadcast  Boolean          @default(false)
+  readByUsernames   String[]         @default([])
+  isRead            Boolean          @default(false)
+  title             String
+  message           String
+  demandId          Int?
+  projectName       String?
+  createdAt         DateTime         @default(now())
+
+  @@index([recipientUsername, createdAt(sort: Desc)])
+  @@index([isAdminBroadcast, createdAt(sort: Desc)])
+}
