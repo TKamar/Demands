@@ -12,6 +12,7 @@
   "management": {
     "demandsTitle": "Demands Management",
     "makeDecision": "Make Decision",
+    "decide": "Decide",
     "decisionModal": {
       "title": "Make Decision",
       "decisionType": "Decision Type",
