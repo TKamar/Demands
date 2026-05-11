@@ -1,6 +1,7 @@
 import prisma from "../../lib/prisma";
 import { ProjectType, Median, Prisma, Priority } from "@prisma/client";
 import { NotFoundError } from "../../lib/errors";
+import { notificationService } from "../notification/notification.service";
 
 export const projectService = {
   findAll: async (
@@ -114,10 +115,25 @@ export const projectService = {
     createdBy?: string;
     createdByName?: string;
   }) => {
-    return prisma.project.create({
+    const project = await prisma.project.create({
       data,
       include: { location: true, kind: true, emergencyOption: true },
     });
+
+    setImmediate(async () => {
+      try {
+        await notificationService.createAdminBroadcast({
+          type: "NewProject",
+          title: "New Project Created",
+          message: `Project "${project.name}" was created by ${project.createdByName ?? project.createdBy ?? "unknown"}.`,
+          projectName: project.name,
+        });
+      } catch (err) {
+        console.error("[notifications] project create:", err);
+      }
+    });
+
+    return project;
   },
 
   update: async (
@@ -145,11 +161,26 @@ export const projectService = {
         throw new NotFoundError("Project");
       }
     }
-    return prisma.project.update({
+    const project = await prisma.project.update({
       where: { name },
       data,
       include: { location: true, kind: true, emergencyOption: true },
     });
+
+    setImmediate(async () => {
+      try {
+        await notificationService.createAdminBroadcast({
+          type: "ProjectEdited",
+          title: "Project Edited",
+          message: `Project "${project.name}" was edited.`,
+          projectName: project.name,
+        });
+      } catch (err) {
+        console.error("[notifications] project update:", err);
+      }
+    });
+
+    return project;
   },
 
   delete: async (name: string, createdBy?: string) => {
@@ -167,9 +198,26 @@ export const projectService = {
       throw new Error("Cannot delete project with existing demands");
     }
 
-    return prisma.project.delete({
+    const result = await prisma.project.delete({
       where: { name },
     });
+
+    const projectName = existing.name;
+    const projectCreatedBy = existing.createdByName ?? existing.createdBy ?? "unknown";
+    setImmediate(async () => {
+      try {
+        await notificationService.createAdminBroadcast({
+          type: "ProjectDeleted",
+          title: "Project Deleted",
+          message: `Project "${projectName}" was deleted by ${projectCreatedBy}.`,
+          projectName: projectName,
+        });
+      } catch (err) {
+        console.error("[notifications] project delete:", err);
+      }
+    });
+
+    return result;
   },
 
   duplicate: async (
