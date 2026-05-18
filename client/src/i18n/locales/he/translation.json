@@ -283,7 +283,9 @@
       "Rejected": "נדחה",
       "PartiallyApproved": "אושר חלקית",
       "ApprovedWithCondition": "אושר עם תנאי",
-      "Cancelled": "בוטל"
+      "Cancelled": "בוטל",
+      "PendingCenterManager": "ממתין לאישור מנהל מרכז",
+      "CenterManagerRejected": "נדחה על ידי מנהל מרכז"
     },
     "editProject": {
       "title": "עריכת פרויקט"

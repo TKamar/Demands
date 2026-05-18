@@ -281,7 +281,9 @@
       "Rejected": "Rejected",
       "PartiallyApproved": "Partially Approved",
       "ApprovedWithCondition": "Approved With Condition",
-      "Cancelled": "Cancelled"
+      "Cancelled": "Cancelled",
+      "PendingCenterManager": "Pending Center Manager Approval",
+      "CenterManagerRejected": "Rejected by Center Manager"
     },
     "editProject": {
       "title": "Edit Project"
