@@ -437,7 +437,8 @@
     "value": "כמות",
     "createdBy": "נוצר על ידי",
     "createdAt": "תאריך יצירה",
-    "status": "סטטוס"
+    "status": "סטטוס",
+    "reason": "סיבה"
   },
   "notFound": {
     "message": "העמוד המבוקש לא נמצא"
@@ -482,6 +483,19 @@
   "history": { "comingSoon": "היסטוריית דרישות תהיה זמינה בקרוב." },
   "actions": {
     "approve": "אשר",
-    "reject": "דחה"
+    "reject": "דחה",
+    "cancel": "ביטול"
+  },
+  "cmDecision": {
+    "title": "החלטת מנהל מרכז",
+    "approve": "אשר",
+    "reject": "דחה",
+    "reasonPlaceholder": "הזן סיבת דחייה..."
+  },
+  "validation": {
+    "reasonRequired": "סיבה נדרשת"
+  },
+  "errors": {
+    "generic": "אירעה שגיאה. אנא נסה שוב."
   }
 }

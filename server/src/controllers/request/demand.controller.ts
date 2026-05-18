@@ -597,6 +597,60 @@ export const demandController = {
     }
   },
 
+  cmApprove: async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const user = req.auth!.user;
+
+      const demand = await demandService.findById(id);
+      if (!demand) return res.status(404).json({ message: 'Demand not found' });
+      if (!user.canManageCenter(demand.centerName)) {
+        return res.status(403).json({ message: 'Forbidden: not your center' });
+      }
+      if (demand.status !== 'PendingCenterManager') {
+        return res.status(400).json({ message: `Cannot approve: demand status is ${demand.status}` });
+      }
+
+      const updated = await prisma.demand.update({
+        where: { id },
+        data: { status: 'Pending' },
+        include: { project: true, service: true, resource: true, location: true },
+      });
+      res.json(updated);
+    } catch (error) {
+      console.error("demandController.cmApprove error:", error);
+      res.status(500).json({ error: "Failed to approve demand" });
+    }
+  },
+
+  cmReject: async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const { reason } = req.body as { reason: string };
+      if (!reason?.trim()) return res.status(400).json({ message: 'reason is required' });
+      const user = req.auth!.user;
+
+      const demand = await demandService.findById(id);
+      if (!demand) return res.status(404).json({ message: 'Demand not found' });
+      if (!user.canManageCenter(demand.centerName)) {
+        return res.status(403).json({ message: 'Forbidden: not your center' });
+      }
+      if (demand.status !== 'PendingCenterManager') {
+        return res.status(400).json({ message: `Cannot reject: demand status is ${demand.status}` });
+      }
+
+      const updated = await prisma.demand.update({
+        where: { id },
+        data: { status: 'CenterManagerRejected', reason: reason.trim() },
+        include: { project: true, service: true, resource: true, location: true },
+      });
+      res.json(updated);
+    } catch (error) {
+      console.error("demandController.cmReject error:", error);
+      res.status(500).json({ error: "Failed to reject demand" });
+    }
+  },
+
   approve: async (req: Request, res: Response) => {
     try {
       const { status, approvedValue, reason } = req.body;

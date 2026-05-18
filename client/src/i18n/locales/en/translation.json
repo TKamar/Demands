@@ -441,7 +441,8 @@
     "value": "Value",
     "createdBy": "Created By",
     "createdAt": "Created At",
-    "status": "Status"
+    "status": "Status",
+    "reason": "Reason"
   },
   "notFound": {
     "message": "The requested page was not found"
@@ -486,6 +487,19 @@
   "history": { "comingSoon": "Request history will be available soon." },
   "actions": {
     "approve": "Approve",
-    "reject": "Reject"
+    "reject": "Reject",
+    "cancel": "Cancel"
+  },
+  "cmDecision": {
+    "title": "Center Manager Decision",
+    "approve": "Approve",
+    "reject": "Reject",
+    "reasonPlaceholder": "Enter reason for rejection..."
+  },
+  "validation": {
+    "reasonRequired": "Reason is required"
+  },
+  "errors": {
+    "generic": "An error occurred. Please try again."
   }
 }

@@ -1,5 +1,5 @@
 // client/src/pages/MainPage.tsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useModal } from '../contexts/ModalContext';
@@ -11,9 +11,12 @@ import ProjectsAccordion from '../components/main/ProjectsAccordion';
 import { TopNavTabs } from '../components/main/TopNavTabs';
 import type { TopNavTabId } from '../components/main/TopNavTabs';
 import { MyApprovalRequests } from '../components/main/MyApprovalRequests';
+import type { MyApprovalRequestsHandle } from '../components/main/MyApprovalRequests';
+import { CmDecisionModal } from '../components/management/CmDecisionModal';
 import { RequestsIOpened } from '../components/main/RequestsIOpened';
 import { ResourcesForAssignment } from '../components/main/ResourcesForAssignment';
 import { useCurrentUser } from '../hooks/useCurrentUser';
+import type { Demand } from '../types/domain';
 
 type MainTab = 'projects' | 'requirements';
 
@@ -25,6 +28,8 @@ export default function MainPage() {
   const currentUser = useCurrentUser();
   const isCenterManager = currentUser?.role === 'CENTER_MANAGER' || currentUser?.role === 'ADMIN';
   const [topNavTab, setTopNavTab] = useState<TopNavTabId | null>(null);
+  const approvalRequestsRef = useRef<MyApprovalRequestsHandle>(null);
+  const [cmDecisionDemand, setCmDecisionDemand] = useState<Demand | null>(null);
 
   const [activeTab, setActiveTab] = useState<MainTab>(
     searchParams.get('tab') === 'requirements' ? 'requirements' : 'projects'
@@ -115,8 +120,9 @@ export default function MainPage() {
         {/* TopNav content panels */}
         {topNavTab === 'approvalRequests' && isCenterManager && (
           <MyApprovalRequests
-            onApprove={(_demand) => { /* CmDecisionModal wired in Branch 3 */ }}
-            onReject={(_demand) => { /* CmDecisionModal wired in Branch 3 */ }}
+            ref={approvalRequestsRef}
+            onApprove={demand => setCmDecisionDemand(demand)}
+            onReject={demand => setCmDecisionDemand(demand)}
           />
         )}
         {topNavTab === 'myRequests' && <RequestsIOpened />}
@@ -139,6 +145,16 @@ export default function MainPage() {
           )
         )}
       </div>
+      {cmDecisionDemand && (
+        <CmDecisionModal
+          demand={cmDecisionDemand}
+          onClose={() => setCmDecisionDemand(null)}
+          onComplete={() => {
+            setCmDecisionDemand(null);
+            approvalRequestsRef.current?.reload();
+          }}
+        />
+      )}
     </div>
   );
 }

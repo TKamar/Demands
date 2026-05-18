@@ -231,6 +231,16 @@ export async function fetchCenterPendingDemands(): Promise<Demand[]> {
   return res.data.map(mapDemand);
 }
 
+export async function cmApproveDemand(id: number): Promise<Demand> {
+  const res = await api.patch<any>(`/demands/${id}/cm-approve`);
+  return mapDemand(res.data);
+}
+
+export async function cmRejectDemand(id: number, reason: string): Promise<Demand> {
+  const res = await api.patch<any>(`/demands/${id}/cm-reject`, { reason });
+  return mapDemand(res.data);
+}
+
 // --- Reference data ---
 
 export async function fetchBases(): Promise<ReferenceItem[]> {

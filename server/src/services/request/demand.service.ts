@@ -152,7 +152,7 @@ export const demandService = {
     return prisma.demand.create({
       data: {
         ...data,
-        status: "Pending",
+        status: "PendingCenterManager",
       },
       include: {
         project: true,

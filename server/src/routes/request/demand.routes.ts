@@ -13,6 +13,8 @@ router.get("/filter", authenticate, requireAuth, demandController.getByFilters);
 router.get("/center/pending", authenticate, requireAuth, requireCenterManager, demandController.getCenterPendingDemands);
 router.patch("/bulk/approve", authenticate, requireModerator, demandController.bulkApprove);
 router.patch("/bulk/reject", authenticate, requireModerator, demandController.bulkReject);
+router.patch("/:id/cm-approve", authenticate, requireAuth, requireCenterManager, demandController.cmApprove);
+router.patch("/:id/cm-reject",  authenticate, requireAuth, requireCenterManager, demandController.cmReject);
 router.get("/:id", authenticate, requireAuth, demandController.getById);
 router.post("/", authenticate, requireAuth, demandController.create);
 router.patch("/:id", authenticate, requireAuth, demandController.update);
