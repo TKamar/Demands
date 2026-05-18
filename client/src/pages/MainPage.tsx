@@ -30,6 +30,7 @@ export default function MainPage() {
   const [topNavTab, setTopNavTab] = useState<TopNavTabId | null>(null);
   const approvalRequestsRef = useRef<MyApprovalRequestsHandle>(null);
   const [cmDecisionDemand, setCmDecisionDemand] = useState<Demand | null>(null);
+  const [cmDecisionInitial, setCmDecisionInitial] = useState<'approve' | 'reject'>('approve');
 
   const [activeTab, setActiveTab] = useState<MainTab>(
     searchParams.get('tab') === 'requirements' ? 'requirements' : 'projects'
@@ -121,8 +122,8 @@ export default function MainPage() {
         {topNavTab === 'approvalRequests' && isCenterManager && (
           <MyApprovalRequests
             ref={approvalRequestsRef}
-            onApprove={demand => setCmDecisionDemand(demand)}
-            onReject={demand => setCmDecisionDemand(demand)}
+            onApprove={demand => { setCmDecisionInitial('approve'); setCmDecisionDemand(demand); }}
+            onReject={demand => { setCmDecisionInitial('reject'); setCmDecisionDemand(demand); }}
           />
         )}
         {topNavTab === 'myRequests' && <RequestsIOpened />}
@@ -148,6 +149,7 @@ export default function MainPage() {
       {cmDecisionDemand && (
         <CmDecisionModal
           demand={cmDecisionDemand}
+          initialDecision={cmDecisionInitial}
           onClose={() => setCmDecisionDemand(null)}
           onComplete={() => {
             setCmDecisionDemand(null);
