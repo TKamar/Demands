@@ -15,43 +15,42 @@ jobs:
     runs-on: self-hosted
     defaults:
       run:
-        shell: bash
+        shell: pwsh
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Build Server Image
-        run: |
-          docker build -t demands-server:latest ./server
+        run: docker build -t demands-server:latest ./server
 
       - name: Build Client Image
-        run: |
-          docker build -t demands-client:latest ./client \
-            --build-arg VITE_API_URL=http://localhost:3000/api \
-            --build-arg VITE_OIDC_AUTHORITY=http://localhost:8080/realms/demands \
-            --build-arg VITE_OIDC_CLIENT_ID=demands-web \
-            --build-arg VITE_OIDC_REDIRECT_URI=http://localhost:5173/callback
+        run: >-
+          docker build -t demands-client:latest ./client
+          --build-arg VITE_API_URL=http://localhost:3000/api
+          --build-arg VITE_OIDC_AUTHORITY=http://localhost:8080/realms/demands
+          --build-arg VITE_OIDC_CLIENT_ID=demands-web
+          --build-arg VITE_OIDC_REDIRECT_URI=http://localhost:5173/callback
 
       - name: Helm Lint
-        run: helm lint ${{ env.CHART_PATH }}
+        run: helm lint $env:CHART_PATH
 
       - name: Create Namespace
-        run: kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
+        run: kubectl create namespace $env:NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Helm Upgrade / Install
-        run: |
-          helm upgrade --install ${{ env.RELEASE_NAME }} ${{ env.CHART_PATH }} \
-            --namespace ${{ env.NAMESPACE }} \
-            --wait \
-            --timeout 5m
+        run: >-
+          helm upgrade --install $env:RELEASE_NAME $env:CHART_PATH
+          --namespace $env:NAMESPACE
+          --wait
+          --timeout 5m
 
       - name: Verify Deployment
         run: |
-          kubectl rollout status deployment/demands-server -n ${{ env.NAMESPACE }} --timeout=120s
-          kubectl rollout status deployment/demands-keycloak -n ${{ env.NAMESPACE }} --timeout=120s
-          kubectl rollout status deployment/demands-client -n ${{ env.NAMESPACE }} --timeout=120s
-          kubectl rollout status statefulset/demands-postgres -n ${{ env.NAMESPACE }} --timeout=120s
+          kubectl rollout status deployment/demands-server -n $env:NAMESPACE --timeout=120s
+          kubectl rollout status deployment/demands-keycloak -n $env:NAMESPACE --timeout=120s
+          kubectl rollout status deployment/demands-client -n $env:NAMESPACE --timeout=120s
+          kubectl rollout status statefulset/demands-postgres -n $env:NAMESPACE --timeout=120s
 
       - name: Show Pod Status
         if: always()
-        run: kubectl get pods -n ${{ env.NAMESPACE }} -o wide
+        run: kubectl get pods -n $env:NAMESPACE -o wide
