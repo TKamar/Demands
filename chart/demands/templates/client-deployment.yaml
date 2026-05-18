@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "demands.fullname" . }}-client
+  labels:
+    app: client
+    {{- include "demands.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.client.replicas }}
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client
+          image: {{ .Values.client.image }}
+          imagePullPolicy: {{ .Values.client.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.client.port }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.client.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5

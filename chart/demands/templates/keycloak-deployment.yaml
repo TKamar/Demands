@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "demands.fullname" . }}-keycloak
+  labels:
+    app: keycloak
+    {{- include "demands.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.keycloak.replicas }}
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: {{ .Values.keycloak.image }}
+          args:
+            - start-dev
+            - --import-realm
+          ports:
+            - containerPort: {{ .Values.keycloak.port }}
+          env:
+            - name: KC_DB
+              value: postgres
+            - name: KC_DB_URL
+              value: "jdbc:postgresql://{{ include "demands.fullname" . }}-postgres:{{ .Values.postgres.port }}/keycloak"
+            - name: KC_DB_USERNAME
+              value: {{ .Values.postgres.user | quote }}
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "demands.fullname" . }}-secrets
+                  key: postgres-password
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+              value: {{ .Values.keycloak.adminUser | quote }}
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "demands.fullname" . }}-secrets
+                  key: keycloak-admin-password
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+            - name: KC_HOSTNAME_STRICT_HTTPS
+              value: "false"
+            - name: KC_HTTP_ENABLED
+              value: "true"
+          {{- if .Values.keycloak.realmImport }}
+          volumeMounts:
+            - name: realm-config
+              mountPath: /opt/keycloak/data/import
+          {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /realms/master
+              port: {{ .Values.keycloak.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.keycloak.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 15
+      {{- if .Values.keycloak.realmImport }}
+      volumes:
+        - name: realm-config
+          configMap:
+            name: {{ include "demands.fullname" . }}-keycloak-realm
+      {{- end }}

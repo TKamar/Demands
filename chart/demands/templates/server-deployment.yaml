@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "demands.fullname" . }}-server
+  labels:
+    app: server
+    {{- include "demands.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.server.replicas }}
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          image: {{ .Values.server.image }}
+          imagePullPolicy: {{ .Values.server.imagePullPolicy }}
+          ports:
+            - containerPort: {{ .Values.server.port }}
+          env:
+            - name: PORT
+              value: {{ .Values.server.port | quote }}
+            - name: NODE_ENV
+              value: {{ .Values.server.env.NODE_ENV | quote }}
+            - name: DATABASE_URL
+              value: "postgresql://{{ .Values.postgres.user }}:{{ .Values.postgres.password }}@{{ include "demands.fullname" . }}-postgres:{{ .Values.postgres.port }}/demands"
+            - name: OIDC_DISCOVERY_URL
+              value: "http://{{ include "demands.fullname" . }}-keycloak:{{ .Values.keycloak.port }}/realms/demands/.well-known/openid-configuration"
+            - name: AUTH_ISSUER
+              value: {{ .Values.server.authIssuerExternal | quote }}
+            - name: AUTH_AUDIENCE
+              value: {{ .Values.server.env.AUTH_AUDIENCE | quote }}
+            - name: AUTH_GROUP_CLAIM_PATH
+              value: {{ .Values.server.env.AUTH_GROUP_CLAIM_PATH | quote }}
+            - name: AUTH_ADMIN_GROUP
+              value: {{ .Values.server.env.AUTH_ADMIN_GROUP | quote }}
+            - name: AUTH_CLIENT_TYPE
+              value: {{ .Values.server.env.AUTH_CLIENT_TYPE | quote }}
+            - name: KEYCLOAK_URL
+              value: "http://{{ include "demands.fullname" . }}-keycloak:{{ .Values.keycloak.port }}"
+            - name: KEYCLOAK_REALM
+              value: {{ .Values.server.env.KEYCLOAK_REALM | quote }}
+            - name: KEYCLOAK_CLIENT_ID
+              value: {{ .Values.server.env.KEYCLOAK_CLIENT_ID | quote }}
+            - name: KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "demands.fullname" . }}-secrets
+                  key: keycloak-client-secret
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.server.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.server.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 10

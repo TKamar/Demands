@@ -1,0 +1,73 @@
+# -- Global settings
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Ingress
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: demands.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: client
+        - path: /api
+          pathType: Prefix
+          service: server
+        - path: /auth
+          pathType: Prefix
+          service: keycloak
+
+# -- PostgreSQL
+postgres:
+  image: postgres:16-alpine
+  replicas: 1
+  port: 5432
+  user: user
+  password: password
+  databases: "demands,keycloak"
+  storage:
+    size: 5Gi
+    storageClass: ""
+
+# -- Keycloak
+keycloak:
+  image: quay.io/keycloak/keycloak:26.0
+  replicas: 1
+  port: 8080
+  adminUser: admin
+  adminPassword: admin
+  realmImport: true
+
+# -- Server (Node.js API)
+server:
+  image: demands-server:latest
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  port: 3000
+  env:
+    NODE_ENV: production
+    AUTH_CLIENT_TYPE: keycloak
+    AUTH_AUDIENCE: demands-api
+    AUTH_GROUP_CLAIM_PATH: groups
+    AUTH_ADMIN_GROUP: admin
+    KEYCLOAK_REALM: demands
+    KEYCLOAK_CLIENT_ID: demands-api
+    KEYCLOAK_CLIENT_SECRET: demands-api-secret
+  # Set AUTH_ISSUER to match the external URL that users access Keycloak from
+  # This must match the "iss" claim in JWT tokens
+  authIssuerExternal: "http://localhost:8080/realms/demands"
+
+# -- Client (Vite/React served by nginx)
+client:
+  image: demands-client:latest
+  imagePullPolicy: IfNotPresent
+  replicas: 1
+  port: 5173
+  env:
+    VITE_API_URL: http://localhost:3000/api
+    VITE_OIDC_AUTHORITY: http://localhost:8080/realms/demands
+    VITE_OIDC_CLIENT_ID: demands-web
+    VITE_OIDC_REDIRECT_URI: http://localhost:5173/callback

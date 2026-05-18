@@ -1,0 +1,41 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "demands.fullname" . }}-ingress
+  labels:
+    {{- include "demands.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                {{- if eq .service "client" }}
+                name: {{ include "demands.fullname" $ }}-client
+                port:
+                  number: {{ $.Values.client.port }}
+                {{- else if eq .service "server" }}
+                name: {{ include "demands.fullname" $ }}-server
+                port:
+                  number: {{ $.Values.server.port }}
+                {{- else if eq .service "keycloak" }}
+                name: {{ include "demands.fullname" $ }}-keycloak
+                port:
+                  number: {{ $.Values.keycloak.port }}
+                {{- end }}
+          {{- end }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "demands.fullname" . }}-postgres-init
+  labels:
+    {{- include "demands.labels" . | nindent 4 }}
+data:
+  init-multiple-dbs.sh: |
+    #!/bin/bash
+    set -e
+    for db in $(echo $POSTGRES_MULTIPLE_DATABASES | tr ',' ' '); do
+      echo "Creating database: $db"
+      psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --no-password -c "CREATE DATABASE $db;" 2>&1 || echo "Database $db may already exist"
+    done

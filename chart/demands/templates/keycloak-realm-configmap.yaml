@@ -1,0 +1,11 @@
+{{- if .Values.keycloak.realmImport }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "demands.fullname" . }}-keycloak-realm
+  labels:
+    {{- include "demands.labels" . | nindent 4 }}
+data:
+  demands-realm.json: |
+    {{- .Files.Get "files/demands-realm.json" | nindent 4 }}
+{{- end }}
