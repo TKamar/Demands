@@ -23,7 +23,7 @@ export default function MainPage() {
   const { openModal } = useModal();
 
   const currentUser = useCurrentUser();
-  const isCenterManager = currentUser?.role === 'CENTER_MANAGER';
+  const isCenterManager = currentUser?.role === 'CENTER_MANAGER' || currentUser?.role === 'ADMIN';
   const [topNavTab, setTopNavTab] = useState<TopNavTabId | null>(null);
 
   const [activeTab, setActiveTab] = useState<MainTab>(

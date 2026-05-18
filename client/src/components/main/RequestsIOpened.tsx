@@ -11,8 +11,8 @@ export const RequestsIOpened: React.FC = () => {
 
   useEffect(() => {
     // fetchDemands with no special filter returns only the current user's demands for non-admin users
-    fetchDemands({})
-      .then(res => setDemands(Array.isArray(res) ? res : res.data ?? []))
+    fetchDemands({ limit: 500 })
+      .then(res => setDemands(res.data ?? []))
       .catch(() => setDemands([]))
       .finally(() => setLoading(false));
   }, []);

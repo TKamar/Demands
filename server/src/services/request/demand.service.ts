@@ -311,7 +311,7 @@ export const demandService = {
   getDemandsByCenterAndStatus: async (centerName: string, status: DemandStatus) => {
     return prisma.demand.findMany({
       where: { centerName, status },
-      include: { project: true, location: true },
+      include: { project: true, location: true, service: true, resource: true },
       orderBy: { createdAt: 'asc' },
     });
   },
