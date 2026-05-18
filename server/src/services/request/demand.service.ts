@@ -1,5 +1,6 @@
 import prisma from "../../lib/prisma";
 import { DemandType, DemandStatus, ProjectType, Median } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { NotFoundError } from "../../lib/errors";
 
 export const demandService = {
@@ -311,7 +312,7 @@ export const demandService = {
   cmApprove: async (id: number) => {
     return prisma.demand.update({
       where: { id },
-      data: { status: 'Pending', updatedAt: new Date() },
+      data: { status: 'Pending' },
       include: { project: true, location: true, service: true, resource: true },
     });
   },
@@ -319,7 +320,7 @@ export const demandService = {
   cmReject: async (id: number, reason: string) => {
     return prisma.demand.update({
       where: { id },
-      data: { status: 'CenterManagerRejected', reason: reason.trim(), updatedAt: new Date() },
+      data: { status: 'CenterManagerRejected', reason: reason.trim() },
       include: { project: true, location: true, service: true, resource: true },
     });
   },
@@ -340,25 +341,37 @@ export const demandService = {
         reason: null,
         approvedValue: null,
         approvedDate: null,
-        updatedAt: new Date(),
       },
       include: { project: true, location: true, service: true, resource: true },
     });
   },
 
-  getHistory: async (filters: { username?: string; centerName?: string; isAdmin?: boolean; isModerator?: boolean }) => {
-    const where: any = {};
-    if (!filters.isAdmin && !filters.isModerator) {
-      if (filters.centerName) {
-        where.centerName = filters.centerName;
-      } else if (filters.username) {
-        where.createdBy = filters.username;
-      }
+  getHistory: async (filters: {
+    username?: string;
+    centerName?: string;
+    isAdmin?: boolean;
+    isModerator?: boolean;
+    managedServices?: string[];
+  }) => {
+    const where: Prisma.DemandWhereInput = {};
+
+    if (filters.isAdmin) {
+      // no filter — admin sees all
+    } else if (filters.isModerator && filters.managedServices?.length) {
+      where.serviceName = { in: filters.managedServices };
+    } else {
+      // CM OR regular user — OR-combine centerName and createdBy
+      const orClauses: Prisma.DemandWhereInput[] = [];
+      if (filters.centerName) orClauses.push({ centerName: filters.centerName });
+      if (filters.username) orClauses.push({ createdBy: filters.username });
+      if (orClauses.length > 0) where.OR = orClauses;
     }
+
     return prisma.demand.findMany({
       where,
       include: { project: true, location: true, service: true, resource: true },
       orderBy: { updatedAt: 'desc' },
+      take: 500,  // practical limit; pagination can be added later
     });
   },
 };

@@ -677,11 +677,24 @@ export const demandController = {
       const user = req.auth!.user;
       const isAdmin = user.hasAnyRole([settings.authAdminGroup]);
       const isModerator = user.hasAnyRole([settings.authModeratorGroup]);
+
+      // Get managed services for moderator scoping (matches existing bulkApprove pattern)
+      let managedServices: string[] | undefined;
+      if (isModerator && !isAdmin) {
+        // Look up which services this moderator manages — same pattern as bulkApprove
+        const services = await prisma.service.findMany({
+          where: { moderators: { has: user.username } },
+          select: { name: true },
+        });
+        managedServices = services.map(s => s.name);
+      }
+
       const demands = await demandService.getHistory({
         username: user.username,
         centerName: user.isCenterManager ? user.centerName! : undefined,
         isAdmin,
         isModerator,
+        managedServices,
       });
       res.json(demands);
     } catch (error) {
