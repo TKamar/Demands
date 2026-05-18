@@ -19,7 +19,7 @@ export const userController = {
       return res.status(400).json({ message: 'Invalid role' });
     }
     try {
-      const updated = await userService.updateRoleAndCenter(username, role, centerName ?? null);
+      const updated = await userService.updateRoleAndCenter(username, role, centerName ?? null, req.auth!.user.username);
       res.json(updated);
     } catch (err: any) {
       res.status(400).json({ message: err.message });

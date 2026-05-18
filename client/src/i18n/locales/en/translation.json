@@ -446,7 +446,8 @@
     "username": "Username",
     "fullName": "Full Name",
     "role": "Role",
-    "center": "Center"
+    "center": "Center",
+    "selectCenter": "-- Select Center --"
   },
   "status": {
     "PendingCenterManager": "Pending Center Manager Approval",

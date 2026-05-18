@@ -442,7 +442,8 @@
     "username": "שם משתמש",
     "fullName": "שם מלא",
     "role": "תפקיד",
-    "center": "מרכז"
+    "center": "מרכז",
+    "selectCenter": "-- בחר מרכז --"
   },
   "status": {
     "PendingCenterManager": "ממתין לאישור מנהל מרכז",

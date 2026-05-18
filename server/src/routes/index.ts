@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { authenticate } from "../middleware/openIdConnect";
 import { requireAuth } from "../middleware/authorization";
 
 // Auth routes
@@ -37,7 +38,7 @@ import emergencyOptionRoutes from "./request/emergencyOption.routes";
 const router = Router();
 
 // Current user endpoint
-router.get('/me', requireAuth, (req, res) => {
+router.get('/me', authenticate, requireAuth, (req, res) => {
   const u = req.auth!.user;
   res.json({
     username: u.username,

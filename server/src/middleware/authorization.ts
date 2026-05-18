@@ -41,8 +41,9 @@ export const requireAuth = async (
       familyName: req.auth.user.familyName,
     });
   } catch (err) {
-    console.error('requireAuth DB upsert failed:', err);
-    // Non-fatal: continue with token-based user if DB is unavailable
+    console.error(`[requireAuth] DB upsert failed for user ${req.auth.user.username}:`, err);
+    res.status(503).json({ message: 'Service temporarily unavailable' });
+    return;
   }
 
   next();
@@ -95,18 +96,37 @@ export const requireAllRoles = (...roles: string[]) => {
 /**
  * Require admin role
  */
-export const requireAdmin = (req: Request, res: Response, next: NextFunction): void => {
-  if (!req.auth) {
+export const requireAdmin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const authUser = req.auth?.user;
+  if (!authUser) {
     res.status(401).json({ error: 'Authentication required' });
     return;
   }
 
-  if (!req.auth.user.isAdmin && !req.auth.user.hasAnyRole([settings.authAdminGroup])) {
-    res.status(403).json({ message: 'Forbidden: Admin role required' });
+  // Fast path: requireAuth already ran and confirmed DB ADMIN role
+  if (authUser.isAdmin) {
+    next();
     return;
   }
 
-  next();
+  // Slow path: route didn't call requireAuth first — check DB directly
+  try {
+    const dbUser = await prisma.user.findUnique({ where: { username: authUser.username } });
+    if (dbUser?.role === UserRole.ADMIN) {
+      next();
+      return;
+    }
+  } catch {
+    // DB unavailable — fall through to OIDC check
+  }
+
+  // Legacy OIDC fallback for users not yet in DB
+  if (authUser.hasAnyRole([settings.authAdminGroup])) {
+    next();
+    return;
+  }
+
+  res.status(403).json({ message: 'Forbidden: Admin role required' });
 };
 
 /**

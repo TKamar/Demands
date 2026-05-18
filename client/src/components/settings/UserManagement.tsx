@@ -64,6 +64,7 @@ interface UserRowProps {
 }
 
 const UserRow: React.FC<UserRowProps> = ({ user, centers, saving, onUpdate }) => {
+  const { t } = useTranslation();
   const [role, setRole] = useState<UserRole>(user.role);
   const [centerName, setCenterName] = useState<string>(user.centerName ?? '');
 
@@ -85,7 +86,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, centers, saving, onUpdate }) =>
       <td className="p-2">
         {role === 'CENTER_MANAGER' ? (
           <select value={centerName} onChange={e => setCenterName(e.target.value)} className="border rounded px-2 py-1 text-sm">
-            <option value="">-- בחר מרכז --</option>
+            <option value="">{t('users.selectCenter')}</option>
             {centers.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
           </select>
         ) : <span className="text-gray-400">—</span>}
@@ -93,7 +94,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, centers, saving, onUpdate }) =>
       <td className="p-2">
         {changed && (
           <button onClick={handleSave} disabled={saving} className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50">
-            {saving ? '...' : 'שמור'}
+            {saving ? '...' : t('common.save')}
           </button>
         )}
       </td>
