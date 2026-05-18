@@ -148,7 +148,8 @@
     "moderators": "Moderators",
     "typeAndEnter": "Type and press Enter...",
     "active": "Active",
-    "updated": "Updated successfully"
+    "updated": "Updated successfully",
+    "loading": "Loading..."
   },
   "settings": {
     "subtitle": "Manage system entities and configurations",
@@ -433,7 +434,14 @@
     "cancelSuccess": "Demand cancelled successfully",
     "cancelFailed": "Failed to cancel demand",
     "updateSuccess": "Demand updated successfully",
-    "updateFailed": "Failed to update demand"
+    "updateFailed": "Failed to update demand",
+    "project": "Project",
+    "service": "Service",
+    "resource": "Resource",
+    "value": "Value",
+    "createdBy": "Created By",
+    "createdAt": "Created At",
+    "status": "Status"
   },
   "notFound": {
     "message": "The requested page was not found"
@@ -463,5 +471,21 @@
       "timeline": "Timeline",
       "other": "Other"
     }
+  },
+  "tabs": {
+    "myApprovalRequests": "My Approval Requests",
+    "requestsIOpened": "Requests I Opened",
+    "requestHistory": "Request History"
+  },
+  "approvalRequests": { "empty": "No pending approval requests" },
+  "myRequests": { "empty": "You have not opened any requests yet" },
+  "resourceAssignment": {
+    "title": "Resources for Assignment",
+    "comingSoon": "Resource assignment will be available after moderator approval."
+  },
+  "history": { "comingSoon": "Request history will be available soon." },
+  "actions": {
+    "approve": "Approve",
+    "reject": "Reject"
   }
 }

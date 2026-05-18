@@ -150,7 +150,8 @@
     "moderators": "כל המנהלים",
     "typeAndEnter": "הקלד ולחץ ENTER...",
     "active": "פעיל",
-    "updated": "עודכן בהצלחה"
+    "updated": "עודכן בהצלחה",
+    "loading": "טוען..."
   },
   "settings": {
     "subtitle": "ניהול ישויות מערכת והגדרות",
@@ -429,7 +430,14 @@
     "cancelSuccess": "הדרישה בוטלה בהצלחה",
     "cancelFailed": "ביטול הדרישה נכשל",
     "updateSuccess": "הדרישה עודכנה בהצלחה",
-    "updateFailed": "עדכון הדרישה נכשל"
+    "updateFailed": "עדכון הדרישה נכשל",
+    "project": "פרויקט",
+    "service": "שירות",
+    "resource": "משאב",
+    "value": "כמות",
+    "createdBy": "נוצר על ידי",
+    "createdAt": "תאריך יצירה",
+    "status": "סטטוס"
   },
   "notFound": {
     "message": "העמוד המבוקש לא נמצא"
@@ -459,5 +467,21 @@
       "timeline": "לוח זמנים",
       "other": "אחר"
     }
+  },
+  "tabs": {
+    "myApprovalRequests": "בקשות לאישור שלי",
+    "requestsIOpened": "הבקשות שפתחתי",
+    "requestHistory": "היסטוריית דרישות"
+  },
+  "approvalRequests": { "empty": "אין בקשות ממתינות לאישור" },
+  "myRequests": { "empty": "לא פתחת בקשות עדיין" },
+  "resourceAssignment": {
+    "title": "משאבים לשיוך",
+    "comingSoon": "שיוך משאבים יהיה זמין לאחר אישור מנחה."
+  },
+  "history": { "comingSoon": "היסטוריית דרישות תהיה זמינה בקרוב." },
+  "actions": {
+    "approve": "אשר",
+    "reject": "דחה"
   }
 }

@@ -226,6 +226,11 @@ export async function bulkRejectDemands(payload: BulkRejectDemandPayload): Promi
   return data;
 }
 
+export async function fetchCenterPendingDemands(): Promise<Demand[]> {
+  const res = await api.get<any[]>('/demands/center/pending');
+  return res.data.map(mapDemand);
+}
+
 // --- Reference data ---
 
 export async function fetchBases(): Promise<ReferenceItem[]> {

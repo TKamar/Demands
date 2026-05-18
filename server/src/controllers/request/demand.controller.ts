@@ -580,6 +580,23 @@ export const demandController = {
     }
   },
 
+  getCenterPendingDemands: async (req: Request, res: Response) => {
+    try {
+      const user = req.auth!.user;
+      if (!user.isCenterManager && !user.isAdmin) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+      const centerName = user.isCenterManager ? user.centerName! : req.query.centerName as string;
+      if (!centerName) return res.status(400).json({ message: 'centerName required' });
+
+      const demands = await demandService.getDemandsByCenterAndStatus(centerName, 'PendingCenterManager');
+      res.json(demands);
+    } catch (error) {
+      console.error("demandController.getCenterPendingDemands error:", error);
+      res.status(500).json({ error: "Failed to fetch center pending demands" });
+    }
+  },
+
   approve: async (req: Request, res: Response) => {
     try {
       const { status, approvedValue, reason } = req.body;

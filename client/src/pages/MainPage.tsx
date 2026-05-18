@@ -8,6 +8,12 @@ import CenterFilter from '../components/main/CenterFilter';
 import ResourceSummaryStrip from '../components/main/ResourceSummaryStrip';
 import RequirementsView from '../components/main/RequirementsView';
 import ProjectsAccordion from '../components/main/ProjectsAccordion';
+import { TopNavTabs } from '../components/main/TopNavTabs';
+import type { TopNavTabId } from '../components/main/TopNavTabs';
+import { MyApprovalRequests } from '../components/main/MyApprovalRequests';
+import { RequestsIOpened } from '../components/main/RequestsIOpened';
+import { ResourcesForAssignment } from '../components/main/ResourcesForAssignment';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 
 type MainTab = 'projects' | 'requirements';
 
@@ -15,6 +21,10 @@ export default function MainPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { openModal } = useModal();
+
+  const currentUser = useCurrentUser();
+  const isCenterManager = currentUser?.role === 'CENTER_MANAGER';
+  const [topNavTab, setTopNavTab] = useState<TopNavTabId | null>(null);
 
   const [activeTab, setActiveTab] = useState<MainTab>(
     searchParams.get('tab') === 'requirements' ? 'requirements' : 'projects'
@@ -96,10 +106,37 @@ export default function MainPage() {
 
       {/* Tab content */}
       <div className="flex-1 overflow-auto p-6">
-        {activeTab === 'projects' ? (
-          <ProjectsAccordion selectedCenters={selectedCenters} />
-        ) : (
-          <RequirementsView selectedCenters={selectedCenters} />
+        <TopNavTabs
+          activeTab={topNavTab}
+          onTabChange={setTopNavTab}
+          isCenterManager={isCenterManager}
+        />
+
+        {/* TopNav content panels */}
+        {topNavTab === 'approvalRequests' && isCenterManager && (
+          <MyApprovalRequests
+            onApprove={(_demand) => { /* CmDecisionModal wired in Branch 3 */ }}
+            onReject={(_demand) => { /* CmDecisionModal wired in Branch 3 */ }}
+          />
+        )}
+        {topNavTab === 'myRequests' && <RequestsIOpened />}
+        {topNavTab === 'history' && (
+          <div className="p-4 text-center text-gray-400" dir="rtl">
+            {/* RequestHistory component added in Branch 4 */}
+            {t('history.comingSoon')}
+          </div>
+        )}
+
+        {/* Resources for Assignment — shown when CM and no top tab selected */}
+        {isCenterManager && !topNavTab && <ResourcesForAssignment />}
+
+        {/* Main Projects/Requirements view — hidden when a top nav tab is active */}
+        {!topNavTab && (
+          activeTab === 'projects' ? (
+            <ProjectsAccordion selectedCenters={selectedCenters} />
+          ) : (
+            <RequirementsView selectedCenters={selectedCenters} />
+          )
         )}
       </div>
     </div>

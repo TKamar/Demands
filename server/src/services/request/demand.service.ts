@@ -307,4 +307,12 @@ export const demandService = {
       },
     });
   },
+
+  getDemandsByCenterAndStatus: async (centerName: string, status: DemandStatus) => {
+    return prisma.demand.findMany({
+      where: { centerName, status },
+      include: { project: true, location: true },
+      orderBy: { createdAt: 'asc' },
+    });
+  },
 };
