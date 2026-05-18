@@ -34,9 +34,10 @@ jobs:
       - name: Install Helm
         run: |
           Invoke-WebRequest -Uri https://get.helm.sh/helm-v3.17.3-windows-amd64.zip -OutFile helm.zip
-          Expand-Archive helm.zip -DestinationPath helm-extract
-          Copy-Item helm-extract\windows-amd64\helm.exe -Destination "C:\Windows\helm.exe"
-          helm version
+          Expand-Archive helm.zip -DestinationPath helm-extract -Force
+          $helmDir = "$env:GITHUB_WORKSPACE\helm-extract\windows-amd64"
+          echo $helmDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          & "$helmDir\helm.exe" version
 
       - name: Helm Lint
         run: helm lint $env:CHART_PATH
