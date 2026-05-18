@@ -57,7 +57,7 @@ export const authController = {
         email: user.email,
         username: user.username,
         fullName: user.fullName,
-        roles: user.roles,
+        roles: user.oidcRoles,
       });
     } catch (error) {
       console.error('authController.getCurrentUser error:', error);

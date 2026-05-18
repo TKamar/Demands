@@ -2,12 +2,14 @@ import { useTranslation } from 'react-i18next';
 import type { DemandStatus } from '../../types/domain';
 
 const statusStyles: Record<DemandStatus, string> = {
+  PendingCenterManager: 'bg-orange-100 text-orange-800',
   Pending: 'bg-yellow-100 text-yellow-800',
   Approved: 'bg-green-100 text-green-800',
   Rejected: 'bg-red-100 text-red-800',
   PartiallyApproved: 'bg-blue-100 text-blue-800',
   ApprovedWithCondition: 'bg-purple-100 text-purple-800',
   Cancelled: 'bg-gray-100 text-gray-800',
+  CenterManagerRejected: 'bg-red-200 text-red-900',
 };
 
 interface StatusBadgeProps {

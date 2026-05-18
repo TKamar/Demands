@@ -1,3 +1,4 @@
+import { UserRole } from '@prisma/client';
 import { User } from './user.model';
 import { settings } from '../../lib/settings';
 
@@ -39,22 +40,34 @@ export function extractRolesFromClaims(
 }
 
 /**
- * Create TokenInfo from raw token and decoded claims
+ * Create TokenInfo from raw token and decoded claims.
+ * Produces a User with REGULAR_USER role by default; requireAuth will
+ * upsert the DB record and replace req.auth.user with the DB-backed role.
  */
 export function tokenInfoFromClaims(
   rawToken: string,
   claims: Record<string, unknown>
 ): TokenInfo {
-  const roles = extractRolesFromClaims(claims, settings.authGroupClaimPath);
+  const oidcRoles = extractRolesFromClaims(claims, settings.authGroupClaimPath);
+  const username = (claims.preferred_username as string | undefined) ?? (claims.sub as string);
+  const givenName = claims.given_name as string | undefined;
+  const familyName = claims.family_name as string | undefined;
+  const fullName =
+    givenName && familyName
+      ? `${givenName} ${familyName}`
+      : givenName ?? familyName ?? username;
 
-  const user = new User(
-    claims.sub as string,
-    claims.email as string | undefined,
-    claims.preferred_username as string | undefined,
-    roles,
-    claims.given_name as string | undefined,
-    claims.family_name as string | undefined
-  );
+  const user = new User({
+    username,
+    fullName,
+    oidcRoles,
+    role: UserRole.REGULAR_USER,
+    centerName: null,
+    sub: claims.sub as string,
+    email: claims.email as string | undefined,
+    givenName,
+    familyName,
+  });
 
   return {
     rawToken,

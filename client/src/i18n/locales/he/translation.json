@@ -154,6 +154,7 @@
   },
   "settings": {
     "subtitle": "ניהול ישויות מערכת והגדרות",
+    "userManagement": "ניהול משתמשים",
     "mainTabs": {
       "infrastructure": "תשתיות",
       "organization": "ארגון",
@@ -434,6 +435,16 @@
   "table": {
     "columns": "עמודות",
     "resetColumns": "איפוס לברירת מחדל"
+  },
+  "users": {
+    "username": "שם משתמש",
+    "fullName": "שם מלא",
+    "role": "תפקיד",
+    "center": "מרכז"
+  },
+  "status": {
+    "PendingCenterManager": "ממתין לאישור מנהל מרכז",
+    "CenterManagerRejected": "נדחה על ידי מנהל מרכז"
   },
   "filters": {
     "groups": {

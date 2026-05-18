@@ -3,7 +3,24 @@ export type ProjectKind = string;
 export type Median = 'H1' | 'H2';
 export type Priority = 'P1' | 'P2' | 'P3';
 export type DemandType = 'New' | 'Extension';
-export type DemandStatus = 'Pending' | 'Approved' | 'Rejected' | 'PartiallyApproved' | 'ApprovedWithCondition' | 'Cancelled';
+export type DemandStatus =
+  | 'PendingCenterManager'
+  | 'Pending'
+  | 'Approved'
+  | 'Rejected'
+  | 'PartiallyApproved'
+  | 'ApprovedWithCondition'
+  | 'Cancelled'
+  | 'CenterManagerRejected';
+
+export type UserRole = 'ADMIN' | 'MODERATOR' | 'CENTER_MANAGER' | 'REGULAR_USER';
+
+export interface AppUser {
+  username: string;
+  fullName: string;
+  role: UserRole;
+  centerName: string | null;
+}
 
 export interface Project {
   name: string;

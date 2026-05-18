@@ -5,6 +5,8 @@ import CapacityManagement from '../components/management/CapacityManagement';
 import WalletManagement from '../components/management/WalletManagement';
 import EntityManager from '../components/common/EntityManager';
 import { useReferenceData } from '../hooks/useReferenceData';
+import { UserManagement } from '../components/settings/UserManagement';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 
 // Sub-components for each tab section
 function InfrastructureSettings({
@@ -388,11 +390,15 @@ function ServicesSettings({ serviceOptions, onSuccess }: { serviceOptions: { val
 export default function SettingsPage() {
     const { t } = useTranslation();
     const auth = useAuth();
-    const role = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase() || 'user';
-    const isAdmin = role === 'admin';
-    const isModerator = role === 'moderator';
+    const currentUser = useCurrentUser();
 
-    const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services' | 'capacity' | 'wallets'>(
+    // DB-backed role takes precedence; fall back to OIDC groups for initial render
+    const dbRole = currentUser?.role;
+    const oidcRole = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase() || 'user';
+    const isAdmin = dbRole === 'ADMIN' || (!dbRole && oidcRole === 'admin');
+    const isModerator = dbRole === 'MODERATOR' || (!dbRole && oidcRole === 'moderator');
+
+    const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services' | 'capacity' | 'wallets' | 'users'>(
         isAdmin ? 'infrastructure' : 'services'
     );
 
@@ -422,6 +428,9 @@ export default function SettingsPage() {
         ...((isAdmin || isModerator) ? [
             { id: 'capacity', label: t('settings.mainTabs.capacity', 'Capacity') },
             { id: 'wallets', label: t('settings.mainTabs.wallets', 'Wallets') },
+        ] : []),
+        ...(isAdmin ? [
+            { id: 'users', label: t('settings.userManagement', 'User Management') },
         ] : []),
     ];
 
@@ -473,6 +482,7 @@ export default function SettingsPage() {
                 {mainTab === 'services' && <ServicesSettings serviceOptions={serviceOptions} onSuccess={refreshData} />}
                 {mainTab === 'capacity' && <CapacityManagement />}
                 {mainTab === 'wallets' && <WalletManagement />}
+                {mainTab === 'users' && isAdmin && <UserManagement />}
             </div>
         </div>
     );

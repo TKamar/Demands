@@ -19,6 +19,7 @@ model Center {
   wallets     Wallet[]
   projects    Project[]
   demands     Demand[]
+  users       User[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -203,12 +204,14 @@ enum DemandType {
 }
 
 enum DemandStatus {
+  PendingCenterManager
   Pending
   Approved
   Rejected
   PartiallyApproved
   ApprovedWithCondition
   Cancelled
+  CenterManagerRejected
 }
 
 enum Priority {
@@ -283,4 +286,25 @@ model EmergencyOption {
   projects  Project[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+// ============================================
+// User Models
+// ============================================
+
+enum UserRole {
+  ADMIN
+  MODERATOR
+  CENTER_MANAGER
+  REGULAR_USER
+}
+
+model User {
+  username   String    @id
+  fullName   String?
+  role       UserRole  @default(REGULAR_USER)
+  centerName String?
+  center     Center?   @relation(fields: [centerName], references: [name])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }

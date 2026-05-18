@@ -1,4 +1,4 @@
-import type { ProjectType, ProjectKind, Median, DemandType, DemandStatus } from '../types/domain';
+import type { ProjectType, ProjectKind, Median, DemandType, DemandStatus, UserRole } from '../types/domain';
 
 export interface ReferenceItem {
   name: string;
@@ -274,4 +274,9 @@ export interface BulkRejectDemandPayload {
 
 export interface BulkDecisionResult {
   count: number;
+}
+
+export interface UpdateUserPayload {
+  role: UserRole;
+  centerName?: string;
 }

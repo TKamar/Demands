@@ -152,6 +152,7 @@
   },
   "settings": {
     "subtitle": "Manage system entities and configurations",
+    "userManagement": "User Management",
     "mainTabs": {
       "infrastructure": "Infrastructure",
       "organization": "Organization",
@@ -438,6 +439,16 @@
   "table": {
     "columns": "Columns",
     "resetColumns": "Reset to defaults"
+  },
+  "users": {
+    "username": "Username",
+    "fullName": "Full Name",
+    "role": "Role",
+    "center": "Center"
+  },
+  "status": {
+    "PendingCenterManager": "Pending Center Manager Approval",
+    "CenterManagerRejected": "Rejected by Center Manager"
   },
   "filters": {
     "groups": {
