@@ -67,6 +67,7 @@ export interface Demand {
   createdBy: string;
   createdByName: string;
   createdAt: string;
+  updatedAt?: string;
   centerName?: string;
   branchName?: string;
   sectionName?: string;

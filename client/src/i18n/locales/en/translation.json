@@ -441,6 +441,7 @@
     "value": "Value",
     "createdBy": "Created By",
     "createdAt": "Created At",
+    "updatedAt": "Last Updated",
     "status": "Status",
     "reason": "Reason"
   },
@@ -484,11 +485,16 @@
     "title": "Resources for Assignment",
     "comingSoon": "Resource assignment will be available after moderator approval."
   },
-  "history": { "comingSoon": "Request history will be available soon." },
+  "history": {
+    "comingSoon": "Request history will be available soon.",
+    "empty": "No request history found",
+    "restoreConfirm": "Are you sure you want to restore the request for project \"{{project}}\"?"
+  },
   "actions": {
     "approve": "Approve",
     "reject": "Reject",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "restore": "Restore"
   },
   "cmDecision": {
     "title": "Center Manager Decision",

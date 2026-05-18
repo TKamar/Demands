@@ -56,6 +56,7 @@ function mapDemand(raw: any): Demand {
     createdBy: raw.createdBy ?? '',
     createdByName: raw.createdByName ?? '',
     createdAt: raw.createdAt,
+    updatedAt: raw.updatedAt,
     centerName: raw.centerName,
     branchName: raw.branchName,
     sectionName: raw.sectionName,
@@ -224,6 +225,16 @@ export async function bulkApproveDemands(payload: BulkApproveDemandPayload): Pro
 export async function bulkRejectDemands(payload: BulkRejectDemandPayload): Promise<BulkDecisionResult> {
   const { data } = await api.patch('/demands/bulk/reject', payload);
   return data;
+}
+
+export async function fetchDemandHistory(): Promise<Demand[]> {
+  const res = await api.get<any[]>('/demands/history');
+  return res.data.map(mapDemand);
+}
+
+export async function restoreDemand(id: number): Promise<Demand> {
+  const res = await api.patch<any>(`/demands/${id}/restore`);
+  return mapDemand(res.data);
 }
 
 export async function fetchCenterPendingDemands(): Promise<Demand[]> {

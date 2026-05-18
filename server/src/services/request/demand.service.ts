@@ -185,7 +185,7 @@ export const demandService = {
     if (!existing) {
       throw new NotFoundError("Demand");
     }
-    if (existing.status !== "Pending") {
+    if (existing.status !== "Pending" && existing.status !== "PendingCenterManager") {
       throw new Error("Only pending demands can be edited");
     }
     return prisma.demand.update({
@@ -237,7 +237,7 @@ export const demandService = {
     if (!existing) {
       throw new NotFoundError("Demand");
     }
-    if (existing.status !== "Pending") {
+    if (existing.status !== "Pending" && existing.status !== "PendingCenterManager") {
       throw new Error("Only pending demands can be cancelled");
     }
     return prisma.demand.update({
@@ -308,11 +308,57 @@ export const demandService = {
     });
   },
 
+  cmApprove: async (id: number) => {
+    return prisma.demand.update({
+      where: { id },
+      data: { status: 'Pending', updatedAt: new Date() },
+      include: { project: true, location: true, service: true, resource: true },
+    });
+  },
+
+  cmReject: async (id: number, reason: string) => {
+    return prisma.demand.update({
+      where: { id },
+      data: { status: 'CenterManagerRejected', reason: reason.trim(), updatedAt: new Date() },
+      include: { project: true, location: true, service: true, resource: true },
+    });
+  },
+
   getDemandsByCenterAndStatus: async (centerName: string, status: DemandStatus) => {
     return prisma.demand.findMany({
       where: { centerName, status },
       include: { project: true, location: true, service: true, resource: true },
       orderBy: { createdAt: 'asc' },
+    });
+  },
+
+  restore: async (id: number) => {
+    return prisma.demand.update({
+      where: { id },
+      data: {
+        status: 'PendingCenterManager',
+        reason: null,
+        approvedValue: null,
+        approvedDate: null,
+        updatedAt: new Date(),
+      },
+      include: { project: true, location: true, service: true, resource: true },
+    });
+  },
+
+  getHistory: async (filters: { username?: string; centerName?: string; isAdmin?: boolean; isModerator?: boolean }) => {
+    const where: any = {};
+    if (!filters.isAdmin && !filters.isModerator) {
+      if (filters.centerName) {
+        where.centerName = filters.centerName;
+      } else if (filters.username) {
+        where.createdBy = filters.username;
+      }
+    }
+    return prisma.demand.findMany({
+      where,
+      include: { project: true, location: true, service: true, resource: true },
+      orderBy: { updatedAt: 'desc' },
     });
   },
 };

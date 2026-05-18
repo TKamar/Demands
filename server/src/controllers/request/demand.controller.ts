@@ -611,11 +611,7 @@ export const demandController = {
         return res.status(400).json({ message: `Cannot approve: demand status is ${demand.status}` });
       }
 
-      const updated = await prisma.demand.update({
-        where: { id },
-        data: { status: 'Pending' },
-        include: { project: true, service: true, resource: true, location: true },
-      });
+      const updated = await demandService.cmApprove(id);
       res.json(updated);
     } catch (error) {
       console.error("demandController.cmApprove error:", error);
@@ -639,15 +635,58 @@ export const demandController = {
         return res.status(400).json({ message: `Cannot reject: demand status is ${demand.status}` });
       }
 
-      const updated = await prisma.demand.update({
-        where: { id },
-        data: { status: 'CenterManagerRejected', reason: reason.trim() },
-        include: { project: true, service: true, resource: true, location: true },
-      });
+      const updated = await demandService.cmReject(id, reason);
       res.json(updated);
     } catch (error) {
       console.error("demandController.cmReject error:", error);
       res.status(500).json({ error: "Failed to reject demand" });
+    }
+  },
+
+  restore: async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const user = req.auth!.user;
+
+      const demand = await demandService.findById(id);
+      if (!demand) return res.status(404).json({ message: 'Demand not found' });
+
+      const restorableStatuses = ['Rejected', 'CenterManagerRejected'];
+      if (!restorableStatuses.includes(demand.status)) {
+        return res.status(400).json({ message: `Demand status '${demand.status}' cannot be restored` });
+      }
+
+      const isAdmin = user.hasAnyRole([settings.authAdminGroup]);
+      const canRestore =
+        isAdmin ||
+        demand.createdBy === user.username ||
+        user.canManageCenter(demand.centerName);
+
+      if (!canRestore) return res.status(403).json({ message: 'Forbidden' });
+
+      const updated = await demandService.restore(id);
+      res.json(updated);
+    } catch (error) {
+      console.error("demandController.restore error:", error);
+      res.status(500).json({ error: "Failed to restore demand" });
+    }
+  },
+
+  getHistory: async (req: Request, res: Response) => {
+    try {
+      const user = req.auth!.user;
+      const isAdmin = user.hasAnyRole([settings.authAdminGroup]);
+      const isModerator = user.hasAnyRole([settings.authModeratorGroup]);
+      const demands = await demandService.getHistory({
+        username: user.username,
+        centerName: user.isCenterManager ? user.centerName! : undefined,
+        isAdmin,
+        isModerator,
+      });
+      res.json(demands);
+    } catch (error) {
+      console.error("demandController.getHistory error:", error);
+      res.status(500).json({ error: "Failed to fetch demand history" });
     }
   },
 

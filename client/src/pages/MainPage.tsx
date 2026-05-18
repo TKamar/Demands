@@ -14,6 +14,7 @@ import { MyApprovalRequests } from '../components/main/MyApprovalRequests';
 import type { MyApprovalRequestsHandle } from '../components/main/MyApprovalRequests';
 import { CmDecisionModal } from '../components/management/CmDecisionModal';
 import { RequestsIOpened } from '../components/main/RequestsIOpened';
+import { RequestHistory } from '../components/main/RequestHistory';
 import { ResourcesForAssignment } from '../components/main/ResourcesForAssignment';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import type { Demand } from '../types/domain';
@@ -127,12 +128,7 @@ export default function MainPage() {
           />
         )}
         {topNavTab === 'myRequests' && <RequestsIOpened />}
-        {topNavTab === 'history' && (
-          <div className="p-4 text-center text-gray-400" dir="rtl">
-            {/* RequestHistory component added in Branch 4 */}
-            {t('history.comingSoon')}
-          </div>
-        )}
+        {topNavTab === 'history' && <RequestHistory />}
 
         {/* Resources for Assignment — shown when CM and no top tab selected */}
         {isCenterManager && !topNavTab && <ResourcesForAssignment />}
