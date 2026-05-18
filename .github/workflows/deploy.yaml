@@ -31,6 +31,13 @@ jobs:
           --build-arg VITE_OIDC_CLIENT_ID=demands-web
           --build-arg VITE_OIDC_REDIRECT_URI=http://localhost:5173/callback
 
+      - name: Install Helm
+        run: |
+          Invoke-WebRequest -Uri https://get.helm.sh/helm-v3.17.3-windows-amd64.zip -OutFile helm.zip
+          Expand-Archive helm.zip -DestinationPath helm-extract
+          Copy-Item helm-extract\windows-amd64\helm.exe -Destination "C:\Windows\helm.exe"
+          helm version
+
       - name: Helm Lint
         run: helm lint $env:CHART_PATH
 
