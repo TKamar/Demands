@@ -439,6 +439,7 @@
     "service": "Service",
     "resource": "Resource",
     "value": "Value",
+    "requestedValue": "Requested Amount",
     "createdBy": "Created By",
     "createdAt": "Created At",
     "updatedAt": "Last Updated",
@@ -483,6 +484,8 @@
   "myRequests": { "empty": "You have not opened any requests yet" },
   "resourceAssignment": {
     "title": "Resources for Assignment",
+    "assignValue": "Assign Amount",
+    "assign": "Assign",
     "comingSoon": "Resource assignment will be available after moderator approval."
   },
   "history": {

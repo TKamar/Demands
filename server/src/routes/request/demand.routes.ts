@@ -15,6 +15,7 @@ router.get("/center/pending", authenticate, requireAuth, requireCenterManager, d
 router.patch("/:id/restore", authenticate, requireAuth, demandController.restore);
 router.patch("/bulk/approve", authenticate, requireModerator, demandController.bulkApprove);
 router.patch("/bulk/reject", authenticate, requireModerator, demandController.bulkReject);
+router.patch("/:id/assign", authenticate, requireAuth, requireCenterManager, demandController.assign);
 router.patch("/:id/cm-approve", authenticate, requireAuth, requireCenterManager, demandController.cmApprove);
 router.patch("/:id/cm-reject",  authenticate, requireAuth, requireCenterManager, demandController.cmReject);
 router.get("/:id", authenticate, requireAuth, demandController.getById);

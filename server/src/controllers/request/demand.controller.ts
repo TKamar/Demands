@@ -597,6 +597,33 @@ export const demandController = {
     }
   },
 
+  assign: async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const { assignedValue } = req.body as { assignedValue: number };
+      const user = req.auth!.user;
+
+      if (typeof assignedValue !== 'number' || assignedValue <= 0) {
+        return res.status(400).json({ message: 'assignedValue must be a positive number' });
+      }
+
+      const demand = await demandService.findById(id);
+      if (!demand) return res.status(404).json({ message: 'Demand not found' });
+      if (!user.canManageCenter(demand.centerName)) {
+        return res.status(403).json({ message: 'Forbidden: not your center' });
+      }
+      if (demand.status !== 'Pending') {
+        return res.status(400).json({ message: `Assignment only valid for Pending demands (current: ${demand.status})` });
+      }
+
+      const updated = await demandService.assign(id, assignedValue);
+      res.json(updated);
+    } catch (error) {
+      console.error("demandController.assign error:", error);
+      res.status(500).json({ error: "Failed to assign demand" });
+    }
+  },
+
   cmApprove: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id, 10);

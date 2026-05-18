@@ -237,6 +237,11 @@ export async function restoreDemand(id: number): Promise<Demand> {
   return mapDemand(res.data);
 }
 
+export async function cmAssignDemand(id: number, assignedValue: number): Promise<Demand> {
+  const res = await api.patch<any>(`/demands/${id}/assign`, { assignedValue });
+  return mapDemand(res.data);
+}
+
 export async function fetchCenterPendingDemands(): Promise<Demand[]> {
   const res = await api.get<any[]>('/demands/center/pending');
   return res.data.map(mapDemand);

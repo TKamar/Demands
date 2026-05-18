@@ -435,6 +435,7 @@
     "service": "שירות",
     "resource": "משאב",
     "value": "כמות",
+    "requestedValue": "כמות מבוקשת",
     "createdBy": "נוצר על ידי",
     "createdAt": "תאריך יצירה",
     "updatedAt": "עדכון אחרון",
@@ -479,6 +480,8 @@
   "myRequests": { "empty": "לא פתחת בקשות עדיין" },
   "resourceAssignment": {
     "title": "משאבים לשיוך",
+    "assignValue": "כמות לשיוך",
+    "assign": "שייך",
     "comingSoon": "שיוך משאבים יהיה זמין לאחר אישור מנחה."
   },
   "history": {

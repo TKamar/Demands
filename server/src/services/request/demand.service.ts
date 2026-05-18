@@ -309,6 +309,14 @@ export const demandService = {
     });
   },
 
+  assign: async (id: number, assignedValue: number) => {
+    return prisma.demand.update({
+      where: { id },
+      data: { approvedValue: assignedValue },
+      include: { project: true, location: true, service: true, resource: true },
+    });
+  },
+
   cmApprove: async (id: number) => {
     return prisma.demand.update({
       where: { id },
