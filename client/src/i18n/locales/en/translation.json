@@ -460,6 +460,12 @@
       "other": "Other"
     }
   },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
   "notifications": {
     "title": "My Notifications",
     "markAllRead": "Mark all as read",

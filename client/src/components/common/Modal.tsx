@@ -31,7 +31,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 overflow-y-auto bg-black/50"
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/50 dark:bg-black/60"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -47,7 +47,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
             <button
               type="button"
               onClick={onClose}
-              className="p-1 rounded-lg text-text-secondary hover:bg-gray-100 hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer"
+              className="p-1 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer"
             >
               <MdClose size={22} />
             </button>

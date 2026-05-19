@@ -3,11 +3,12 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { MdStorage, MdPersonOutline, MdLogout, MdExpandMore, MdOutlineSettings } from 'react-icons/md';
+import { MdStorage, MdPersonOutline, MdLogout, MdExpandMore, MdOutlineSettings, MdDarkMode, MdLightMode } from 'react-icons/md';
 import { GiQueenCrown } from 'react-icons/gi';
 import type { UserProfile } from '../../types/navigation';
 import LanguageSwitcher from '../LanguageSwitcher';
 import NotificationBell from '../notifications/NotificationBell';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface TopBarProps {
   userProfile: UserProfile;
@@ -17,6 +18,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
   const { t } = useTranslation();
   const auth = useAuth();
   const navigate = useNavigate();
+  const { effectiveTheme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -46,13 +48,20 @@ export default function TopBar({ userProfile }: TopBarProps) {
       {/* Right side: language + role icon + user */}
       <div className="flex items-center gap-4">
         <LanguageSwitcher />
+        <button
+          onClick={toggleTheme}
+          aria-label={t('theme.toggle')}
+          className="p-1.5 rounded-full text-text-secondary hover:text-text-primary hover:bg-primary-light dark:hover:bg-primary-light transition-colors"
+        >
+          {effectiveTheme === 'dark' ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
+        </button>
         <NotificationBell />
 
         {/* Role icon — clicking navigates to settings */}
         {hasSettingsAccess && (
           <button
             onClick={() => navigate('/settings')}
-            className="p-1.5 rounded-lg hover:bg-gray-100 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
+            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
             title={t('nav.settings', 'Settings')}
             aria-label={t('nav.settings', 'Settings')}
           >
@@ -68,7 +77,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-100 transition-colors bg-transparent border-none cursor-pointer"
+            className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors bg-transparent border-none cursor-pointer"
             aria-expanded={menuOpen}
             aria-haspopup="menu"
           >
@@ -88,14 +97,14 @@ export default function TopBar({ userProfile }: TopBarProps) {
             <div className="absolute end-0 top-full mt-1 w-44 bg-bg-paper rounded-xl shadow-lg border border-divider overflow-hidden z-[9999]">
               <button
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-gray-50 transition-colors bg-transparent border-none cursor-pointer text-start"
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-transparent border-none cursor-pointer text-start"
               >
                 <MdPersonOutline size={18} />
                 {t('user.profile')}
               </button>
               <button
                 onClick={() => { setMenuOpen(false); auth.signoutRedirect(); }}
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-danger hover:bg-gray-50 transition-colors bg-transparent border-none cursor-pointer text-start"
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-danger hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-transparent border-none cursor-pointer text-start"
               >
                 <MdLogout size={18} />
                 {t('user.logout')}
