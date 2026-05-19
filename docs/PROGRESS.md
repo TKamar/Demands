@@ -1,6 +1,6 @@
 # Center Manager & Multi-Step Approval — Implementation Progress
 
-> Last updated: 2026-05-19
+> Last updated: 2026-05-19 (all 6 branches complete)
 > Plan file: `.claude/plans/task-brief-implementation-floofy-axolotl.md`
 
 ---
@@ -14,7 +14,7 @@
 | 3 | `feature/multi-step-approval` | ✅ Complete | `bf1aa19`, `f479dc5` |
 | 4 | `feature/request-history-restore` | ✅ Complete | `b25030a`, `d0e8316` |
 | 5 | `feature/resource-assignment` | ✅ Complete | `4a46571` |
-| 6 | `feature/moderator-bulk-decision` | ⬜ Not started | — |
+| 6 | `feature/moderator-bulk-decision` | ✅ Complete | `72654b5`, `6a3f911`, `f884e53` |
 
 ---
 
@@ -94,27 +94,18 @@
 
 ## What's Left
 
-### Branch 6 — `feature/moderator-bulk-decision` ⬜
+All 6 feature branches are complete and pushed to GitHub. Only the final manual verification checklist remains.
 
-**Scope:**
-1. **`WalletSummary.tsx`** — new component showing center wallet balance (value, allocated, available) per capacity; used inside `BulkDecisionModal`
-2. **`BulkDecisionModal.tsx`** — enhanced with:
-   - `WalletSummary` embedded at top
-   - Approval mode selector: Full Amount / Specific Amount / Percentage
-   - Percentage mode computes total from selected demands' `value` sum
-   - 3-state dialog: `idle → confirming → success/error`
-   - Stats row: selected count + total requested
-3. **i18n keys** for `bulkDecision.*`, `wallet.*`, `decisionStatus.*`, `actions.next/back/confirm`
-4. **Build + commit**
+---
 
-**Files to touch:**
-| Action | Path |
-|--------|------|
-| Modify | `client/src/components/management/BulkDecisionModal.tsx` |
-| Create | `client/src/components/management/WalletSummary.tsx` |
-| Modify | `client/src/api/apiService.ts` (add `fetchWallets`) |
-| Modify | `client/src/i18n/locales/en/translation.json` |
-| Modify | `client/src/i18n/locales/he/translation.json` |
+### Branch 6 — `feature/moderator-bulk-decision` ✅
+
+**Delivered:**
+- `WalletSummary.tsx` — shows available/allocated per wallet for the selected center; hidden for multi-center filter
+- `BulkDecisionModal.tsx` enhanced: `PartiallyApproved` type, full/amount/percentage approval modes, 2-step form→confirm dialog, stats row (selected count + total of selected demands), WalletSummary embedded
+- `fetchWalletsByCenter(centerName)` API function added; `allocated`/`available` added to `Wallet` interface
+- `RequirementsView` passes filtered selection to modal (not full page)
+- i18n complete in en/he
 
 ---
 
