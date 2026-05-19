@@ -47,7 +47,23 @@
       "summary": "Apply status change to {{count}} demands (only Pending demands will be affected)",
       "submit": "Apply to All",
       "successApproved": "{{count}} demands approved successfully",
-      "successRejected": "{{count}} demands rejected successfully"
+      "successRejected": "{{count}} demands rejected successfully",
+      "decisionType": {
+        "Approved": "Approved",
+        "PartiallyApproved": "Partially Approved",
+        "Rejected": "Rejected"
+      },
+      "approvalMode": "Approval Mode",
+      "mode": {
+        "full": "Full Amount",
+        "amount": "Specific Amount",
+        "percentage": "Percentage"
+      },
+      "amountPlaceholder": "Enter amount...",
+      "selectedCount": "Selected",
+      "totalRequested": "Total Requested",
+      "approvedValueSummary": "Approved amount: {{value}}",
+      "confirmMessage": "Apply \"{{decision}}\" to {{count}} demands?"
     },
     "tabs": {
       "capacity": "Capacity Management",
@@ -55,6 +71,9 @@
     },
     "wallet": {
       "add": "Add Wallet",
+      "summaryTitle": "Center Wallet: {{center}}",
+      "available": "Available",
+      "allocated": "Allocated",
       "columns": {
         "service": "Service",
         "resource": "Resource",
@@ -149,7 +168,9 @@
     "typeAndEnter": "Type and press Enter...",
     "active": "Active",
     "updated": "Updated successfully",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "back": "Back",
+    "confirm": "Confirm"
   },
   "settings": {
     "subtitle": "Manage system entities and configurations",

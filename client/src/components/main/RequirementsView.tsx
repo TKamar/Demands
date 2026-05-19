@@ -616,6 +616,8 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
         onReject={handleBulkReject}
         selectedCount={selectedCount}
         isLoading={isBulkLoading}
+        demands={demands}
+        centerName={demandFilterParams.centerName}
       />
     </div>
   );

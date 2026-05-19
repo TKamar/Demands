@@ -191,6 +191,8 @@ export interface Wallet {
   centerName: string;
   capacityId: number;
   value: number;
+  allocated: number;
+  available: number;
   center: {
     name: string;
     displayName?: string;

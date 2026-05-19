@@ -357,6 +357,11 @@ export async function fetchWallets(): Promise<Wallet[]> {
   return data;
 }
 
+export async function fetchWalletsByCenter(centerName: string): Promise<Wallet[]> {
+  const { data } = await api.get('/wallets/filter', { params: { centerName } });
+  return data;
+}
+
 export async function createWallet(payload: CreateWalletPayload): Promise<Wallet> {
   const { data } = await api.post('/wallets', payload);
   return data;

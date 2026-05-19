@@ -47,7 +47,23 @@
       "summary": "החל שינוי סטטוס על {{count}} דרישות (רק דרישות ממתינות יושפעו)",
       "submit": "החל על הכל",
       "successApproved": "{{count}} דרישות אושרו בהצלחה",
-      "successRejected": "{{count}} דרישות נדחו בהצלחה"
+      "successRejected": "{{count}} דרישות נדחו בהצלחה",
+      "decisionType": {
+        "Approved": "מאושר",
+        "PartiallyApproved": "מאושר חלקית",
+        "Rejected": "נדחה"
+      },
+      "approvalMode": "מצב אישור",
+      "mode": {
+        "full": "כמות מלאה",
+        "amount": "כמות ספציפית",
+        "percentage": "אחוז"
+      },
+      "amountPlaceholder": "הזן כמות...",
+      "selectedCount": "נבחרו",
+      "totalRequested": "סה\"כ מבוקש",
+      "approvedValueSummary": "כמות מאושרת: {{value}}",
+      "confirmMessage": "להחיל \"{{decision}}\" על {{count}} דרישות?"
     },
     "tabs": {
       "capacity": "ניהול קיבולת משאבים",
@@ -55,6 +71,9 @@
     },
     "wallet": {
       "add": "הוסף ארנק",
+      "summaryTitle": "ארנק מרכז: {{center}}",
+      "available": "זמין",
+      "allocated": "מוקצה",
       "columns": {
         "service": "שירות",
         "resource": "משאב",
@@ -151,7 +170,9 @@
     "typeAndEnter": "הקלד ולחץ ENTER...",
     "active": "פעיל",
     "updated": "עודכן בהצלחה",
-    "loading": "טוען..."
+    "loading": "טוען...",
+    "back": "חזור",
+    "confirm": "אשר"
   },
   "settings": {
     "subtitle": "ניהול ישויות מערכת והגדרות",
