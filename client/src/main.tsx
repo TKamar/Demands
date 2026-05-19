@@ -4,9 +4,12 @@ import './i18n';
 import App from './App';
 import './index.css';
 import { authConfig } from './auth/authConfig';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 createRoot(document.getElementById('root')!).render(
-  <AuthProvider {...authConfig}>
-    <App />
-  </AuthProvider>,
+  <ThemeProvider>
+    <AuthProvider {...authConfig}>
+      <App />
+    </AuthProvider>
+  </ThemeProvider>,
 );

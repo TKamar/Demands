@@ -456,6 +456,12 @@
       "other": "אחר"
     }
   },
+  "theme": {
+    "toggle": "החלף ערכת נושא",
+    "light": "בהיר",
+    "dark": "כהה",
+    "system": "מערכת"
+  },
   "notifications": {
     "title": "ההתראות שלי",
     "markAllRead": "סמן הכל כנקרא",
