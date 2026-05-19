@@ -12,6 +12,7 @@ router.get("/", authenticate, requireAuth, demandController.getAll);
 router.get("/filter", authenticate, requireAuth, demandController.getByFilters);
 router.get("/history", authenticate, requireAuth, demandController.getHistory);
 router.get("/center/pending", authenticate, requireAuth, requireCenterManager, demandController.getCenterPendingDemands);
+router.get("/center/for-assignment", authenticate, requireAuth, requireCenterManager, demandController.getCenterForAssignmentDemands);
 router.patch("/:id/restore", authenticate, requireAuth, demandController.restore);
 router.patch("/bulk/approve", authenticate, requireModerator, demandController.bulkApprove);
 router.patch("/bulk/reject", authenticate, requireModerator, demandController.bulkReject);

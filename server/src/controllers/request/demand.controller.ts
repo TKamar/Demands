@@ -597,6 +597,23 @@ export const demandController = {
     }
   },
 
+  getCenterForAssignmentDemands: async (req: Request, res: Response) => {
+    try {
+      const user = req.auth!.user;
+      if (!user.isCenterManager && !user.isAdmin) {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
+      const centerName = user.isCenterManager ? user.centerName! : (req.query.centerName as string);
+      if (!centerName) return res.status(400).json({ message: 'centerName required' });
+
+      const demands = await demandService.getDemandsByCenterAndStatus(centerName, 'Pending');
+      res.json(demands);
+    } catch (error) {
+      console.error("demandController.getCenterForAssignmentDemands error:", error);
+      res.status(500).json({ error: "Failed to fetch center for-assignment demands" });
+    }
+  },
+
   assign: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id, 10);

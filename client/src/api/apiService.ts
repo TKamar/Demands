@@ -247,6 +247,11 @@ export async function fetchCenterPendingDemands(): Promise<Demand[]> {
   return res.data.map(mapDemand);
 }
 
+export async function fetchCenterForAssignmentDemands(): Promise<Demand[]> {
+  const res = await api.get<any[]>('/demands/center/for-assignment');
+  return res.data.map(mapDemand);
+}
+
 export async function cmApproveDemand(id: number): Promise<Demand> {
   const res = await api.patch<any>(`/demands/${id}/cm-approve`);
   return mapDemand(res.data);

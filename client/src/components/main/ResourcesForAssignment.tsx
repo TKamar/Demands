@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Demand } from '../../types/domain';
-import { fetchDemands, cmAssignDemand } from '../../api/apiService';
+import { fetchCenterForAssignmentDemands, cmAssignDemand } from '../../api/apiService';
 
 export const ResourcesForAssignment: React.FC = () => {
   const { t } = useTranslation();
@@ -9,12 +9,13 @@ export const ResourcesForAssignment: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState<number | null>(null);
   const [values, setValues] = useState<Record<number, string>>({});
+  const [error, setError] = useState<string | null>(null);
 
   const reload = () => {
+    setError(null);
     setLoading(true);
-    fetchDemands({ status: 'Pending', limit: 500 })
-      .then(res => {
-        const data = res.data ?? [];
+    fetchCenterForAssignmentDemands()
+      .then(data => {
         setDemands(data);
         const init: Record<number, string> = {};
         data.forEach((d: Demand) => {
@@ -35,8 +36,8 @@ export const ResourcesForAssignment: React.FC = () => {
     try {
       await cmAssignDemand(demand.id, val);
       reload();
-    } catch {
-      // keep existing list on error
+    } catch (e: any) {
+      setError(e.response?.data?.message ?? t('errors.generic'));
     } finally {
       setAssigning(null);
     }
@@ -50,6 +51,7 @@ export const ResourcesForAssignment: React.FC = () => {
       <div className="bg-blue-50 border-b px-4 py-2 font-semibold text-blue-800">
         {t('resourceAssignment.title')}
       </div>
+      {error && <p className="text-red-600 text-sm mb-3 p-2">{error}</p>}
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-gray-50">
@@ -69,7 +71,7 @@ export const ResourcesForAssignment: React.FC = () => {
               <td className="p-2">
                 <input
                   type="number"
-                  min="0"
+                  min="1"
                   max={demand.value}
                   value={values[demand.id] ?? ''}
                   onChange={e => setValues(prev => ({ ...prev, [demand.id]: e.target.value }))}
