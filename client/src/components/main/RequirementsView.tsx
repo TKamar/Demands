@@ -616,8 +616,8 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
         onReject={handleBulkReject}
         selectedCount={selectedCount}
         isLoading={isBulkLoading}
-        demands={demands}
-        centerName={demandFilterParams.centerName}
+        demands={isAllAcrossPagesSelected ? undefined : demands.filter((d) => selectedIds.has(d.id))}
+        centerName={demandFilterParams.centerName?.includes(',') ? undefined : demandFilterParams.centerName}
       />
     </div>
   );
