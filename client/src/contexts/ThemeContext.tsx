@@ -22,7 +22,8 @@ function resolveTheme(mode: ThemeMode): 'light' | 'dark' {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>(() => {
     try {
-      return (localStorage.getItem('theme') as ThemeMode) || 'system';
+      const stored = localStorage.getItem('theme');
+      return (stored === 'light' || stored === 'dark' || stored === 'system') ? stored : 'system';
     } catch {
       return 'system';
     }
@@ -38,7 +39,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (theme !== 'system') return;
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = () => setThemeState('system');
+    const handler = (e: MediaQueryListEvent) => {
+      document.documentElement.classList.toggle('dark', e.matches);
+    };
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, [theme]);
