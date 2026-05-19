@@ -73,11 +73,11 @@ export default function BulkDecisionModal({
   const isValid = () => {
     if (decisionType === 'Rejected' && (!reason || !reason.trim())) return false;
     if (decisionType === 'PartiallyApproved' && (!reason || !reason.trim())) return false;
-    if (approvalMode === 'amount') {
+    if (decisionType !== 'Rejected' && approvalMode === 'amount') {
       const v = parseFloat(amountValue);
       if (isNaN(v) || v <= 0) return false;
     }
-    if (approvalMode === 'percentage') {
+    if (decisionType !== 'Rejected' && approvalMode === 'percentage') {
       const pct = parseFloat(percentageValue);
       if (isNaN(pct) || pct <= 0 || pct > 100) return false;
     }
