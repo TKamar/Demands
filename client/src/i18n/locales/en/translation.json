@@ -282,7 +282,9 @@
       "Rejected": "Rejected",
       "PartiallyApproved": "Partially Approved",
       "ApprovedWithCondition": "Approved With Condition",
-      "Cancelled": "Cancelled"
+      "Cancelled": "Cancelled",
+      "PendingCenterManager": "Pending CM Approval",
+      "CenterManagerRejected": "Rejected by CM"
     },
     "editProject": {
       "title": "Edit Project"
@@ -307,6 +309,8 @@
     "updateSuccess": "Project updated successfully",
     "updateFailed": "Failed to update project",
     "type": {
+      "New": "New",
+      "Extension": "Extension",
       "Semiannual": "Semiannual",
       "Emergency": "Emergency",
       "median": "Median",
