@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { MdClose } from 'react-icons/md';
 
@@ -6,7 +7,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
@@ -47,6 +48,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
             <button
               type="button"
               onClick={onClose}
+              aria-label="Close"
               className="p-1 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer"
             >
               <MdClose size={22} />
