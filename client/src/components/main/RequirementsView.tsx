@@ -245,8 +245,8 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
     const emergencyOptionOptions = emergencyOptions.map((eo) => ({ value: eo.name, label: eo.name }));
 
     const typeOptions = [
-      { value: 'New', label: 'New' },
-      { value: 'Extension', label: 'Extension' },
+      { value: 'New', label: t('projects.type.New') },
+      { value: 'Extension', label: t('projects.type.Extension') },
     ];
 
     const statusOptions = [
