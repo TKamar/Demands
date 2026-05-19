@@ -41,7 +41,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
           if (e.target === e.currentTarget) onClose();
         }}
       >
-        <div className="relative bg-bg-paper rounded-2xl shadow-xl w-full max-w-3xl overflow-visible">
+        <div className="relative bg-bg-paper dark:bg-bg-paper rounded-2xl shadow-xl w-full max-w-3xl overflow-visible">
           <div className="flex items-center justify-between p-6 border-b border-divider">
             <h2 className="text-xl font-bold text-text-primary m-0">{title}</h2>
             <button
