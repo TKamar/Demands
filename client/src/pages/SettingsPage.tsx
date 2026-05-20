@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
+import { MdArrowBack } from 'react-icons/md';
 import CapacityManagement from '../components/management/CapacityManagement';
 import WalletManagement from '../components/management/WalletManagement';
 import EntityManager from '../components/common/EntityManager';
@@ -389,6 +391,7 @@ function ServicesSettings({ serviceOptions, onSuccess }: { serviceOptions: { val
 
 export default function SettingsPage() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const auth = useAuth();
     const currentUser = useCurrentUser();
 
@@ -437,6 +440,13 @@ export default function SettingsPage() {
     return (
         <div className="max-w-[1600px] mx-auto p-6 md:p-8">
             <div className="mb-8">
+                <button
+                    onClick={() => navigate('/projects')}
+                    className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer p-0 mb-4 text-sm"
+                >
+                    <MdArrowBack size={16} />
+                    {t('common.back', 'Back')}
+                </button>
                 <h1 className="text-2xl font-bold text-text-primary mb-2">{t('nav.settings', 'Settings')}</h1>
                 <p className="text-text-secondary">{t('settings.subtitle', 'Manage system entities and configurations')}</p>
             </div>

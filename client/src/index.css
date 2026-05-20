@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-primary: #1565C0;
@@ -13,6 +14,20 @@
   --color-topbar: #3D5C3E;
   --font-sans: "Segoe UI", Tahoma, Arial, sans-serif;
   --animate-slide-in: slide-in 0.3s ease-out;
+}
+
+/* Dark Mode Token Overrides */
+html.dark {
+  --color-bg-default:      #0D1117;
+  --color-bg-paper:        #161B22;
+  --color-text-primary:    #E6EDF3;
+  --color-text-secondary:  #8B949E;
+  --color-divider:         #30363D;
+  --color-primary:         #58A6FF;
+  --color-primary-light:   #1F3450;
+  --color-primary-dark:    #388BFD;
+  --color-topbar:          #1E3320;
+  --color-danger:          #F85149;
 }
 
 @keyframes slide-in {
@@ -56,6 +71,7 @@
     font-family: var(--font-sans);
     color: var(--color-text-primary);
     background-color: var(--color-bg-default);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
   #root {

@@ -12,6 +12,7 @@
   "management": {
     "demandsTitle": "ניהול דרישות",
     "makeDecision": "קבלת החלטה",
+    "decide": "החלט",
     "decisionModal": {
       "title": "קבלת החלטה",
       "decisionType": "סוג החלטה",
@@ -151,6 +152,8 @@
     "typeAndEnter": "הקלד ולחץ ENTER...",
     "active": "פעיל",
     "updated": "עודכן בהצלחה",
+    "back": "חזרה",
+    "duplicate": "שכפל",
     "loading": "טוען..."
   },
   "settings": {
@@ -311,6 +314,8 @@
     "updateSuccess": "הפרויקט עודכן בהצלחה",
     "updateFailed": "עדכון הפרויקט נכשל",
     "type": {
+      "New": "חדש",
+      "Extension": "הרחבה",
       "Semiannual": "חצי שנתי",
       "Emergency": "חירום",
       "median": "חציון",
@@ -331,7 +336,18 @@
     },
     "demandType": {
       "New": "חדש",
-      "Extension": "הרחבה"
+      "Extension": "הרחבה",
+      "median": "חציון",
+      "relatedTo": "מסלול / אפליקציה",
+      "emergencyOption": "אפשרות חירום",
+      "center": "מרכז",
+      "branch": "ענף",
+      "section": "מדור"
+    },
+    "empty": "לא נמצאו פרויקטים",
+    "median": {
+      "H1": "H1",
+      "H2": "H2"
     },
     "newProject": "פרויקט חדש",
     "export": "ייצוא",
@@ -423,6 +439,7 @@
     "editDemand": {
       "title": "עריכת דרישה"
     },
+    "empty": "אין דרישות",
     "actions": {
       "cancel": "ביטול"
     },
@@ -437,6 +454,18 @@
     "value": "כמות",
     "createdBy": "נוצר על ידי",
     "createdAt": "תאריך יצירה",
+    "status": "סטטוס"
+  },
+  "demand": {
+    "deleteConfirm": "למחוק דרישה זו?",
+    "deleted": "הדרישה נמחקה",
+    "deleteError": "מחיקת הדרישה נכשלה",
+    "cancelConfirm": "לבטל דרישה זו?",
+    "cancelled": "הדרישה בוטלה",
+    "cancelError": "ביטול הדרישה נכשל",
+    "service": "שירות",
+    "resource": "משאב",
+    "value": "כמות",
     "status": "סטטוס"
   },
   "notFound": {
@@ -483,5 +512,61 @@
   "actions": {
     "approve": "אשר",
     "reject": "דחה"
+  },
+  "theme": {
+    "toggle": "החלף ערכת נושא",
+    "light": "בהיר",
+    "dark": "כהה",
+    "system": "מערכת"
+  },
+  "notifications": {
+    "title": "ההתראות שלי",
+    "markAllRead": "סמן הכל כנקרא",
+    "empty": "אין התראות",
+    "loading": "טוען...",
+    "types": {
+      "NewDemand": "דרישה חדשה",
+      "DemandDecision": "קבלת תשובה על הדרישה",
+      "DemandCancelled": "ביטול דרישה",
+      "DemandEdited": "עריכת דרישה",
+      "NewProject": "פרויקט חדש",
+      "ProjectDeleted": "מחיקת פרויקט",
+      "ProjectEdited": "עריכת פרויקט"
+    }
+  },
+  "main": {
+    "tabs": {
+      "projects": "פרויקטים ודרישות",
+      "requirements": "דרישות"
+    },
+    "search": {
+      "placeholder": "חיפוש… (בקרוב)"
+    },
+    "actions": {
+      "newProject": "פרויקט חדש",
+      "newRequirement": "דרישה חדשה"
+    }
+  },
+  "centerFilter": {
+    "label": "מרכז",
+    "all": "כל המרכזים",
+    "selectAll": "כל המרכזים",
+    "count": "{{count}} מרכזים"
+  },
+  "resourceSummary": {
+    "label": "משאבים",
+    "collapse": "כווץ",
+    "expand": "הרחב משאבים",
+    "empty": "אין נתוני קיבולת"
+  },
+  "project": {
+    "name": "שם",
+    "type": "סוג",
+    "center": "מרכז",
+    "priority": "תעדוף",
+    "status": "סטטוס",
+    "deleteConfirm": "למחוק את הפרויקט?",
+    "deleted": "הפרויקט נמחק",
+    "deleteError": "מחיקת הפרויקט נכשלה"
   }
 }

@@ -35,6 +35,9 @@ import demandRoutes from "./request/demand.routes";
 import projectKindRoutes from "./request/projectKind.routes";
 import emergencyOptionRoutes from "./request/emergencyOption.routes";
 
+// Notification routes
+import notificationRoutes from "./notification/notification.routes";
+
 const router = Router();
 
 // Current user endpoint
@@ -80,5 +83,8 @@ router.use("/projects", projectRoutes);
 router.use("/demands", demandRoutes);
 router.use("/project-kinds", projectKindRoutes);
 router.use("/emergency-options", emergencyOptionRoutes);
+
+// Notification endpoints
+router.use("/notifications", notificationRoutes);
 
 export default router;

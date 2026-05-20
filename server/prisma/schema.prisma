@@ -245,6 +245,7 @@ model Project {
   createdByName       String?
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
+  notifications       Notification[]
 
   @@index([createdBy])
 }
@@ -277,6 +278,7 @@ model Demand {
   createdByName      String?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
+  notifications      Notification[]
 
   @@index([createdBy])
 }
@@ -307,4 +309,37 @@ model User {
   center     Center?   @relation(fields: [centerName], references: [name])
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+}
+
+// ============================================
+// Notification Models
+// ============================================
+
+enum NotificationType {
+  NewDemand
+  DemandDecision
+  DemandCancelled
+  DemandEdited
+  NewProject
+  ProjectDeleted
+  ProjectEdited
+}
+
+model Notification {
+  id                Int              @id @default(autoincrement())
+  type              NotificationType
+  recipientUsername String?
+  isAdminBroadcast  Boolean          @default(false)
+  readByUsernames   String[]         @default([])
+  isRead            Boolean          @default(false)
+  title             String
+  message           String
+  demandId          Int?
+  demand            Demand?          @relation(fields: [demandId], references: [id], onDelete: SetNull)
+  projectName       String?
+  project           Project?         @relation(fields: [projectName], references: [name], onDelete: SetNull)
+  createdAt         DateTime         @default(now())
+
+  @@index([recipientUsername, createdAt(sort: Desc)])
+  @@index([isAdminBroadcast, createdAt(sort: Desc)])
 }

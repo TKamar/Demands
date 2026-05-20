@@ -245,8 +245,8 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
     const emergencyOptionOptions = emergencyOptions.map((eo) => ({ value: eo.name, label: eo.name }));
 
     const typeOptions = [
-      { value: 'New', label: 'New' },
-      { value: 'Extension', label: 'Extension' },
+      { value: 'New', label: t('projects.type.New') },
+      { value: 'Extension', label: t('projects.type.Extension') },
     ];
 
     const statusOptions = [
@@ -259,19 +259,19 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
     ];
 
     const projectTypeOptions = [
-      { value: 'Emergency', label: 'Emergency' },
-      { value: 'Semiannual', label: 'Semiannual' },
+      { value: 'Emergency', label: t('projects.type.Emergency') },
+      { value: 'Semiannual', label: t('projects.type.Semiannual') },
     ];
 
     const medianOptions = [
-      { value: 'H1', label: 'H1' },
-      { value: 'H2', label: 'H2' },
+      { value: 'H1', label: t('projects.median.H1') },
+      { value: 'H2', label: t('projects.median.H2') },
     ];
 
     const priorityOptions = [
-      { value: 'P1', label: 'P1' },
-      { value: 'P2', label: 'P2' },
-      { value: 'P3', label: 'P3' },
+      { value: 'P1', label: t('projects.priority.P1') },
+      { value: 'P2', label: t('projects.priority.P2') },
+      { value: 'P3', label: t('projects.priority.P3') },
     ];
 
     const optionsMap: Record<DemandFilterKey, { value: string; label: string }[]> = {

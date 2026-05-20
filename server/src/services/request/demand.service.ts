@@ -1,6 +1,7 @@
 import prisma from "../../lib/prisma";
 import { DemandType, DemandStatus, ProjectType, Median } from "@prisma/client";
 import { NotFoundError } from "../../lib/errors";
+import { notificationService } from "../notification/notification.service";
 
 export const demandService = {
 
@@ -149,7 +150,7 @@ export const demandService = {
     createdBy?: string;
     createdByName?: string;
   }) => {
-    return prisma.demand.create({
+    const demand = await prisma.demand.create({
       data: {
         ...data,
         status: "Pending",
@@ -161,6 +162,27 @@ export const demandService = {
         location: true,
       },
     });
+
+    const moderators = (demand.service?.moderators ?? []) as string[];
+    const notifData = {
+      type: "NewDemand" as const,
+      title: "New Demand Submitted",
+      message: `New demand for ${demand.resourceName} (${demand.value} ${demand.resource?.unit ?? ""}) in project "${demand.projectName}" was submitted by ${demand.createdByName ?? demand.createdBy ?? "unknown"}.`,
+      demandId: demand.id,
+      projectName: demand.projectName,
+    };
+    setImmediate(async () => {
+      try {
+        await Promise.all([
+          ...moderators.map((u) => notificationService.createForUser(u, notifData)),
+          notificationService.createAdminBroadcast(notifData),
+        ]);
+      } catch (err) {
+        console.error("[notifications] create:", err);
+      }
+    });
+
+    return demand;
   },
 
   update: async (
@@ -188,7 +210,7 @@ export const demandService = {
     if (existing.status !== "Pending") {
       throw new Error("Only pending demands can be edited");
     }
-    return prisma.demand.update({
+    const demand = await prisma.demand.update({
       where: { id },
       data,
       include: {
@@ -198,6 +220,28 @@ export const demandService = {
         location: true,
       },
     });
+
+    const moderators = (demand.service?.moderators ?? []) as string[];
+    const notifData = {
+      type: "DemandEdited" as const,
+      title: "Demand Edited",
+      // Uses original creator for attribution — service doesn't receive acting user separately
+      message: `The demand for ${demand.resourceName} in project "${demand.projectName}" was edited by ${demand.createdByName ?? demand.createdBy ?? "unknown"}.`,
+      demandId: demand.id,
+      projectName: demand.projectName,
+    };
+    setImmediate(async () => {
+      try {
+        await Promise.all([
+          ...moderators.map((u) => notificationService.createForUser(u, notifData)),
+          notificationService.createAdminBroadcast(notifData),
+        ]);
+      } catch (err) {
+        console.error("[notifications] update:", err);
+      }
+    });
+
+    return demand;
   },
 
   delete: async (id: number, createdBy?: string) => {
@@ -215,7 +259,7 @@ export const demandService = {
   },
 
   reject: async (id: number, reason: string) => {
-    return prisma.demand.update({
+    const demand = await prisma.demand.update({
       where: { id },
       data: {
         status: "Rejected",
@@ -228,6 +272,24 @@ export const demandService = {
         location: true,
       },
     });
+
+    if (demand.createdBy) {
+      setImmediate(async () => {
+        try {
+          await notificationService.createForUser(demand.createdBy!, {
+            type: "DemandDecision",
+            title: "Decision Received on Your Demand",
+            message: `Your demand for ${demand.resourceName} in project "${demand.projectName}" was rejected.${demand.reason ? ` Reason: ${demand.reason}` : ""}`,
+            demandId: demand.id,
+            projectName: demand.projectName,
+          });
+        } catch (err) {
+          console.error("[notifications] reject:", err);
+        }
+      });
+    }
+
+    return demand;
   },
 
   cancel: async (id: number, createdBy?: string) => {
@@ -240,7 +302,7 @@ export const demandService = {
     if (existing.status !== "Pending") {
       throw new Error("Only pending demands can be cancelled");
     }
-    return prisma.demand.update({
+    const demand = await prisma.demand.update({
       where: { id },
       data: {
         status: "Cancelled",
@@ -252,6 +314,27 @@ export const demandService = {
         location: true,
       },
     });
+
+    const moderators = (demand.service?.moderators ?? []) as string[];
+    const notifData = {
+      type: "DemandCancelled" as const,
+      title: "Demand Cancelled by Creator",
+      message: `The demand for ${demand.resourceName} in project "${demand.projectName}" was cancelled by ${demand.createdByName ?? demand.createdBy ?? "unknown"}.`,
+      demandId: demand.id,
+      projectName: demand.projectName,
+    };
+    setImmediate(async () => {
+      try {
+        await Promise.all([
+          ...moderators.map((u) => notificationService.createForUser(u, notifData)),
+          notificationService.createAdminBroadcast(notifData),
+        ]);
+      } catch (err) {
+        console.error("[notifications] cancel:", err);
+      }
+    });
+
+    return demand;
   },
 
   approve: async (
@@ -262,7 +345,7 @@ export const demandService = {
       reason?: string;
     }
   ) => {
-    return prisma.demand.update({
+    const demand = await prisma.demand.update({
       where: { id },
       data: {
         status: data.status,
@@ -277,6 +360,30 @@ export const demandService = {
         location: true,
       },
     });
+
+    if (demand.createdBy) {
+      const statusLabel: Record<string, string> = {
+        Approved: "approved",
+        PartiallyApproved: "partially approved",
+        ApprovedWithCondition: "approved with condition",
+      };
+      const label = statusLabel[demand.status] ?? demand.status;
+      setImmediate(async () => {
+        try {
+          await notificationService.createForUser(demand.createdBy!, {
+            type: "DemandDecision",
+            title: "Decision Received on Your Demand",
+            message: `Your demand for ${demand.resourceName} in project "${demand.projectName}" was ${label}.${demand.approvedValue != null ? ` Approved value: ${demand.approvedValue} ${demand.resource?.unit ?? ""}.` : ""}`,
+            demandId: demand.id,
+            projectName: demand.projectName,
+          });
+        } catch (err) {
+          console.error("[notifications] approve:", err);
+        }
+      });
+    }
+
+    return demand;
   },
 
   bulkApprove: async (
@@ -287,6 +394,7 @@ export const demandService = {
       reason?: string;
     }
   ) => {
+    // Bulk operations skip per-demand notifications intentionally — too noisy for batch decisions.
     return prisma.demand.updateMany({
       where: { ...where, status: "Pending" },
       data: {
@@ -299,6 +407,7 @@ export const demandService = {
   },
 
   bulkReject: async (where: any, reason: string) => {
+    // Bulk operations skip per-demand notifications intentionally — too noisy for batch decisions.
     return prisma.demand.updateMany({
       where: { ...where, status: "Pending" },
       data: {
