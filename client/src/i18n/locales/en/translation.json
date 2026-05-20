@@ -62,6 +62,7 @@
         "base": "Base",
         "environment": "Environment",
         "network": "Network",
+        "cluster": "Cluster",
         "center": "Center",
         "value": "Value",
         "actions": "Actions"
@@ -91,6 +92,7 @@
         "base": "Base",
         "network": "Network",
         "environment": "Environment",
+        "cluster": "Cluster",
         "total": "Total Capacity",
         "allocated": "Allocated",
         "available": "Available",
@@ -150,7 +152,9 @@
     "typeAndEnter": "Type and press Enter...",
     "active": "Active",
     "updated": "Updated successfully",
-    "back": "Back"
+    "back": "Back",
+    "duplicate": "Duplicate",
+    "loading": "Loading..."
   },
   "settings": {
     "subtitle": "Manage system entities and configurations",
@@ -339,6 +343,11 @@
       "branch": "Branch",
       "section": "Section"
     },
+    "empty": "No projects found",
+    "median": {
+      "H1": "H1",
+      "H2": "H2"
+    },
     "newProject": "New Project",
     "export": "Export",
     "createDemand": {
@@ -429,6 +438,7 @@
     "editDemand": {
       "title": "Edit Demand"
     },
+    "empty": "No requirements",
     "actions": {
       "cancel": "Cancel"
     },
@@ -444,7 +454,11 @@
     "deleteError": "Failed to delete requirement",
     "cancelConfirm": "Cancel this requirement?",
     "cancelled": "Requirement cancelled",
-    "cancelError": "Failed to cancel requirement"
+    "cancelError": "Failed to cancel requirement",
+    "service": "Service",
+    "resource": "Resource",
+    "value": "Value",
+    "status": "Status"
   },
   "notFound": {
     "message": "The requested page was not found"
@@ -484,5 +498,40 @@
       "ProjectDeleted": "Project Deleted",
       "ProjectEdited": "Project Edited"
     }
+  },
+  "main": {
+    "tabs": {
+      "projects": "Projects & Requirements",
+      "requirements": "Requirements"
+    },
+    "search": {
+      "placeholder": "Search… (coming soon)"
+    },
+    "actions": {
+      "newProject": "New Project",
+      "newRequirement": "New Requirement"
+    }
+  },
+  "centerFilter": {
+    "label": "Center",
+    "all": "All Centers",
+    "selectAll": "All Centers",
+    "count": "{{count}} centers"
+  },
+  "resourceSummary": {
+    "label": "Resources",
+    "collapse": "Collapse",
+    "expand": "Expand resources",
+    "empty": "No capacity data"
+  },
+  "project": {
+    "name": "Name",
+    "type": "Type",
+    "center": "Center",
+    "priority": "Priority",
+    "status": "Status",
+    "deleteConfirm": "Delete this project?",
+    "deleted": "Project deleted",
+    "deleteError": "Failed to delete project"
   }
 }
