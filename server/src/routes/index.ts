@@ -1,8 +1,13 @@
 import { Router } from "express";
+import { authenticate } from "../middleware/openIdConnect";
+import { requireAuth } from "../middleware/authorization";
 
 // Auth routes
 import authRoutes from "./auth/auth.routes";
 import usersGroupsRoutes from "./usersGroups/usersGroups.routes";
+
+// Admin routes
+import userRoutes from "./admin/user.routes";
 
 // Organization routes
 import centerRoutes from "./organization/center.routes";
@@ -35,9 +40,23 @@ import notificationRoutes from "./notification/notification.routes";
 
 const router = Router();
 
+// Current user endpoint
+router.get('/me', authenticate, requireAuth, (req, res) => {
+  const u = req.auth!.user;
+  res.json({
+    username: u.username,
+    fullName: u.fullName,
+    role: u.role,
+    centerName: u.centerName,
+  });
+});
+
 // Auth endpoints
 router.use("/auth", authRoutes);
 router.use("/users-groups", usersGroupsRoutes);
+
+// Admin endpoints
+router.use("/users", userRoutes);
 
 // Organization endpoints
 router.use("/centers", centerRoutes);

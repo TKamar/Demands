@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import type { Demand, Project } from '../types/domain';
+import type { Demand, Project, AppUser } from '../types/domain';
 
 import type {
   ReferenceItem,
@@ -27,6 +27,7 @@ import type {
   BulkApproveDemandPayload,
   BulkRejectDemandPayload,
   BulkDecisionResult,
+  UpdateUserPayload,
 } from './types';
 
 // --- Response mappers ---
@@ -225,6 +226,11 @@ export async function bulkRejectDemands(payload: BulkRejectDemandPayload): Promi
   return data;
 }
 
+export async function fetchCenterPendingDemands(): Promise<Demand[]> {
+  const res = await api.get<any[]>('/demands/center/pending');
+  return res.data.map(mapDemand);
+}
+
 // --- Reference data ---
 
 export async function fetchBases(): Promise<ReferenceItem[]> {
@@ -332,4 +338,16 @@ export async function updateWallet(id: number, payload: UpdateWalletPayload): Pr
 
 export async function deleteWallet(id: number): Promise<void> {
   await api.delete(`/wallets/${id}`);
+}
+
+// --- Users (admin) ---
+
+export async function fetchUsers(): Promise<AppUser[]> {
+  const res = await api.get<AppUser[]>('/users');
+  return res.data;
+}
+
+export async function updateUser(username: string, payload: UpdateUserPayload): Promise<AppUser> {
+  const res = await api.patch<AppUser>(`/users/${username}`, payload);
+  return res.data;
 }

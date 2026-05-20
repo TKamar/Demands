@@ -158,6 +158,7 @@
   },
   "settings": {
     "subtitle": "Manage system entities and configurations",
+    "userManagement": "User Management",
     "mainTabs": {
       "infrastructure": "Infrastructure",
       "organization": "Organization",
@@ -446,7 +447,14 @@
     "cancelSuccess": "Demand cancelled successfully",
     "cancelFailed": "Failed to cancel demand",
     "updateSuccess": "Demand updated successfully",
-    "updateFailed": "Failed to update demand"
+    "updateFailed": "Failed to update demand",
+    "project": "Project",
+    "service": "Service",
+    "resource": "Resource",
+    "value": "Value",
+    "createdBy": "Created By",
+    "createdAt": "Created At",
+    "status": "Status"
   },
   "demand": {
     "deleteConfirm": "Delete this requirement?",
@@ -467,6 +475,17 @@
     "columns": "Columns",
     "resetColumns": "Reset to defaults"
   },
+  "users": {
+    "username": "Username",
+    "fullName": "Full Name",
+    "role": "Role",
+    "center": "Center",
+    "selectCenter": "-- Select Center --"
+  },
+  "status": {
+    "PendingCenterManager": "Pending CM Approval",
+    "CenterManagerRejected": "Rejected by CM"
+  },
   "filters": {
     "groups": {
       "general": "General",
@@ -477,6 +496,22 @@
       "timeline": "Timeline",
       "other": "Other"
     }
+  },
+  "tabs": {
+    "myApprovalRequests": "My Approval Requests",
+    "requestsIOpened": "Requests I Opened",
+    "requestHistory": "Request History"
+  },
+  "approvalRequests": { "empty": "No pending approval requests" },
+  "myRequests": { "empty": "You have not opened any requests yet" },
+  "resourceAssignment": {
+    "title": "Resources for Assignment",
+    "comingSoon": "Resource assignment will be available after moderator approval."
+  },
+  "history": { "comingSoon": "Request history will be available soon." },
+  "actions": {
+    "approve": "Approve",
+    "reject": "Reject"
   },
   "theme": {
     "toggle": "Toggle theme",

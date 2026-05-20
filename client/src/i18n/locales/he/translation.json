@@ -158,6 +158,7 @@
   },
   "settings": {
     "subtitle": "ניהול ישויות מערכת והגדרות",
+    "userManagement": "ניהול משתמשים",
     "mainTabs": {
       "infrastructure": "תשתיות",
       "organization": "ארגון",
@@ -446,7 +447,14 @@
     "cancelSuccess": "הדרישה בוטלה בהצלחה",
     "cancelFailed": "ביטול הדרישה נכשל",
     "updateSuccess": "הדרישה עודכנה בהצלחה",
-    "updateFailed": "עדכון הדרישה נכשל"
+    "updateFailed": "עדכון הדרישה נכשל",
+    "project": "פרויקט",
+    "service": "שירות",
+    "resource": "משאב",
+    "value": "כמות",
+    "createdBy": "נוצר על ידי",
+    "createdAt": "תאריך יצירה",
+    "status": "סטטוס"
   },
   "demand": {
     "deleteConfirm": "למחוק דרישה זו?",
@@ -467,6 +475,17 @@
     "columns": "עמודות",
     "resetColumns": "איפוס לברירת מחדל"
   },
+  "users": {
+    "username": "שם משתמש",
+    "fullName": "שם מלא",
+    "role": "תפקיד",
+    "center": "מרכז",
+    "selectCenter": "-- בחר מרכז --"
+  },
+  "status": {
+    "PendingCenterManager": "ממתין לאישור מנהל מרכז",
+    "CenterManagerRejected": "נדחה על ידי מנהל מרכז"
+  },
   "filters": {
     "groups": {
       "general": "כללי",
@@ -477,6 +496,22 @@
       "timeline": "לוח זמנים",
       "other": "אחר"
     }
+  },
+  "tabs": {
+    "myApprovalRequests": "בקשות לאישור שלי",
+    "requestsIOpened": "הבקשות שפתחתי",
+    "requestHistory": "היסטוריית דרישות"
+  },
+  "approvalRequests": { "empty": "אין בקשות ממתינות לאישור" },
+  "myRequests": { "empty": "לא פתחת בקשות עדיין" },
+  "resourceAssignment": {
+    "title": "משאבים לשיוך",
+    "comingSoon": "שיוך משאבים יהיה זמין לאחר אישור מנחה."
+  },
+  "history": { "comingSoon": "היסטוריית דרישות תהיה זמינה בקרוב." },
+  "actions": {
+    "approve": "אשר",
+    "reject": "דחה"
   },
   "theme": {
     "toggle": "החלף ערכת נושא",

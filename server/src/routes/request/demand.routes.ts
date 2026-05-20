@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { demandController } from "../../controllers/request/demand.controller";
 import { authenticate } from "../../middleware/openIdConnect";
-import { requireAuth, requireRoles } from "../../middleware/authorization";
+import { requireAuth, requireRoles, requireCenterManager } from "../../middleware/authorization";
 import { settings } from "../../lib/settings";
 
 const router = Router();
@@ -10,6 +10,7 @@ const requireModerator = requireRoles(settings.authAdminGroup, settings.authMode
 
 router.get("/", authenticate, requireAuth, demandController.getAll);
 router.get("/filter", authenticate, requireAuth, demandController.getByFilters);
+router.get("/center/pending", authenticate, requireAuth, requireCenterManager, demandController.getCenterPendingDemands);
 router.patch("/bulk/approve", authenticate, requireModerator, demandController.bulkApprove);
 router.patch("/bulk/reject", authenticate, requireModerator, demandController.bulkReject);
 router.get("/:id", authenticate, requireAuth, demandController.getById);
