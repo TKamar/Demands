@@ -159,7 +159,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   }, [demands, currentPage, isLoading]);
 
   // Sentinel refs for IntersectionObserver (use refs to avoid stale closures)
-  const sentinelNodeRef = useRef<HTMLDivElement | null>(null);
+  const rvObserverRef = useRef<IntersectionObserver | null>(null);
   const currentPageRef = useRef(currentPage);
   const totalPagesRef = useRef(totalPages);
   const isLoadingRef = useRef(isLoading);
@@ -168,15 +168,23 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   useEffect(() => { totalPagesRef.current = totalPages; }, [totalPages]);
   useEffect(() => { isLoadingRef.current = isLoading; }, [isLoading]);
 
+  // Cleanup observer on unmount
+  useEffect(() => {
+    return () => { rvObserverRef.current?.disconnect(); };
+  }, []);
+
   const sentinelRef = useCallback((node: HTMLDivElement | null) => {
-    sentinelNodeRef.current = node;
+    if (rvObserverRef.current) {
+      rvObserverRef.current.disconnect();
+      rvObserverRef.current = null;
+    }
     if (!node) return;
-    const observer = new IntersectionObserver(([entry]) => {
+    rvObserverRef.current = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !isLoadingRef.current && currentPageRef.current < totalPagesRef.current) {
         setCurrentPage((p) => p + 1);
       }
     }, { threshold: 0.1 });
-    observer.observe(node);
+    rvObserverRef.current.observe(node);
   }, []);
 
   const {
