@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
-import { MdEdit, MdCancel, MdGavel } from 'react-icons/md';
+import { MdEdit, MdCancel, MdGavel, MdArrowUpward, MdArrowDownward, MdUnfoldMore } from 'react-icons/md';
 import type { Demand, Project } from '../../types/domain';
 import type { ColumnConfig } from '../../types/table';
+import type { SortState } from '../../types/filter';
+import type { DemandSortKey } from '../../configs/demandFilters';
 import StatusBadge from './StatusBadge';
 import PriorityBadge from './PriorityBadge';
 
@@ -26,6 +28,15 @@ export type DemandColumnKey =
   | 'createdBy'
   | 'createdAt'
   | 'actions';
+
+const SORTABLE_COLUMNS: Partial<Record<DemandColumnKey, DemandSortKey>> = {
+  project: 'project',
+  service: 'service',
+  resource: 'resource',
+  status: 'status',
+  value: 'value',
+  createdAt: 'createdAt',
+};
 
 export const demandColumnConfig: ColumnConfig<DemandColumnKey>[] = [
   { key: 'project', label: 'projects.columns.project', canHide: false },
@@ -73,6 +84,9 @@ interface DemandsTableProps {
   onSelectAllPage?: (checked: boolean) => void;
   isAllAcrossPagesSelected?: boolean;
   excludedIds?: Set<number>;
+  // Column sort
+  sortState?: SortState<DemandSortKey>;
+  onColumnSort?: (key: DemandSortKey) => void;
 }
 
 export default function DemandsTable({
@@ -97,6 +111,8 @@ export default function DemandsTable({
   onSelectAllPage,
   isAllAcrossPagesSelected = false,
   excludedIds,
+  sortState,
+  onColumnSort,
 }: DemandsTableProps) {
   const { t } = useTranslation();
 
@@ -305,14 +321,31 @@ export default function DemandsTable({
                 />
               </th>
             )}
-            {visibleColumns.map((col) => (
-              <th
-                key={col.key}
-                className="px-4 py-3 text-start font-semibold text-text-secondary whitespace-nowrap bg-bg-default"
-              >
-                {t(col.label)}
-              </th>
-            ))}
+            {visibleColumns.map((col) => {
+              const sortKey = SORTABLE_COLUMNS[col.key];
+              const isSorted = sortState?.field === sortKey;
+              return (
+                <th
+                  key={col.key}
+                  className={`px-4 py-3 text-start font-semibold text-text-secondary whitespace-nowrap bg-bg-default ${sortKey ? 'cursor-pointer select-none hover:text-text-primary' : ''}`}
+                  onClick={sortKey ? () => onColumnSort?.(sortKey) : undefined}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {t(col.label)}
+                    {sortKey && (
+                      <span className={isSorted ? 'text-primary' : 'text-text-secondary/40'}>
+                        {isSorted
+                          ? sortState!.direction === 'asc'
+                            ? <MdArrowUpward size={14} />
+                            : <MdArrowDownward size={14} />
+                          : <MdUnfoldMore size={14} />
+                        }
+                      </span>
+                    )}
+                  </span>
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>

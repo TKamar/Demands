@@ -57,4 +57,5 @@ export interface FilterSortProps<
 
   // Display options
   className?: string;
+  compact?: boolean;
 }
