@@ -12,9 +12,9 @@ export default function NotificationPanel({ onClose }: Props) {
   const { notifications, unreadCount, markRead, markAllRead, isLoading } = useNotificationContext();
 
   return (
-    <div role="dialog" aria-label={t('notifications.title')} className="absolute end-0 top-full mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white border border-gray-200 rounded-2xl shadow-xl z-50 flex flex-col max-h-[80vh]">
+    <div dir="rtl" role="dialog" aria-label={t('notifications.title')} className="absolute end-0 top-full mt-2 w-96 max-w-[calc(100vw-2rem)] bg-bg-paper border border-divider rounded-2xl shadow-xl z-50 flex flex-col max-h-[80vh]">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-divider shrink-0">
         <h2 className="text-sm font-semibold text-text-primary">
           {t('notifications.title')}
         </h2>
@@ -30,11 +30,11 @@ export default function NotificationPanel({ onClose }: Props) {
 
       {/* Mark all read */}
       {unreadCount > 0 && (
-        <div className="px-4 py-2 border-b border-gray-200 shrink-0">
+        <div className="px-4 py-2 border-b border-divider shrink-0 flex items-center justify-start">
           <button
             type="button"
             onClick={markAllRead}
-            className="text-xs text-blue-500 hover:underline cursor-pointer bg-transparent border-none"
+            className="text-xs text-primary hover:underline cursor-pointer bg-transparent border-none"
           >
             {t('notifications.markAllRead')}
           </button>
