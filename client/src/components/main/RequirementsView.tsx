@@ -1,5 +1,5 @@
 // client/src/components/main/RequirementsView.tsx
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import DemandsTable, { demandColumnConfig, type DemandColumnKey } from '../projects/DemandsTable';
@@ -16,7 +16,7 @@ import { useDebounce } from '../../hooks/useDebounce';
 import { useDelayedLoading } from '../../hooks/useDelayedLoading';
 import { useTableColumns } from '../../hooks/useTableColumns';
 import { useToast } from '../common/Toast';
-import Pagination from '../common/Pagination';
+import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
 import {
   demandFilterGroups,
   demandSortOptions,
@@ -61,6 +61,9 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Accumulated demands for infinite scroll
+  const [accumulatedDemands, setAccumulatedDemands] = useState<Demand[]>([]);
 
   // Filter State
   const [filters, setFilters] = useState<Record<DemandFilterKey, string>>(initialDemandFilters);
@@ -147,6 +150,35 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
 
   const showLoading = useDelayedLoading(isLoading);
 
+  // Accumulate pages as user scrolls
+  useEffect(() => {
+    if (isLoading) return;
+    setAccumulatedDemands((prev) =>
+      currentPage === 1 ? demands : [...prev, ...demands]
+    );
+  }, [demands, currentPage, isLoading]);
+
+  // Sentinel refs for IntersectionObserver (use refs to avoid stale closures)
+  const sentinelNodeRef = useRef<HTMLDivElement | null>(null);
+  const currentPageRef = useRef(currentPage);
+  const totalPagesRef = useRef(totalPages);
+  const isLoadingRef = useRef(isLoading);
+
+  useEffect(() => { currentPageRef.current = currentPage; }, [currentPage]);
+  useEffect(() => { totalPagesRef.current = totalPages; }, [totalPages]);
+  useEffect(() => { isLoadingRef.current = isLoading; }, [isLoading]);
+
+  const sentinelRef = useCallback((node: HTMLDivElement | null) => {
+    sentinelNodeRef.current = node;
+    if (!node) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !isLoadingRef.current && currentPageRef.current < totalPagesRef.current) {
+        setCurrentPage((p) => p + 1);
+      }
+    }, { threshold: 0.1 });
+    observer.observe(node);
+  }, []);
+
   const {
     bases,
     environments,
@@ -198,6 +230,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   const handleFilterChange = useCallback((key: DemandFilterKey, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
+    setAccumulatedDemands([]);
     setIsAllAcrossPagesSelected(false);
     setSelectedIds(new Set());
     setExcludedIds(new Set());
@@ -206,6 +239,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   const handleClearAllFilters = useCallback(() => {
     setFilters(initialDemandFilters);
     setCurrentPage(1);
+    setAccumulatedDemands([]);
     setIsAllAcrossPagesSelected(false);
     setSelectedIds(new Set());
     setExcludedIds(new Set());
@@ -213,6 +247,8 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
 
   const handleSortChange = useCallback((field: DemandSortKey | null, direction: SortDirection) => {
     setSortState({ field, direction });
+    setCurrentPage(1);
+    setAccumulatedDemands([]);
   }, []);
 
   // Build filter groups with dynamic options
@@ -544,7 +580,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
               className={`overflow-x-auto transition-opacity duration-200 ${isFiltersPending || showLoading ? 'opacity-50' : 'opacity-100'}`}
             >
               <DemandsTable
-                demands={demands}
+                demands={accumulatedDemands}
                 projectMap={projectMap}
                 isLoading={false}
                 visibleColumns={orderedVisibleColumns}
@@ -567,18 +603,15 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
               />
             </div>
 
-            {!isLoading && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-                totalItems={total}
-                itemsPerPage={itemsPerPage}
-              />
-            )}
           </>
         )}
       </div>
+
+      <InfiniteScrollSentinel
+        sentinelRef={sentinelRef}
+        isLoading={isLoading}
+        hasMore={currentPage < totalPages}
+      />
 
       <DemandDetailSidebar
         demand={selectedDemand}

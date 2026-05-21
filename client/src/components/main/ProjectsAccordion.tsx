@@ -25,7 +25,8 @@ import DecisionModal from '../management/DecisionModal';
 import CreateProjectModal from '../projects/CreateProjectModal';
 import CreateDemandModal from '../projects/CreateDemandModal';
 import DuplicateProjectModal from '../projects/DuplicateProjectModal';
-import Pagination from '../common/Pagination';
+import { useClientInfiniteScroll } from '../../hooks/useClientInfiniteScroll';
+import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
 import { useToast } from '../common/Toast';
 import type { Project, Demand, Priority } from '../../types/domain';
 import type {
@@ -37,8 +38,6 @@ import type {
   ApproveDemandPayload,
   RejectDemandPayload,
 } from '../../api/types';
-
-const ITEMS_PER_PAGE = 10;
 
 // Column header with per-column filter dropdown and sort toggle
 interface ColumnHeaderProps {
@@ -375,7 +374,6 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
   const canDecide = role === 'admin' || role === 'moderator';
 
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [duplicatingProject, setDuplicatingProject] = useState<Project | null>(null);
@@ -407,7 +405,6 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
 
   const setColumnFilter = useCallback((col: string, values: string[]) => {
     setColumnFilters((prev) => ({ ...prev, [col]: values }));
-    setCurrentPage(1);
   }, []);
 
   // Derive unique values for filter dropdowns
@@ -459,13 +456,7 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
     });
   }, [filteredProjects, sortState]);
 
-  // Local pagination
-  const totalFiltered = sortedProjects.length;
-  const totalPages = Math.max(1, Math.ceil(totalFiltered / ITEMS_PER_PAGE));
-  const pageProjects = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return sortedProjects.slice(start, start + ITEMS_PER_PAGE);
-  }, [sortedProjects, currentPage]);
+  const { displayedItems: pageProjects, sentinelRef, hasMore } = useClientInfiniteScroll(sortedProjects, 20);
 
   const toggleExpand = useCallback((name: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -688,12 +679,10 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
           })}
       </div>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        totalItems={totalFiltered}
-        itemsPerPage={ITEMS_PER_PAGE}
+      <InfiniteScrollSentinel
+        sentinelRef={sentinelRef}
+        isLoading={isLoading}
+        hasMore={hasMore}
       />
 
       <ProjectDetailSidebar
