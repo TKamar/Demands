@@ -26,10 +26,11 @@ export const TopNavTabs: React.FC<TopNavTabsProps> = ({ activeTab, onTabChange, 
   };
 
   return (
-    <div className="flex gap-1 border-b border-divider bg-bg-paper px-6" dir="rtl">
+    <div role="tablist" className="flex gap-1 border-b border-divider bg-bg-paper px-6" dir="rtl">
       {visibleTabs.map(tab => (
         <button
           key={tab.id}
+          role="tab"
           aria-selected={activeTab === tab.id}
           onClick={() => handleClick(tab.id)}
           className={`px-4 py-3 text-sm font-medium transition-colors relative cursor-pointer border-none bg-transparent outline-none whitespace-nowrap ${

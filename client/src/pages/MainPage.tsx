@@ -53,7 +53,7 @@ export default function MainPage() {
 
       {/* Tab bar — hidden when a topNavTab is active */}
       {!topNavTab && (
-        <div className="flex items-center gap-0 border-b border-divider bg-bg-paper px-6">
+        <div role="tablist" className="flex items-center gap-0 border-b border-divider bg-bg-paper px-6">
           {(['projects', 'requirements'] as MainTab[]).map((tab) => {
             const label =
               tab === 'projects'
@@ -62,6 +62,7 @@ export default function MainPage() {
             return (
               <button
                 key={tab}
+                role="tab"
                 aria-selected={activeTab === tab}
                 onClick={() => handleTabChange(tab)}
                 className={`px-5 py-3 text-sm font-medium transition-colors relative cursor-pointer border-none bg-transparent outline-none whitespace-nowrap ${
@@ -99,7 +100,7 @@ export default function MainPage() {
           <div className="w-56 flex items-center gap-2 px-3 py-2 border border-divider rounded-lg bg-bg-default cursor-not-allowed opacity-60">
             <MdSearch size={16} className="text-text-secondary" />
             <span className="text-sm text-text-secondary">
-              {t('main.search.placeholder', 'חיפוש...')}
+              {t('main.search.placeholder', 'Search...')}
             </span>
           </div>
           <button
