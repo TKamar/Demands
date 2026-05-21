@@ -2,7 +2,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import DemandsTable, { demandColumnConfig, type DemandColumnKey } from '../projects/DemandsTable';
+import DemandsTable, { demandColumnConfig } from '../projects/DemandsTable';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import { FilterSort } from '../common/filters';
 import CreateDemandModal from '../projects/CreateDemandModal';
