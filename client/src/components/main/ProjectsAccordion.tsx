@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
 import {
   MdExpandMore,
-  MdChevronRight,
+  MdChevronLeft,
   MdEdit,
   MdDelete,
   MdContentCopy,
@@ -308,16 +308,16 @@ function DemandSubTable({
                 <td className="px-3 py-2 font-medium">{demand.value.toLocaleString()}</td>
                 <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                    className={`text-[10px] font-medium ${
                       demand.status === 'Approved'
-                        ? 'bg-green-100 text-green-700'
+                        ? 'text-green-700'
                         : demand.status === 'Pending'
-                        ? 'bg-amber-100 text-amber-700'
+                        ? 'text-amber-600'
                         : demand.status === 'Rejected'
-                        ? 'bg-red-100 text-red-700'
+                        ? 'text-red-600'
                         : demand.status === 'PartiallyApproved'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'text-blue-600'
+                        : 'text-gray-500'
                     }`}
                   >
                     {demand.status}
@@ -599,7 +599,7 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
                     onClick={(e) => toggleExpand(project.name, e)}
                     className="w-6 shrink-0 flex items-center justify-center text-primary bg-transparent border-none cursor-pointer p-0"
                   >
-                    {isExpanded ? <MdExpandMore size={18} /> : <MdChevronRight size={18} />}
+                    {isExpanded ? <MdExpandMore size={18} /> : <MdChevronLeft size={18} />}
                   </button>
 
                   {/* Name */}
@@ -612,7 +612,7 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
 
                   {/* Type */}
                   <div className="w-28 shrink-0">
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 font-medium">
+                    <span className="text-xs text-purple-700 font-medium">
                       {project.type}
                     </span>
                   </div>
@@ -634,7 +634,7 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
                   {/* Status */}
                   <div className="w-28 shrink-0">
                     {projectStatus ? (
-                      <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700 font-medium">
+                      <span className="text-xs text-green-700 font-medium">
                         {projectStatus}
                       </span>
                     ) : (
@@ -644,27 +644,39 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
 
                   {/* Actions */}
                   <div className="w-24 shrink-0 flex items-center gap-1">
-                    <button
-                      onClick={() => setEditingProject(project)}
-                      className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer rounded"
-                      title={t('common.edit', 'Edit')}
-                    >
-                      <MdEdit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProject(project)}
-                      className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer rounded"
-                      title={t('common.delete', 'Delete')}
-                    >
-                      <MdDelete size={16} />
-                    </button>
-                    <button
-                      onClick={() => setDuplicatingProject(project)}
-                      className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer rounded"
-                      title={t('common.duplicate', 'Duplicate')}
-                    >
-                      <MdContentCopy size={16} />
-                    </button>
+                    <span className="relative group">
+                      <button
+                        onClick={() => handleDeleteProject(project)}
+                        className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer rounded"
+                      >
+                        <MdDelete size={16} />
+                      </button>
+                      <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                        {t('common.delete', 'Delete')}
+                      </span>
+                    </span>
+                    <span className="relative group">
+                      <button
+                        onClick={() => setDuplicatingProject(project)}
+                        className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer rounded"
+                      >
+                        <MdContentCopy size={16} />
+                      </button>
+                      <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                        {t('common.duplicate', 'Duplicate')}
+                      </span>
+                    </span>
+                    <span className="relative group">
+                      <button
+                        onClick={() => setEditingProject(project)}
+                        className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer rounded"
+                      >
+                        <MdEdit size={16} />
+                      </button>
+                      <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                        {t('common.edit', 'Edit')}
+                      </span>
+                    </span>
                   </div>
                 </div>
 

@@ -171,11 +171,12 @@ export default function ProjectsTable({
           <td key={columnKey} className="px-4 py-3 whitespace-nowrap">
             <div className="flex items-center justify-center gap-1">
               <button
-                onClick={(e) => { e.stopPropagation(); onEdit(project); }}
-                className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
-                title={t('common.edit')}
+                onClick={(e) => { e.stopPropagation(); onDelete(project); }}
+                className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                title={(project.demandCount ?? 0) > 0 ? t('projects.actions.cannotDeleteWithDemands') : t('common.delete')}
+                disabled={(project.demandCount ?? 0) > 0}
               >
-                <MdEdit size={18} />
+                <MdDelete size={18} />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDuplicate(project); }}
@@ -185,12 +186,11 @@ export default function ProjectsTable({
                 <MdContentCopy size={18} />
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); onDelete(project); }}
-                className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                title={(project.demandCount ?? 0) > 0 ? t('projects.actions.cannotDeleteWithDemands') : t('common.delete')}
-                disabled={(project.demandCount ?? 0) > 0}
+                onClick={(e) => { e.stopPropagation(); onEdit(project); }}
+                className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
+                title={t('common.edit')}
               >
-                <MdDelete size={18} />
+                <MdEdit size={18} />
               </button>
             </div>
           </td>
