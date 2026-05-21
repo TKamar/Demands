@@ -75,15 +75,6 @@ interface DemandsTableProps {
   isModerator?: boolean;
   totalValue?: number;
   totalApprovedValue?: number;
-  // Bulk selection
-  showCheckboxes?: boolean;
-  selectedIds?: Set<number>;
-  onToggleSelect?: (id: number) => void;
-  isAllPageSelected?: boolean;
-  isSomePageSelected?: boolean;
-  onSelectAllPage?: (checked: boolean) => void;
-  isAllAcrossPagesSelected?: boolean;
-  excludedIds?: Set<number>;
   // Column sort
   sortState?: SortState<DemandSortKey>;
   onColumnSort?: (key: DemandSortKey) => void;
@@ -103,14 +94,6 @@ export default function DemandsTable({
   isModerator = false,
   totalValue,
   totalApprovedValue,
-  showCheckboxes = false,
-  selectedIds,
-  onToggleSelect,
-  isAllPageSelected = false,
-  isSomePageSelected = false,
-  onSelectAllPage,
-  isAllAcrossPagesSelected = false,
-  excludedIds,
   sortState,
   onColumnSort,
 }: DemandsTableProps) {
@@ -309,18 +292,6 @@ export default function DemandsTable({
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-divider">
-            {showCheckboxes && (
-              <th className="px-4 py-3 w-10 bg-bg-default">
-                <input
-                  type="checkbox"
-                  checked={isAllPageSelected}
-                  ref={(el) => { if (el) el.indeterminate = isSomePageSelected && !isAllPageSelected; }}
-                  onChange={(e) => onSelectAllPage?.(e.target.checked)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="cursor-pointer accent-primary"
-                />
-              </th>
-            )}
             {visibleColumns.map((col) => {
               const sortKey = SORTABLE_COLUMNS[col.key];
               const isSorted = sortState?.field === sortKey;
@@ -350,38 +321,14 @@ export default function DemandsTable({
         </thead>
         <tbody>
           {demands.map((demand) => {
-            const isChecked = isAllAcrossPagesSelected
-  ? demand.status === 'Pending' && !excludedIds?.has(demand.id)
-  : (selectedIds?.has(demand.id) ?? false);
             return (
               <tr
                 key={demand.id}
                 onClick={() => onSelectDemand(demand)}
                 className={`border-b border-divider last:border-b-0 hover:bg-primary-light/30 transition-colors cursor-pointer ${
                   selectedDemand?.id === demand.id ? 'bg-primary-light' : ''
-                } ${isChecked ? 'bg-primary-light/50' : ''}`}
+                }`}
               >
-                {showCheckboxes && (
-                  <td className="px-4 py-3 w-10">
-                    {demand.status === 'Pending' ? (
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => onToggleSelect?.(demand.id)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="cursor-pointer accent-primary"
-                      />
-                    ) : (
-                      <input
-                        type="checkbox"
-                        disabled
-                        checked={false}
-                        onClick={(e) => e.stopPropagation()}
-                        className="opacity-20 cursor-not-allowed"
-                      />
-                    )}
-                  </td>
-                )}
                 {visibleColumns.map((col) => renderCell(demand, col.key))}
               </tr>
             );
@@ -390,7 +337,6 @@ export default function DemandsTable({
         {(totalValue !== undefined || totalApprovedValue !== undefined) && (
           <tfoot>
             <tr className="border-t-2 border-divider bg-bg-default">
-              {showCheckboxes && <td className="px-4 py-2.5" />}
               {visibleColumns.map((col, index) => {
                 if (index === 0) {
                   return (
