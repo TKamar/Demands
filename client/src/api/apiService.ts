@@ -206,6 +206,11 @@ export async function cancelDemand(id: number): Promise<Demand> {
   return mapDemand(data);
 }
 
+export async function restoreDemand(id: number): Promise<Demand> {
+  const { data } = await api.patch(`/demands/${id}/restore`);
+  return mapDemand(data);
+}
+
 export async function approveDemand(id: number, payload: ApproveDemandPayload): Promise<Demand> {
   const { data } = await api.patch(`/demands/${id}/approve`, payload);
   return mapDemand(data);

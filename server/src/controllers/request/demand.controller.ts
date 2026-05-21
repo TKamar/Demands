@@ -441,6 +441,26 @@ export const demandController = {
     }
   },
 
+  restore: async (req: Request, res: Response) => {
+    try {
+      const { username, isPrivileged } = getUserContext(req);
+      const demand = await demandService.restore(
+        Number(req.params.id),
+        isPrivileged ? undefined : username
+      );
+      res.json(demand);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        return res.status(404).json({ error: "Demand not found" });
+      }
+      if (error instanceof Error && error.message.includes("rejected")) {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error("demandController.restore error:", error);
+      res.status(400).json({ error: "Failed to restore demand" });
+    }
+  },
+
   bulkApprove: async (req: Request, res: Response) => {
     try {
       const { username, isAdmin, isModerator } = getUserContext(req);

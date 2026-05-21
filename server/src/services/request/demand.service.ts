@@ -337,6 +337,31 @@ export const demandService = {
     return demand;
   },
 
+  restore: async (id: number, createdBy?: string) => {
+    const existing = await prisma.demand.findFirst({
+      where: createdBy ? { id, createdBy } : { id },
+    });
+    if (!existing) {
+      throw new NotFoundError("Demand");
+    }
+    if (existing.status !== "Rejected" && existing.status !== "CenterManagerRejected") {
+      throw new Error("Only rejected demands can be restored");
+    }
+    const demand = await prisma.demand.update({
+      where: { id },
+      data: {
+        status: "PendingCenterManager",
+      },
+      include: {
+        project: true,
+        service: true,
+        resource: true,
+        location: true,
+      },
+    });
+    return demand;
+  },
+
   approve: async (
     id: number,
     data: {

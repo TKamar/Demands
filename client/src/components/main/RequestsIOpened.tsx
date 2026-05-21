@@ -1,52 +1,74 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import DemandsTable, { demandColumnConfig } from '../projects/DemandsTable';
+import DemandDetailSidebar from '../demands/DemandDetailSidebar';
+import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
+import { useDemands } from '../../hooks/useDemands';
+import { useCachedProjects } from '../../hooks/useCachedProjects';
+import { useClientInfiniteScroll } from '../../hooks/useClientInfiniteScroll';
+import { useToast } from '../common/Toast';
 import type { Demand } from '../../types/domain';
-import { fetchDemands } from '../../api/apiService';
-import StatusBadge from '../projects/StatusBadge';
+
+// Columns visible in My Requests view
+const MY_REQUESTS_COLUMNS = demandColumnConfig.filter((col) =>
+  ['project', 'service', 'resource', 'status', 'value', 'unit', 'createdAt', 'actions'].includes(col.key)
+);
 
 export const RequestsIOpened: React.FC = () => {
   const { t } = useTranslation();
-  const [demands, setDemands] = useState<Demand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
+  const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
 
-  useEffect(() => {
-    // fetchDemands with no special filter returns only the current user's demands for non-admin users
-    fetchDemands({ limit: 500 })
-      .then(res => setDemands(res.data ?? []))
-      .catch(() => setDemands([]))
-      .finally(() => setLoading(false));
-  }, []);
+  // Fetch current user's demands (server returns only current user's demands for non-admin)
+  const { demands, isLoading, restoreDemand } = useDemands({}, { page: 1, limit: 500 });
 
-  if (loading) return <div className="p-4 text-center text-gray-400">{t('common.loading')}</div>;
-  if (demands.length === 0)
-    return <div className="p-4 text-center text-gray-400" dir="rtl">{t('myRequests.empty')}</div>;
+  // Project map for DemandsTable
+  const { projects } = useCachedProjects();
+  const projectMap = useMemo(() => {
+    const map = new Map();
+    projects.forEach((p) => map.set(p.name, p));
+    return map;
+  }, [projects]);
+
+  // Client-side infinite scroll
+  const { displayedItems, sentinelRef, hasMore } = useClientInfiniteScroll(demands, 20);
+
+  const handleRestore = async (demand: Demand) => {
+    if (!window.confirm(t('demands.restoreConfirm', 'להחזיר דרישה זו לסטטוס ממתין?'))) return;
+    try {
+      await restoreDemand(demand.id);
+      showToast(t('demands.restoreSuccess', 'הדרישה הוחזרה בהצלחה'), 'success');
+    } catch {
+      showToast(t('demands.restoreError', 'שגיאה בהחזרת הדרישה'), 'error');
+    }
+  };
 
   return (
-    <div dir="rtl">
-      <table className="w-full text-sm border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 text-right">{t('demands.project')}</th>
-            <th className="p-2 text-right">{t('demands.service')}</th>
-            <th className="p-2 text-right">{t('demands.resource')}</th>
-            <th className="p-2 text-right">{t('demands.value')}</th>
-            <th className="p-2 text-right">{t('demands.status')}</th>
-            <th className="p-2 text-right">{t('demands.createdAt')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {demands.map(demand => (
-            <tr key={demand.id} className="border-b hover:bg-gray-50">
-              <td className="p-2">{demand.projectName}</td>
-              <td className="p-2">{demand.serviceName}</td>
-              <td className="p-2">{demand.resourceName}</td>
-              <td className="p-2">{demand.value} {demand.unit}</td>
-              <td className="p-2"><StatusBadge status={demand.status} /></td>
-              <td className="p-2">{new Date(demand.createdAt).toLocaleDateString('he-IL')}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="flex flex-col gap-4">
+      <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
+        <DemandsTable
+          demands={displayedItems}
+          projectMap={projectMap}
+          isLoading={isLoading}
+          visibleColumns={MY_REQUESTS_COLUMNS}
+          selectedDemand={selectedDemand}
+          onSelectDemand={setSelectedDemand}
+          onRestore={handleRestore}
+        />
+        <InfiniteScrollSentinel
+          sentinelRef={sentinelRef}
+          isLoading={isLoading}
+          hasMore={hasMore}
+        />
+      </div>
+
+      <DemandDetailSidebar
+        demand={selectedDemand}
+        project={null}
+        isOpen={selectedDemand !== null}
+        onClose={() => setSelectedDemand(null)}
+        isModerator={false}
+      />
     </div>
   );
 };

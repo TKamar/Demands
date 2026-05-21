@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { MdEdit, MdCancel, MdGavel, MdArrowUpward, MdArrowDownward, MdUnfoldMore } from 'react-icons/md';
+import { MdEdit, MdCancel, MdGavel, MdArrowUpward, MdArrowDownward, MdUnfoldMore, MdRestore } from 'react-icons/md';
 import type { Demand, Project } from '../../types/domain';
 import type { ColumnConfig } from '../../types/table';
 import type { SortState } from '../../types/filter';
@@ -70,6 +70,7 @@ interface DemandsTableProps {
   onEdit?: (demand: Demand) => void;
   onCancel?: (demand: Demand) => void;
   onMakeDecision?: (demand: Demand) => void;
+  onRestore?: (demand: Demand) => void;
   visibleColumns: ColumnConfig<DemandColumnKey>[];
   hideActions?: boolean;
   isModerator?: boolean;
@@ -89,6 +90,7 @@ export default function DemandsTable({
   onEdit,
   onCancel,
   onMakeDecision,
+  onRestore,
   visibleColumns,
   hideActions = false,
   isModerator = false,
@@ -234,36 +236,51 @@ export default function DemandsTable({
         }
         return (
           <td key={columnKey} className="px-4 py-3 whitespace-nowrap">
-            {demand.status === 'Pending' && (
-              <div className="flex items-center justify-center gap-1">
-                {isModerator ? (
+            <div className="flex items-center justify-center gap-1">
+              {(demand.status === 'Rejected' || demand.status === 'CenterManagerRejected') && onRestore && (
+                <span className="relative group">
                   <button
-                    onClick={(e) => { e.stopPropagation(); onMakeDecision?.(demand); }}
+                    onClick={(e) => { e.stopPropagation(); onRestore(demand); }}
                     className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
-                    title={t('management.makeDecision')}
                   >
-                    <MdGavel size={18} />
+                    <MdRestore size={18} />
                   </button>
-                ) : (
-                  <>
+                  <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                    {t('demands.actions.restore', 'החזר דרישה')}
+                  </span>
+                </span>
+              )}
+              {demand.status === 'Pending' && (
+                <div className="flex items-center gap-1">
+                  {isModerator ? (
                     <button
-                      onClick={(e) => { e.stopPropagation(); onEdit?.(demand); }}
+                      onClick={(e) => { e.stopPropagation(); onMakeDecision?.(demand); }}
                       className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
-                      title={t('common.edit')}
+                      title={t('management.makeDecision')}
                     >
-                      <MdEdit size={18} />
+                      <MdGavel size={18} />
                     </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onCancel?.(demand); }}
-                      className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer"
-                      title={t('demands.actions.cancel')}
-                    >
-                      <MdCancel size={18} />
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
+                  ) : (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onEdit?.(demand); }}
+                        className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
+                        title={t('common.edit')}
+                      >
+                        <MdEdit size={18} />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onCancel?.(demand); }}
+                        className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer"
+                        title={t('demands.actions.cancel')}
+                      >
+                        <MdCancel size={18} />
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </td>
         );
       default:

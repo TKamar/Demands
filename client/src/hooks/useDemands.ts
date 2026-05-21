@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchDemands, createDemand as apiCreateDemand, updateDemand as apiUpdateDemand, deleteDemand as apiDeleteDemand, cancelDemand as apiCancelDemand, approveDemand as apiApproveDemand, rejectDemand as apiRejectDemand, bulkApproveDemands as apiBulkApprove, bulkRejectDemands as apiBulkReject } from '../api/apiService';
+import { fetchDemands, createDemand as apiCreateDemand, updateDemand as apiUpdateDemand, deleteDemand as apiDeleteDemand, cancelDemand as apiCancelDemand, restoreDemand as apiRestoreDemand, approveDemand as apiApproveDemand, rejectDemand as apiRejectDemand, bulkApproveDemands as apiBulkApprove, bulkRejectDemands as apiBulkReject } from '../api/apiService';
 import { useRefresh } from '../contexts/RefreshContext';
 import type { Demand } from '../types/domain';
 import type { PaginationParams, DemandFilterParams, CreateDemandPayload, UpdateDemandPayload, ApproveDemandPayload, RejectDemandPayload, BulkApproveDemandPayload, BulkRejectDemandPayload } from '../api/types';
@@ -17,6 +17,7 @@ interface UseDemandsResult {
   updateDemand: (id: number, payload: UpdateDemandPayload) => Promise<void>;
   deleteDemand: (id: number) => Promise<void>;
   cancelDemand: (id: number) => Promise<void>;
+  restoreDemand: (id: number) => Promise<void>;
   approveDemand: (id: number, payload: ApproveDemandPayload) => Promise<void>;
   rejectDemand: (id: number, payload: RejectDemandPayload) => Promise<void>;
   bulkApproveDemands: (payload: BulkApproveDemandPayload) => Promise<number>;
@@ -88,6 +89,11 @@ export function useDemands(
     triggerRefreshDemands();
   }, [triggerRefreshDemands]);
 
+  const restoreDemand = useCallback(async (id: number) => {
+    await apiRestoreDemand(id);
+    triggerRefreshDemands();
+  }, [triggerRefreshDemands]);
+
   const approveDemand = useCallback(async (id: number, payload: ApproveDemandPayload) => {
     await apiApproveDemand(id, payload);
     triggerRefreshDemands();
@@ -110,5 +116,5 @@ export function useDemands(
     return result.count;
   }, [triggerRefreshDemands]);
 
-  return { demands, isLoading, error, total, totalPending, totalPages, totalValue, totalApprovedValue, createDemand, updateDemand, deleteDemand, cancelDemand, approveDemand, rejectDemand, bulkApproveDemands, bulkRejectDemands };
+  return { demands, isLoading, error, total, totalPending, totalPages, totalValue, totalApprovedValue, createDemand, updateDemand, deleteDemand, cancelDemand, restoreDemand, approveDemand, rejectDemand, bulkApproveDemands, bulkRejectDemands };
 }
