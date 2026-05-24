@@ -68,3 +68,23 @@ Started: 2026-05-21
 - Scrollbar on left side via inherited `dir="rtl"` from `<html>`
 
 ---
+
+## Bulk Decision Feature
+
+Branch: `feat/bulk-decision`
+Started: 2026-05-24
+
+| Area | Status |
+|------|--------|
+| DemandsTable — checkbox column | ✅ Done |
+| RequirementsView — selection state + bulk bar | ✅ Done |
+| BulkDecisionModal — extended to spec | ✅ Done |
+| i18n keys (`bulk.*`) | ✅ Done |
+
+### 2026-05-24
+
+**feat/bulk-decision**
+- `DemandsTable`: added `showBulkSelect`, `selectedIds`, `lockedCenter`, `lockedResourceName`, `onToggleSelect` props; checkbox column renders as first column when `showBulkSelect=true`; disabled state enforces same-center + same-resource-type constraint; tfoot accounts for extra column
+- `RequirementsView`: added `selectedDemandIds`, `lockedCenter`, `lockedResource`, `isBulkModalOpen` state; `handleToggleSelect` locks center+resource on first selection, unlocks when set goes empty; sticky bulk action bar appears when ≥2 selected; `BulkDecisionModal` wired with `bulkApproveDemands` / `bulkRejectDemands`
+- `BulkDecisionModal`: replaced 2-option radio grid with 3-option select (Approved / Rejected / ApprovedWithCondition); reason textarea shown for all types (required only for Rejected); approved-value input shown for Approved + ApprovedWithCondition; header shows count, locked center, locked resource
+- i18n: added top-level `bulk` namespace (`selected`, `makeDecision`, `title`, `centerInfo`, `resourceInfo`) in both `he` and `en` locales

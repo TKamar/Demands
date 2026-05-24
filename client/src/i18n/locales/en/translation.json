@@ -534,6 +534,13 @@
       "ProjectEdited": "Project Edited"
     }
   },
+  "bulk": {
+    "selected": "requirements selected",
+    "makeDecision": "Make Decision",
+    "title": "Bulk Decision",
+    "centerInfo": "Center: {{center}}",
+    "resourceInfo": "Resource: {{resource}}"
+  },
   "main": {
     "tabs": {
       "projects": "Projects & Requirements",

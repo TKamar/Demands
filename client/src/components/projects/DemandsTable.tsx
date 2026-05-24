@@ -79,6 +79,12 @@ interface DemandsTableProps {
   // Column sort
   sortState?: SortState<DemandSortKey>;
   onColumnSort?: (key: DemandSortKey) => void;
+  // Bulk selection
+  showBulkSelect?: boolean;
+  selectedIds?: Set<number>;
+  lockedCenter?: string | null;
+  lockedResourceName?: string | null;
+  onToggleSelect?: (demand: Demand) => void;
 }
 
 export default function DemandsTable({
@@ -98,6 +104,11 @@ export default function DemandsTable({
   totalApprovedValue,
   sortState,
   onColumnSort,
+  showBulkSelect = false,
+  selectedIds,
+  lockedCenter,
+  lockedResourceName,
+  onToggleSelect,
 }: DemandsTableProps) {
   const { t } = useTranslation();
 
@@ -309,6 +320,11 @@ export default function DemandsTable({
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-divider">
+            {showBulkSelect && (
+              <th className="px-3 py-3 text-start font-semibold text-text-secondary whitespace-nowrap bg-bg-default">
+                —
+              </th>
+            )}
             {visibleColumns.map((col) => {
               const sortKey = SORTABLE_COLUMNS[col.key];
               const isSorted = sortState?.field === sortKey;
@@ -346,6 +362,21 @@ export default function DemandsTable({
                   selectedDemand?.id === demand.id ? 'bg-primary-light' : ''
                 }`}
               >
+                {showBulkSelect && (
+                  <td className="px-3 py-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds?.has(demand.id) ?? false}
+                      disabled={
+                        (lockedCenter != null && demand.centerName !== lockedCenter) ||
+                        (lockedResourceName != null && demand.resourceName !== lockedResourceName)
+                      }
+                      onChange={() => onToggleSelect?.(demand)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    />
+                  </td>
+                )}
                 {visibleColumns.map((col) => renderCell(demand, col.key))}
               </tr>
             );
@@ -354,6 +385,7 @@ export default function DemandsTable({
         {(totalValue !== undefined || totalApprovedValue !== undefined) && (
           <tfoot>
             <tr className="border-t-2 border-divider bg-bg-default">
+              {showBulkSelect && <td className="px-3 py-2.5" />}
               {visibleColumns.map((col, index) => {
                 if (index === 0) {
                   return (

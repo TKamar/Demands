@@ -7,6 +7,7 @@ import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import { FilterSort } from '../common/filters';
 import CreateDemandModal from '../projects/CreateDemandModal';
 import DecisionModal from '../management/DecisionModal';
+import BulkDecisionModal from '../management/BulkDecisionModal';
 import { useDemands } from '../../hooks/useDemands';
 import { useCachedProjects } from '../../hooks/useCachedProjects';
 import { useReferenceData } from '../../hooks/useReferenceData';
@@ -77,6 +78,12 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   const [decisionDemand, setDecisionDemand] = useState<Demand | null>(null);
   const [isDecisionModalLoading, setIsDecisionModalLoading] = useState(false);
 
+  // Bulk selection state
+  const [selectedDemandIds, setSelectedDemandIds] = useState<Set<number>>(new Set());
+  const [lockedCenter, setLockedCenter] = useState<string | null>(null);
+  const [lockedResource, setLockedResource] = useState<string | null>(null);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+
   // Build the demand filter params used by useDemands. Center selection from the
   // outer page is layered on top of the in-view "center" filter — when multiple
   // centers are selected we comma-join the names (the API accepts comma separated
@@ -120,6 +127,8 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
     cancelDemand,
     approveDemand,
     rejectDemand,
+    bulkApproveDemands,
+    bulkRejectDemands,
   } = useDemands(demandFilterParams, {
     page: currentPage,
     limit: itemsPerPage,
@@ -311,6 +320,32 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
     setSelectedDemand(null);
   }, []);
 
+  const handleToggleSelect = useCallback((demand: Demand) => {
+    setSelectedDemandIds(prev => {
+      const next = new Set(prev);
+      if (next.has(demand.id)) {
+        next.delete(demand.id);
+        if (next.size === 0) {
+          setLockedCenter(null);
+          setLockedResource(null);
+        }
+      } else {
+        if (next.size === 0) {
+          setLockedCenter(demand.centerName ?? null);
+          setLockedResource(demand.resourceName ?? null);
+        }
+        next.add(demand.id);
+      }
+      return next;
+    });
+  }, []);
+
+  const clearSelection = useCallback(() => {
+    setSelectedDemandIds(new Set());
+    setLockedCenter(null);
+    setLockedResource(null);
+  }, []);
+
   const handleEditDemand = useCallback((demand: Demand) => {
     setEditingDemand(demand);
     setSelectedDemand(null);
@@ -408,8 +443,34 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
                 totalApprovedValue={totalApprovedValue}
                 sortState={sortState}
                 onColumnSort={handleColumnSort}
+                showBulkSelect={isModerator}
+                selectedIds={selectedDemandIds}
+                lockedCenter={lockedCenter}
+                lockedResourceName={lockedResource}
+                onToggleSelect={handleToggleSelect}
               />
             </div>
+            {selectedDemandIds.size >= 2 && (
+              <div className="sticky bottom-0 bg-primary text-white px-4 py-3 flex items-center justify-between rounded-b-xl border-t border-primary/20" dir="rtl">
+                <span className="text-sm font-medium">
+                  {selectedDemandIds.size} {t('bulk.selected', 'דרישות נבחרו')}
+                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setIsBulkModalOpen(true)}
+                    className="px-4 py-1.5 bg-white text-primary text-sm font-medium rounded-lg hover:opacity-90 transition-opacity cursor-pointer border-none"
+                  >
+                    {t('bulk.makeDecision', 'קבלת החלטה')}
+                  </button>
+                  <button
+                    onClick={clearSelection}
+                    className="px-3 py-1.5 bg-transparent text-white text-sm border border-white/50 rounded-lg hover:bg-white/10 cursor-pointer"
+                  >
+                    {t('common.cancel', 'ביטול')}
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -447,6 +508,26 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
         onReject={handleReject}
         demand={decisionDemand}
         isLoading={isDecisionModalLoading}
+      />
+
+      <BulkDecisionModal
+        open={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        selectedCount={selectedDemandIds.size}
+        lockedCenter={lockedCenter}
+        lockedResourceName={lockedResource}
+        onApprove={async (payload) => {
+          const ids = Array.from(selectedDemandIds);
+          await bulkApproveDemands({ ids, status: payload.status, approvedValue: payload.approvedValue, reason: payload.reason });
+          clearSelection();
+          setIsBulkModalOpen(false);
+        }}
+        onReject={async (payload) => {
+          const ids = Array.from(selectedDemandIds);
+          await bulkRejectDemands({ ids, reason: payload.reason });
+          clearSelection();
+          setIsBulkModalOpen(false);
+        }}
       />
     </div>
   );
