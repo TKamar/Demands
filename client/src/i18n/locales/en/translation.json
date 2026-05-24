@@ -571,6 +571,11 @@
     "status": "Status",
     "deleteConfirm": "Delete this project?",
     "deleted": "Project deleted",
-    "deleteError": "Failed to delete project"
+    "deleteError": "Failed to delete project",
+    "inlineRequirements": {
+      "title": "Requirements (Optional)",
+      "addRow": "Add Requirement",
+      "partialError": "{{succeeded}} requirements created, {{failed}} failed"
+    }
   }
 }

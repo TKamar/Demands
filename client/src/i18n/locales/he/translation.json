@@ -571,6 +571,11 @@
     "status": "סטטוס",
     "deleteConfirm": "למחוק את הפרויקט?",
     "deleted": "הפרויקט נמחק",
-    "deleteError": "מחיקת הפרויקט נכשלה"
+    "deleteError": "מחיקת הפרויקט נכשלה",
+    "inlineRequirements": {
+      "title": "דרישות (אופציונלי)",
+      "addRow": "הוסף דרישה",
+      "partialError": "{{succeeded}} דרישות נוצרו, {{failed}} נכשלו"
+    }
   }
 }

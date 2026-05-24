@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdAdd, MdDelete } from 'react-icons/md';
 import Modal from '../common/Modal';
 import Select from '../common/Select';
 import { useToast } from '../common/Toast';
 import { useReferenceData } from '../../hooks/useReferenceData';
+import { createDemand } from '../../api/apiService';
 import type { Project, ProjectType, Median } from '../../types/domain';
 import type { CreateProjectPayload, UpdateProjectPayload, Priority } from '../../api/types';
 
@@ -50,6 +52,29 @@ export default function CreateProjectModal({
   const [error, setError] = useState<string | null>(null);
 
   const isEditMode = !!editingProject;
+
+  // --- Inline Requirements ---
+  interface InlineRequirement {
+    serviceName: string;
+    resourceName: string;
+    value: number;
+    type: 'New' | 'Extension';
+  }
+  const [inlineRequirements, setInlineRequirements] = useState<InlineRequirement[]>([]);
+
+  const addRequirementRow = () =>
+    setInlineRequirements(prev => [...prev, { serviceName: '', resourceName: '', value: 0, type: 'New' }]);
+  const removeRequirementRow = (idx: number) =>
+    setInlineRequirements(prev => prev.filter((_, i) => i !== idx));
+  const updateRequirementRow = (idx: number, field: keyof InlineRequirement, value: string | number) =>
+    setInlineRequirements(prev =>
+      prev.map((r, i) => {
+        if (i !== idx) return r;
+        const updated = { ...r, [field]: value };
+        if (field === 'serviceName') updated.resourceName = '';
+        return updated;
+      })
+    );
 
   // Populate form when editing
   useEffect(() => {
@@ -267,6 +292,38 @@ export default function CreateProjectModal({
     setIsSubmitting(true);
     try {
       await onSubmit(payload, editingProject?.name);
+
+      // After project is created, create any valid inline requirements
+      if (!isEditMode && inlineRequirements.length > 0) {
+        const validRequirements = inlineRequirements.filter(
+          r => r.serviceName && r.resourceName && r.value > 0
+        );
+        if (validRequirements.length > 0) {
+          const results = await Promise.allSettled(
+            validRequirements.map(r =>
+              createDemand({
+                projectName: form.name.trim(),
+                serviceName: r.serviceName,
+                resourceName: r.resourceName,
+                resourceService: r.serviceName,
+                value: r.value,
+                locationId: location.id,
+                type: r.type,
+                centerName: form.center || undefined,
+                branchName: form.branch || undefined,
+                sectionName: form.section || undefined,
+              })
+            )
+          );
+          const failedCount = results.filter(r => r.status === 'rejected').length;
+          const succeededCount = results.filter(r => r.status === 'fulfilled').length;
+          if (failedCount > 0) {
+            // Show partial-failure info alongside the success
+            setError(`${succeededCount} דרישות נוצרו, ${failedCount} נכשלו`);
+          }
+        }
+      }
+
       showToast(isEditMode ? t('projects.updateSuccess') : t('common.toast.projectCreated'), 'success');
       handleClose();
     } catch (err: any) {
@@ -286,6 +343,7 @@ export default function CreateProjectModal({
     onClose();
     setForm(initialForm);
     setError(null);
+    setInlineRequirements([]);
   }
 
   const placeholder = t('projects.createProject.selectOption');
@@ -535,6 +593,89 @@ export default function CreateProjectModal({
             />
           </div>
         </div>
+
+        {/* Inline Requirements Section — create mode only */}
+        {!editingProject && (
+          <div className="border-t border-divider pt-4 mt-4" dir="rtl">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-text-primary">
+                {t('project.inlineRequirements.title', 'דרישות (אופציונלי)')}
+              </h3>
+              <button
+                type="button"
+                onClick={addRequirementRow}
+                className="flex items-center gap-1 text-sm text-primary hover:underline cursor-pointer bg-transparent border-none"
+              >
+                <MdAdd size={15} />
+                {t('project.inlineRequirements.addRow', 'הוסף דרישה')}
+              </button>
+            </div>
+
+            {inlineRequirements.length > 0 && (
+              <div className="space-y-2">
+                {inlineRequirements.map((req, idx) => (
+                  <div key={idx} className="flex items-center gap-2 flex-wrap">
+                    {/* Service select */}
+                    <select
+                      value={req.serviceName}
+                      onChange={e => updateRequirementRow(idx, 'serviceName', e.target.value)}
+                      className="flex-1 min-w-[120px] px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                    >
+                      <option value="">{t('demand.service', 'שירות')}</option>
+                      {referenceData.services.map(s => (
+                        <option key={s.name} value={s.name}>{s.name}</option>
+                      ))}
+                    </select>
+
+                    {/* Resource select (filtered by service) */}
+                    <select
+                      value={req.resourceName}
+                      onChange={e => updateRequirementRow(idx, 'resourceName', e.target.value)}
+                      className="flex-1 min-w-[120px] px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                      disabled={!req.serviceName}
+                    >
+                      <option value="">{t('demand.resource', 'משאב')}</option>
+                      {referenceData.resources
+                        .filter(r => r.serviceName === req.serviceName)
+                        .map(r => (
+                          <option key={r.name} value={r.name}>{r.name}</option>
+                        ))}
+                    </select>
+
+                    {/* Value input */}
+                    <input
+                      type="number"
+                      min={1}
+                      value={req.value || ''}
+                      onChange={e => updateRequirementRow(idx, 'value', Number(e.target.value))}
+                      placeholder={t('demand.value', 'כמות')}
+                      className="w-20 px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                    />
+
+                    {/* Type select */}
+                    <select
+                      value={req.type}
+                      onChange={e => updateRequirementRow(idx, 'type', e.target.value as 'New' | 'Extension')}
+                      className="w-28 px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                    >
+                      <option value="New">{t('demand.type.new', 'חדש')}</option>
+                      <option value="Extension">{t('demand.type.extension', 'הרחבה')}</option>
+                    </select>
+
+                    {/* Delete row button */}
+                    <button
+                      type="button"
+                      onClick={() => removeRequirementRow(idx)}
+                      className="text-text-secondary hover:text-red-500 transition-colors cursor-pointer bg-transparent border-none p-1"
+                    >
+                      <MdDelete size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {error && (
           <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-danger">
