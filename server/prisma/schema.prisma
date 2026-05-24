@@ -266,6 +266,7 @@ model Demand {
   status             DemandStatus     @default(Pending)
   clusterName        String?
   approvedValue      Float?
+  assignedValue      Float?
   approvedDate       DateTime?
   reason             String?
   centerName         String

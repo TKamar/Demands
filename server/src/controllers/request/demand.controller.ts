@@ -90,6 +90,8 @@ export const demandController = {
         sortDir,
       } = req.query;
 
+      const centerName = typeof req.query.center === 'string' ? req.query.center : undefined;
+
       const page = Number(pageQuery) || 1;
       const limit = Number(limitQuery) || 10;
       const isManagedView = managed === 'true';
@@ -134,6 +136,7 @@ export const demandController = {
           projectRelatedTo: relatedTo as string | undefined,
           projectEmergencyOption: emergencyOption as string | undefined,
           projectPriority: req.query.priority as string | undefined,
+          centerName,
         },
         {
           page,
@@ -458,6 +461,22 @@ export const demandController = {
       }
       console.error("demandController.restore error:", error);
       res.status(400).json({ error: "Failed to restore demand" });
+    }
+  },
+
+  assign: async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const { assignedValue } = req.body;
+      const demand = await (prisma.demand.update as any)({
+        where: { id },
+        data: { assignedValue: assignedValue != null ? Number(assignedValue) : null },
+        include: { project: true, service: true, resource: true, location: true },
+      });
+      res.json(demand);
+    } catch (err) {
+      console.error("demandController.assign error:", err);
+      res.status(500).json({ message: 'Failed to assign resource' });
     }
   },
 

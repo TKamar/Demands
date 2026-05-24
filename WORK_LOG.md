@@ -68,3 +68,34 @@ Started: 2026-05-21
 - Scrollbar on left side via inherited `dir="rtl"` from `<html>`
 
 ---
+
+## Resource Assignment Feature
+
+Branch: `feat/resource-assignment`
+Started: 2026-05-24
+
+| Area | Status |
+|------|--------|
+| Prisma schema — `assignedValue` field | ✅ Done |
+| Migration SQL file | ✅ Done |
+| `demand.service.ts` — `centerName` filter | ✅ Done |
+| `demand.controller.ts` — `centerName` query param + `assign` handler | ✅ Done |
+| `demand.routes.ts` — `PATCH /:id/assign` route | ✅ Done |
+| `domain.ts` — `assignedValue` on `Demand` type | ✅ Done |
+| `apiService.ts` — `centerName` query param + `assignDemand` function | ✅ Done |
+| `ResourcesForAssignment.tsx` — full implementation | ✅ Done |
+| i18n keys (`resourceAssignment.*`) — he + en | ✅ Done |
+
+### 2026-05-24
+
+**feat/resource-assignment**
+- Schema: added `assignedValue Float?` to `Demand` model; manual migration SQL at `server/prisma/migrations/20260524_add_assigned_value/migration.sql`
+- Service: added `centerName` to `findByFilters` filter type and where clause
+- Controller: wired `center` query param → `centerName` filter in `getByFilters`; added `assign` handler using `prisma.demand.update as any` to bypass stale generated client types
+- Routes: added `PATCH /:id/assign` guarded by `requireCenterManager`
+- Frontend `Demand` type: added `assignedValue?: number`
+- `apiService`: maps `assignedValue` in `mapDemand`; sends `center` query param when `centerName` filter present; added `assignDemand` function
+- `ResourcesForAssignment`: replaced "Coming Soon" stub with full grouped accordion UI — fetches approved demands for center, groups by resourceName, allows per-demand quantity input with save button
+- i18n: expanded `resourceAssignment` namespace in both `he` and `en` locales
+
+---

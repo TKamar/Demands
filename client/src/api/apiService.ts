@@ -51,6 +51,7 @@ function mapDemand(raw: any): Demand {
     status: raw.status,
     clusterName: raw.clusterName,
     approvedValue: raw.approvedValue,
+    assignedValue: raw.assignedValue,
     approvedDate: raw.approvedDate,
     reason: raw.reason,
     createdBy: raw.createdBy ?? '',
@@ -165,6 +166,7 @@ export async function fetchDemands(
     if (params.relatedTo) query.append('relatedTo', params.relatedTo);
     if (params.emergencyOption) query.append('emergencyOption', params.emergencyOption);
     if (params.managed) query.append('managed', 'true');
+    if (params.centerName) query.append('center', params.centerName);
   }
 
   // If any filter is present (besides pagination), use /demands/filter, otherwise /demands
@@ -173,7 +175,7 @@ export async function fetchDemands(
     params.locationId || params.baseName || params.environmentName ||
     params.networkName || params.clusterName || params.type || params.status ||
     params.projectType || params.median || params.year || params.relatedTo || params.emergencyOption || params.projectPriority ||
-    params.managed
+    params.managed || params.centerName
   );
 
   const endpoint = isFiltering ? '/demands/filter' : '/demands';
@@ -234,6 +236,11 @@ export async function bulkRejectDemands(payload: BulkRejectDemandPayload): Promi
 export async function fetchCenterPendingDemands(): Promise<Demand[]> {
   const res = await api.get<any[]>('/demands/center/pending');
   return res.data.map(mapDemand);
+}
+
+export async function assignDemand(id: number, assignedValue: number | null): Promise<Demand> {
+  const { data } = await api.patch<any>(`/demands/${id}/assign`, { assignedValue });
+  return mapDemand(data);
 }
 
 // --- Reference data ---

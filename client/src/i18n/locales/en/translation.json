@@ -505,8 +505,17 @@
   "approvalRequests": { "empty": "No pending approval requests" },
   "myRequests": { "empty": "You have not opened any requests yet" },
   "resourceAssignment": {
-    "title": "Resources for Assignment",
-    "comingSoon": "Resource assignment will be available after moderator approval."
+    "title": "Resource Assignment",
+    "comingSoon": "Resource assignment will be available after moderator approval.",
+    "empty": "No approved resources to assign",
+    "demands": "demands",
+    "total": "Total",
+    "requested": "Requested",
+    "approved": "Approved",
+    "assignPlaceholder": "Quantity to assign",
+    "save": "Save",
+    "saved": "Assigned successfully",
+    "saveError": "Error saving"
   },
   "history": { "comingSoon": "Request history will be available soon." },
   "actions": {

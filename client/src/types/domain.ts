@@ -62,6 +62,7 @@ export interface Demand {
   status: DemandStatus;
   clusterName?: string;
   approvedValue?: number;
+  assignedValue?: number;
   approvedDate?: string;
   reason?: string;
   createdBy: string;

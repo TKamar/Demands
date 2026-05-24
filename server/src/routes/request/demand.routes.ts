@@ -21,5 +21,6 @@ router.patch("/:id/cancel", authenticate, requireAuth, demandController.cancel);
 router.patch("/:id/restore", authenticate, requireAuth, demandController.restore);
 router.patch("/:id/reject", authenticate, requireModerator, demandController.reject);
 router.patch("/:id/approve", authenticate, requireModerator, demandController.approve);
+router.patch("/:id/assign", authenticate, requireAuth, requireCenterManager, demandController.assign);
 
 export default router;

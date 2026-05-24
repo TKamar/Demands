@@ -505,8 +505,17 @@
   "approvalRequests": { "empty": "אין בקשות ממתינות לאישור" },
   "myRequests": { "empty": "לא פתחת בקשות עדיין" },
   "resourceAssignment": {
-    "title": "משאבים לשיוך",
-    "comingSoon": "שיוך משאבים יהיה זמין לאחר אישור מנחה."
+    "title": "הקצאת משאבים",
+    "comingSoon": "שיוך משאבים יהיה זמין לאחר אישור מנחה.",
+    "empty": "אין משאבים מאושרים להקצאה",
+    "demands": "דרישות",
+    "total": "סה\"כ",
+    "requested": "נדרש",
+    "approved": "מאושר",
+    "assignPlaceholder": "הכמות שתוקצה",
+    "save": "שמור",
+    "saved": "הוקצה בהצלחה",
+    "saveError": "שגיאה בשמירה"
   },
   "history": { "comingSoon": "היסטוריית דרישות תהיה זמינה בקרוב." },
   "actions": {
