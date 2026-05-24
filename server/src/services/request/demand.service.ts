@@ -38,6 +38,7 @@ export const demandService = {
       projectRelatedTo?: string;
       projectEmergencyOption?: string;
       projectPriority?: string;
+      centerName?: string;
     },
     pagination?: { page: number; limit: number; sortBy?: string; sortDir?: 'asc' | 'desc' }
   ) => {
@@ -54,6 +55,7 @@ export const demandService = {
     if (filters.status) where.status = filters.status;
     if (filters.createdBy) where.createdBy = filters.createdBy;
     if (filters.serviceNames) where.serviceName = { in: filters.serviceNames };
+    if (filters.centerName) where.centerName = filters.centerName;
 
     if (filters.baseName || filters.environmentName || filters.networkName || filters.clusterName) {
       where.location = {};
