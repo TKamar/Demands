@@ -17,6 +17,7 @@ Started: 2026-05-21
 | 5 | RequirementsView: toolbar cleanup + funnel + sort | ✅ Done |
 | 6 | RequestsIOpened: standardize with DemandsTable | ✅ Done |
 | 7 | NotificationPanel: RTL fixes | ✅ Done |
+| B | TopNav panels: add Back button | ✅ Done |
 
 ---
 
@@ -69,11 +70,11 @@ Started: 2026-05-21
 
 ### 2026-05-24
 
-**Step A — OIDC auth callback redirect** (branch: `fix/auth-callback-redirect`)
-- Fixed onSigninCallback in client/src/auth/authConfig.ts to always redirect to `/projects` instead of preserving the callback path
-- Added /callback safety-net route in client/src/App.tsx to handle stale callback URLs
-- Prevents blank page when Keycloak redirects to /callback
-- Verified with npm run build:client (TypeScript + Vite passed)
-- Commit: 14c61ad
+**Step B — TopNav panels: Back navigation** (branch: `feat/back-navigation`)
+- Added MdArrowBack import to MainPage.tsx
+- Wrapped all three TopNav panels (approvalRequests, myRequests, history) with back button container
+- Back button sets `topNavTab` to `null`, returning users to main projects/requirements view
+- Added `nav.back` i18n key to both he/translation.json ("חזרה") and en/translation.json ("Back")
+- Verified build passes with zero TypeScript errors (`npm run build:client`)
 
 ---
