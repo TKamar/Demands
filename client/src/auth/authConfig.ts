@@ -10,7 +10,7 @@ export const authConfig: AuthProviderProps = {
   automaticSilentRenew: true,
   loadUserInfo: true,
   onSigninCallback: () => {
-    // Remove the code and state from the URL after sign-in
-    window.history.replaceState({}, document.title, window.location.pathname);
+    // Redirect to /projects after successful sign-in
+    window.history.replaceState({}, document.title, '/projects');
   },
 };

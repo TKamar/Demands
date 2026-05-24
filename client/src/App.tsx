@@ -88,6 +88,7 @@ function AppContent() {
         <Routes>
           <Route element={<Layout userProfile={userProfile} />}>
             <Route index element={<Navigate to="/projects" replace />} />
+            <Route path="/callback" element={<Navigate to="/projects" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/projects" element={<MainPage />} />
             <Route path="/demands" element={<Navigate to="/projects?tab=requirements" replace />} />
