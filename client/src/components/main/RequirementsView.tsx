@@ -2,6 +2,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
+import { MdAdd } from 'react-icons/md';
 import DemandsTable, { demandColumnConfig } from '../projects/DemandsTable';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import { FilterSort } from '../common/filters';
@@ -13,6 +14,7 @@ import { useReferenceData } from '../../hooks/useReferenceData';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useDelayedLoading } from '../../hooks/useDelayedLoading';
 import { useToast } from '../common/Toast';
+import { useModal } from '../../contexts/ModalContext';
 import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
 import {
   demandFilterGroups,
@@ -39,6 +41,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   const { t } = useTranslation();
   const auth = useAuth();
   const { showToast } = useToast();
+  const { openModal } = useModal();
   const role = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase() || 'user';
   const isModerator = role === 'admin' || role === 'moderator';
 
@@ -372,8 +375,15 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
     <div className="flex flex-col gap-4">
       {/* Table card with embedded FilterSort in header */}
       <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
-        {/* Table header with funnel icon at end */}
-        <div className="relative flex items-center justify-end px-4 py-2 border-b border-divider">
+        {/* Table header with button and funnel icon */}
+        <div className="relative flex items-center justify-end gap-2 px-4 py-2 border-b border-divider">
+          <button
+            onClick={() => openModal('demand')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap"
+          >
+            <MdAdd size={15} />
+            {t('requirements.addRequirement', '+ הוסף דרישה')}
+          </button>
           <FilterSort
             compact
             filterGroups={filterGroupsWithOptions}

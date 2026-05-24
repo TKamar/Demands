@@ -547,6 +547,9 @@
       "newRequirement": "New Requirement"
     }
   },
+  "requirements": {
+    "addRequirement": "+ Add Requirement"
+  },
   "centerFilter": {
     "label": "Center",
     "all": "All Centers",
