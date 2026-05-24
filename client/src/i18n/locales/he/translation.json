@@ -544,6 +544,13 @@
       "ProjectEdited": "עריכת פרויקט"
     }
   },
+  "bulk": {
+    "selected": "דרישות נבחרו",
+    "makeDecision": "קבלת החלטה",
+    "title": "קבלת החלטה עבור דרישות מרובות",
+    "centerInfo": "פיקוד: {{center}}",
+    "resourceInfo": "משאב: {{resource}}"
+  },
   "main": {
     "tabs": {
       "projects": "פרויקטים ודרישות",

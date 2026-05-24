@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../common/Modal';
-import type { ApproveDemandPayload, RejectDemandPayload } from '../../api/types';
 
-type BulkDecisionType = 'Approved' | 'Rejected';
+type BulkDecisionType = 'Approved' | 'Rejected' | 'ApprovedWithCondition';
 
 interface BulkDecisionModalProps {
   open: boolean;
   onClose: () => void;
-  onApprove: (payload: ApproveDemandPayload) => Promise<void>;
-  onReject: (payload: RejectDemandPayload) => Promise<void>;
+  onApprove: (payload: { status: 'Approved' | 'ApprovedWithCondition'; approvedValue?: number; reason?: string }) => Promise<void>;
+  onReject: (payload: { reason: string }) => Promise<void>;
   selectedCount: number;
   isLoading?: boolean;
+  lockedCenter?: string | null;
+  lockedResourceName?: string | null;
 }
 
 export default function BulkDecisionModal({
@@ -21,25 +22,29 @@ export default function BulkDecisionModal({
   onReject,
   selectedCount,
   isLoading,
+  lockedCenter,
+  lockedResourceName,
 }: BulkDecisionModalProps) {
   const { t } = useTranslation();
 
   const [decisionType, setDecisionType] = useState<BulkDecisionType>('Approved');
   const [reason, setReason] = useState('');
+  const [approvedValue, setApprovedValue] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (open) {
       setDecisionType('Approved');
       setReason('');
+      setApprovedValue('');
     }
     setIsSubmitting(false);
   }, [open]);
 
-  const requiresReason = decisionType === 'Rejected';
+  const showApprovedValue = decisionType === 'Approved' || decisionType === 'ApprovedWithCondition';
 
   const isValid = () => {
-    if (requiresReason && (!reason || reason.trim() === '')) return false;
+    if (decisionType === 'Rejected' && (!reason || reason.trim() === '')) return false;
     return true;
   };
 
@@ -50,7 +55,11 @@ export default function BulkDecisionModal({
       if (decisionType === 'Rejected') {
         await onReject({ reason: reason.trim() });
       } else {
-        await onApprove({ status: decisionType });
+        await onApprove({
+          status: decisionType,
+          approvedValue: approvedValue ? Number(approvedValue) : undefined,
+          reason: reason.trim() || undefined,
+        });
       }
       onClose();
     } finally {
@@ -58,70 +67,85 @@ export default function BulkDecisionModal({
     }
   };
 
+  const decisionOptions: { value: BulkDecisionType; label: string }[] = [
+    { value: 'Approved', label: t('management.decisionModal.Approved', 'אישור') },
+    { value: 'Rejected', label: t('management.decisionModal.Rejected', 'דחיה') },
+    { value: 'ApprovedWithCondition', label: t('management.decisionModal.ApprovedWithCondition', 'אישור מותנה') },
+  ];
+
   return (
     <Modal
       isOpen={open}
       onClose={onClose}
-      title={t('management.bulkDecision.title')}
+      title={t('bulk.title', 'קבלת החלטה עבור דרישות מרובות')}
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        {/* Summary */}
-        <div className="bg-gray-50 rounded-xl p-4 text-sm text-text-secondary">
-          {t('management.bulkDecision.summary', { count: selectedCount })}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5" dir="rtl">
+        {/* Summary header */}
+        <div className="bg-gray-50 rounded-xl p-4 text-sm text-text-secondary flex flex-col gap-1">
+          <span className="font-medium text-text-primary">
+            {t('management.bulkDecision.summary', { count: selectedCount })}
+          </span>
+          {lockedCenter && (
+            <span>{t('bulk.centerInfo', 'פיקוד: {{center}}', { center: lockedCenter })}</span>
+          )}
+          {lockedResourceName && (
+            <span>{t('bulk.resourceInfo', 'משאב: {{resource}}', { resource: lockedResourceName })}</span>
+          )}
         </div>
 
-        {/* Decision Type */}
-        <div className="flex flex-col gap-3">
+        {/* Decision Type dropdown */}
+        <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-text-primary">
-            {t('management.decisionModal.decisionType')}
+            {t('management.decisionModal.decisionType', 'סוג החלטה')}
           </label>
-          <div className="grid grid-cols-2 gap-3">
-            {(['Approved', 'Rejected'] as BulkDecisionType[]).map((type) => (
-              <label
-                key={type}
-                className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
-                  decisionType === type
-                    ? type === 'Rejected'
-                      ? 'border-danger bg-danger/5'
-                      : 'border-primary bg-primary/5'
-                    : 'border-divider hover:border-gray-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="bulkDecisionType"
-                  value={type}
-                  checked={decisionType === type}
-                  onChange={() => setDecisionType(type)}
-                  className="accent-primary"
-                />
-                <span className="text-sm font-medium">
-                  {t(`management.decisionModal.${type}`)}
-                </span>
-              </label>
+          <select
+            value={decisionType}
+            onChange={(e) => setDecisionType(e.target.value as BulkDecisionType)}
+            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+          >
+            {decisionOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
-        {/* Reason (for Rejected) */}
-        {requiresReason && (
+        {/* Approved Quantity — Approve and Conditional Approval only */}
+        {showApprovedValue && (
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-primary">
-              {t('management.decisionModal.reason')} <span className="text-danger">*</span>
+              {t('management.decisionModal.approvedValue', 'כמות מאושרת')}
             </label>
-            <textarea
-              className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm resize-none"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder={t('management.decisionModal.reasonPlaceholder')}
-              rows={3}
-              required
+            <input
+              type="number"
+              min={0}
+              value={approvedValue}
+              onChange={(e) => setApprovedValue(e.target.value)}
+              placeholder={t('management.decisionModal.approvedValuePlaceholder', 'השאר ריק לאישור מלא')}
+              className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
             />
           </div>
         )}
 
+        {/* Reason — all decision types */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-text-primary">
+            {t('management.decisionModal.reason', 'סיבה')}
+            {decisionType === 'Rejected' && <span className="text-danger"> *</span>}
+          </label>
+          <textarea
+            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm resize-none"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder={t('management.decisionModal.reasonPlaceholder', 'הוסף הערה...')}
+            rows={3}
+            required={decisionType === 'Rejected'}
+          />
+        </div>
+
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-2">
+        <div className="flex justify-start gap-3 pt-2">
           <button
             type="button"
             onClick={onClose}
@@ -141,7 +165,7 @@ export default function BulkDecisionModal({
             {(isLoading || isSubmitting) && (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block me-2"></div>
             )}
-            {t('management.bulkDecision.submit')}
+            {t('management.bulkDecision.submit', 'החל על הכל')}
           </button>
         </div>
       </form>
