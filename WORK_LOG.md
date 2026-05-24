@@ -67,4 +67,14 @@ Started: 2026-05-21
 - Mark-all-read wrapper: `justify-start` → button appears on right in RTL
 - Scrollbar on left side via inherited `dir="rtl"` from `<html>`
 
+**Unified Project + Demand Form** (branch: `feat/unified-project-form`)
+- Added optional inline requirements section to `CreateProjectModal` (create mode only)
+- New `InlineRequirement` interface: serviceName, resourceName, value, type
+- Row UI: service select → resource select (filtered by service) → value input → type select → delete button
+- Helper functions: `addRequirementRow`, `removeRequirementRow`, `updateRequirementRow`
+- On submit: after project creation succeeds, fires `createDemand` for each valid row (parallel Promise.all)
+- Valid row = serviceName + resourceName filled + value > 0; incomplete rows silently skipped
+- State reset on modal close
+- Imports: `MdAdd`, `MdDelete` from react-icons/md; `createDemand` from apiService directly
+
 ---
