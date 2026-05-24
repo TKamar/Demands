@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../common/Modal';
 import type { Demand } from '../../types/domain';
-import type { ApprovalStatus, ApproveDemandPayload, RejectDemandPayload } from '../../api/types';
+import type { ApproveDemandPayload, RejectDemandPayload } from '../../api/types';
 
-type DecisionType = ApprovalStatus | 'Rejected';
+type DecisionType = 'Approved' | 'Rejected' | 'ApprovedWithCondition' | '';
 
 interface DecisionModalProps {
     open: boolean;
@@ -18,38 +18,30 @@ interface DecisionModalProps {
 export default function DecisionModal({ open, onClose, onApprove, onReject, demand, isLoading }: DecisionModalProps) {
     const { t } = useTranslation();
 
-    const [decisionType, setDecisionType] = useState<DecisionType>('Approved');
-    const [approvedValue, setApprovedValue] = useState<number>(0);
+    const [decision, setDecision] = useState<DecisionType>('');
+    const [approvedValue, setApprovedValue] = useState<number | undefined>(undefined);
     const [reason, setReason] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const requiresValue = decisionType === 'PartiallyApproved' || decisionType === 'ApprovedWithCondition';
-    const requiresReason = decisionType !== 'Approved';
-
     useEffect(() => {
-        if (demand && open) {
-            setDecisionType('Approved');
-            setApprovedValue(demand.value);
+        if (open) {
+            setDecision('');
             setReason('');
+            setApprovedValue(undefined);
         }
         setIsSubmitting(false);
     }, [demand, open]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!demand) return;
+        if (!demand || decision === '') return;
 
         setIsSubmitting(true);
         try {
-            if (decisionType === 'Rejected') {
-                await onReject({ reason: reason.trim() });
+            if (decision === 'Rejected') {
+                await onReject({ reason });
             } else {
-                const payload: ApproveDemandPayload = {
-                    status: decisionType,
-                    ...(requiresValue && { approvedValue }),
-                    ...(requiresReason && { reason: reason.trim() }),
-                };
-                await onApprove(payload);
+                await onApprove({ status: decision as 'Approved' | 'ApprovedWithCondition', approvedValue, reason });
             }
             onClose();
         } finally {
@@ -58,8 +50,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
     };
 
     const isValid = () => {
-        if (requiresValue && (approvedValue === undefined || approvedValue <= 0)) return false;
-        if (requiresReason && (!reason || reason.trim() === '')) return false;
+        if (decision === '') return false;
         return true;
     };
 
@@ -98,76 +89,56 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
                     </div>
                 </div>
 
-                {/* Decision Type Radio Buttons */}
-                <div className="flex flex-col gap-3">
+                {/* Decision Dropdown */}
+                <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium text-text-primary">
                         {t('management.decisionModal.decisionType')}
                     </label>
-                    <div className="grid grid-cols-2 gap-3">
-                        {(['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected'] as DecisionType[]).map((type) => (
-                            <label
-                                key={type}
-                                className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
-                                    decisionType === type
-                                        ? type === 'Rejected'
-                                            ? 'border-danger bg-danger/5'
-                                            : 'border-primary bg-primary/5'
-                                        : 'border-divider hover:border-gray-300'
-                                }`}
-                            >
-                                <input
-                                    type="radio"
-                                    name="decisionType"
-                                    value={type}
-                                    checked={decisionType === type}
-                                    onChange={() => setDecisionType(type)}
-                                    className="accent-primary"
-                                />
-                                <span className="text-sm font-medium">
-                                    {t(`management.decisionModal.${type}`)}
-                                </span>
-                            </label>
-                        ))}
-                    </div>
+                    <select
+                        value={decision}
+                        onChange={e => setDecision(e.target.value as DecisionType)}
+                        className="w-full px-3 py-2 text-sm border border-divider rounded-lg bg-bg-default"
+                        dir="rtl"
+                    >
+                        <option value="">{t('decision.selectPlaceholder', 'בחר החלטה')}</option>
+                        <option value="Approved">{t('decision.approve', 'אישור')}</option>
+                        <option value="Rejected">{t('decision.reject', 'דחיה')}</option>
+                        <option value="ApprovedWithCondition">{t('decision.conditionalApproval', 'אישור מותנה')}</option>
+                    </select>
                 </div>
 
-                {/* Approved Value (conditional) */}
-                {requiresValue && (
-                    <div className="flex flex-col gap-1.5">
+                {/* Approved Quantity — only for Approve and Conditional Approval */}
+                {(decision === 'Approved' || decision === 'ApprovedWithCondition') && (
+                    <div>
                         <label className="text-sm font-medium text-text-primary">
-                            {t('management.decisionModal.approvedValue')} <span className="text-danger">*</span>
+                            {t('decision.approvedQuantity', 'כמות מאושרת')}
                         </label>
                         <div className="flex items-center gap-2">
                             <input
                                 type="number"
-                                className="flex-1 px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-                                value={approvedValue}
-                                onChange={(e) => setApprovedValue(Number(e.target.value))}
-                                min="0"
-                                max={demand.value}
-                                required
+                                min={0}
+                                value={approvedValue ?? ''}
+                                onChange={e => setApprovedValue(e.target.value ? Number(e.target.value) : undefined)}
+                                className="w-32 px-3 py-2 text-sm border border-divider rounded-lg bg-bg-default"
                             />
-                            <span className="text-sm text-text-secondary">{demand.unit}</span>
+                            <span className="text-sm text-text-secondary">{demand.unit ?? ''}</span>
                         </div>
-                        <span className="text-xs text-text-secondary">
-                            {t('management.decisionModal.requestedValue')}: {demand.value}
-                        </span>
                     </div>
                 )}
 
-                {/* Reason (conditional) */}
-                {requiresReason && (
-                    <div className="flex flex-col gap-1.5">
+                {/* Reason — always visible when a decision is selected */}
+                {decision !== '' && (
+                    <div>
                         <label className="text-sm font-medium text-text-primary">
-                            {t('management.decisionModal.reason')} <span className="text-danger">*</span>
+                            {t('decision.reason', 'סיבה')}
                         </label>
                         <textarea
-                            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm resize-none"
                             value={reason}
-                            onChange={(e) => setReason(e.target.value)}
-                            placeholder={t('management.decisionModal.reasonPlaceholder')}
+                            onChange={e => setReason(e.target.value)}
                             rows={3}
-                            required
+                            className="w-full px-3 py-2 text-sm border border-divider rounded-lg bg-bg-default resize-none"
+                            dir="rtl"
+                            placeholder={t('decision.reasonPlaceholder', 'הזן סיבה...')}
                         />
                     </div>
                 )}
@@ -185,7 +156,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
                         type="submit"
                         disabled={isLoading || isSubmitting || !isValid()}
                         className={`px-6 py-2.5 text-white rounded-xl text-sm font-medium transition-colors cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed ${
-                            decisionType === 'Rejected'
+                            decision === 'Rejected'
                                 ? 'bg-danger hover:bg-red-700'
                                 : 'bg-primary hover:bg-primary-dark'
                         }`}

@@ -67,4 +67,14 @@ Started: 2026-05-21
 - Mark-all-read wrapper: `justify-start` → button appears on right in RTL
 - Scrollbar on left side via inherited `dir="rtl"` from `<html>`
 
+**Decision Modal refactor** (branch: `feat/decision-modal-refactor`)
+- Replaced radio buttons with `<select>` dropdown (3 options: Approved, Rejected, ApprovedWithCondition)
+- State variable renamed from `decisionType: DecisionType` (was `ApprovalStatus | 'Rejected'`) to `decision: DecisionType` (now `'Approved' | 'Rejected' | 'ApprovedWithCondition' | ''`)
+- `approvedValue` changed from `number` (default 0) to `number | undefined` (default undefined)
+- Reason textarea shown for ALL decision types (when `decision !== ''`)
+- Approved Quantity input shown only for Approved and ApprovedWithCondition (not Rejected)
+- Submit logic branches on `decision === 'Rejected'` vs approve path
+- State reset to empty on modal open/close
+- Added `decision.*` i18n keys to both he and en translation files
+
 ---
