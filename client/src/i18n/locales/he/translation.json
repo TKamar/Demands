@@ -570,7 +570,8 @@
     "deleteError": "מחיקת הפרויקט נכשלה",
     "inlineRequirements": {
       "title": "דרישות (אופציונלי)",
-      "addRow": "הוסף דרישה"
+      "addRow": "הוסף דרישה",
+      "partialError": "{{succeeded}} דרישות נוצרו, {{failed}} נכשלו"
     }
   }
 }

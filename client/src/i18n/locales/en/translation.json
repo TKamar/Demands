@@ -570,7 +570,8 @@
     "deleteError": "Failed to delete project",
     "inlineRequirements": {
       "title": "Requirements (Optional)",
-      "addRow": "Add Requirement"
+      "addRow": "Add Requirement",
+      "partialError": "{{succeeded}} requirements created, {{failed}} failed"
     }
   }
 }

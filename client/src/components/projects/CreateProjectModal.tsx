@@ -67,7 +67,14 @@ export default function CreateProjectModal({
   const removeRequirementRow = (idx: number) =>
     setInlineRequirements(prev => prev.filter((_, i) => i !== idx));
   const updateRequirementRow = (idx: number, field: keyof InlineRequirement, value: string | number) =>
-    setInlineRequirements(prev => prev.map((r, i) => i === idx ? { ...r, [field]: value } : r));
+    setInlineRequirements(prev =>
+      prev.map((r, i) => {
+        if (i !== idx) return r;
+        const updated = { ...r, [field]: value };
+        if (field === 'serviceName') updated.resourceName = '';
+        return updated;
+      })
+    );
 
   // Populate form when editing
   useEffect(() => {
@@ -292,7 +299,7 @@ export default function CreateProjectModal({
           r => r.serviceName && r.resourceName && r.value > 0
         );
         if (validRequirements.length > 0) {
-          await Promise.all(
+          const results = await Promise.allSettled(
             validRequirements.map(r =>
               createDemand({
                 projectName: form.name.trim(),
@@ -308,6 +315,12 @@ export default function CreateProjectModal({
               })
             )
           );
+          const failedCount = results.filter(r => r.status === 'rejected').length;
+          const succeededCount = results.filter(r => r.status === 'fulfilled').length;
+          if (failedCount > 0) {
+            // Show partial-failure info alongside the success
+            setError(`${succeededCount} דרישות נוצרו, ${failedCount} נכשלו`);
+          }
         }
       }
 
