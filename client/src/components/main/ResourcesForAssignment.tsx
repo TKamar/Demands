@@ -92,6 +92,8 @@ export const ResourcesForAssignment: React.FC = () => {
               <button
                 type="button"
                 onClick={() => toggleGroup(resourceName)}
+                aria-expanded={isExpanded}
+                aria-controls={`resource-group-${resourceName.replace(/\s+/g, '-')}`}
                 className="w-full flex items-center justify-between px-4 py-3 bg-bg-paper hover:bg-gray-50 transition-colors cursor-pointer border-none text-start"
               >
                 <div className="flex items-center gap-3">
@@ -105,7 +107,10 @@ export const ResourcesForAssignment: React.FC = () => {
 
               {/* Demand rows */}
               {isExpanded && (
-                <div className="divide-y divide-divider">
+                <div
+                  id={`resource-group-${resourceName.replace(/\s+/g, '-')}`}
+                  className="divide-y divide-divider"
+                >
                   {resourceDemands.map(demand => (
                     <div key={demand.id} className="px-4 py-2.5 flex items-center gap-3 bg-bg-default text-sm">
                       <span className="flex-1 text-text-primary font-medium">{demand.projectName}</span>
