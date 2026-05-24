@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useModal } from '../contexts/ModalContext';
-import { MdAdd, MdSearch } from 'react-icons/md';
+import { MdAdd, MdSearch, MdArrowBack } from 'react-icons/md';
 import CenterFilter from '../components/main/CenterFilter';
 import ResourceSummaryStrip from '../components/main/ResourceSummaryStrip';
 import RequirementsView from '../components/main/RequirementsView';
@@ -117,16 +117,51 @@ export default function MainPage() {
       <div className="flex-1 overflow-auto p-6">
         {/* TopNav content panels */}
         {topNavTab === 'approvalRequests' && isCenterManager && (
-          <MyApprovalRequests
-            onApprove={(_demand) => { /* CmDecisionModal wired in Branch 3 */ }}
-            onReject={(_demand) => { /* CmDecisionModal wired in Branch 3 */ }}
-          />
+          <div>
+            <div className="flex items-center mb-4" dir="rtl">
+              <button
+                onClick={() => setTopNavTab(null)}
+                className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer bg-transparent border-none"
+              >
+                <MdArrowBack size={18} />
+                {t('nav.back', 'חזרה')}
+              </button>
+            </div>
+            <MyApprovalRequests
+              onApprove={(_demand) => { /* CmDecisionModal wired in Branch 3 */ }}
+              onReject={(_demand) => { /* CmDecisionModal wired in Branch 3 */ }}
+            />
+          </div>
         )}
-        {topNavTab === 'myRequests' && <RequestsIOpened />}
+        {topNavTab === 'myRequests' && (
+          <div>
+            <div className="flex items-center mb-4" dir="rtl">
+              <button
+                onClick={() => setTopNavTab(null)}
+                className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer bg-transparent border-none"
+              >
+                <MdArrowBack size={18} />
+                {t('nav.back', 'חזרה')}
+              </button>
+            </div>
+            <RequestsIOpened />
+          </div>
+        )}
         {topNavTab === 'history' && (
-          <div className="p-4 text-center text-gray-400" dir="rtl">
-            {/* RequestHistory component added in Branch 4 */}
-            {t('history.comingSoon')}
+          <div>
+            <div className="flex items-center mb-4" dir="rtl">
+              <button
+                onClick={() => setTopNavTab(null)}
+                className="flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer bg-transparent border-none"
+              >
+                <MdArrowBack size={18} />
+                {t('nav.back', 'חזרה')}
+              </button>
+            </div>
+            <div className="p-4 text-center text-gray-400" dir="rtl">
+              {/* RequestHistory component added in Branch 4 */}
+              {t('history.comingSoon')}
+            </div>
           </div>
         )}
 

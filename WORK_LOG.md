@@ -17,6 +17,7 @@ Started: 2026-05-21
 | 5 | RequirementsView: toolbar cleanup + funnel + sort | ✅ Done |
 | 6 | RequestsIOpened: standardize with DemandsTable | ✅ Done |
 | 7 | NotificationPanel: RTL fixes | ✅ Done |
+| B | TopNav panels: add Back button | ✅ Done |
 
 ---
 
@@ -66,5 +67,14 @@ Started: 2026-05-21
 - Replaced hardcoded colors with design tokens (bg-bg-paper, border-divider, text-primary)
 - Mark-all-read wrapper: `justify-start` → button appears on right in RTL
 - Scrollbar on left side via inherited `dir="rtl"` from `<html>`
+
+### 2026-05-24
+
+**Step B — TopNav panels: Back navigation** (branch: `feat/back-navigation`)
+- Added MdArrowBack import to MainPage.tsx
+- Wrapped all three TopNav panels (approvalRequests, myRequests, history) with back button container
+- Back button sets `topNavTab` to `null`, returning users to main projects/requirements view
+- Added `nav.back` i18n key to both he/translation.json ("חזרה") and en/translation.json ("Back")
+- Verified build passes with zero TypeScript errors (`npm run build:client`)
 
 ---
