@@ -67,4 +67,15 @@ Started: 2026-05-21
 - Mark-all-read wrapper: `justify-start` → button appears on right in RTL
 - Scrollbar on left side via inherited `dir="rtl"` from `<html>`
 
+### 2026-05-24
+
+**Step C1 — RequirementsView: Add Create Requirement button** (branch: `fix/create-requirement-button`)
+- Added "+ הוסף דרישה" (Add Requirement) button to RequirementsView toolbar
+- Button placed left of FilterSort icon in RTL layout
+- Imported `useModal` from ModalContext to trigger `openModal('demand')`
+- Added `MdAdd` icon from react-icons/md
+- Added i18n keys: `requirements.addRequirement` (EN + HE)
+- Build: zero TypeScript errors
+- Commit: a40ff08
+
 ---
