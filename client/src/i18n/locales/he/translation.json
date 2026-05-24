@@ -469,6 +469,15 @@
     "value": "כמות",
     "status": "סטטוס"
   },
+  "decision": {
+    "selectPlaceholder": "בחר החלטה",
+    "approve": "אישור",
+    "reject": "דחיה",
+    "conditionalApproval": "אישור מותנה",
+    "reason": "סיבה",
+    "reasonPlaceholder": "הזן סיבה...",
+    "approvedQuantity": "כמות מאושרת"
+  },
   "notFound": {
     "message": "העמוד המבוקש לא נמצא"
   },

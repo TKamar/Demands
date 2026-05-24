@@ -469,6 +469,15 @@
     "value": "Value",
     "status": "Status"
   },
+  "decision": {
+    "selectPlaceholder": "Select Decision",
+    "approve": "Approve",
+    "reject": "Reject",
+    "conditionalApproval": "Conditional Approval",
+    "reason": "Reason",
+    "reasonPlaceholder": "Enter reason...",
+    "approvedQuantity": "Approved Quantity"
+  },
   "notFound": {
     "message": "The requested page was not found"
   },

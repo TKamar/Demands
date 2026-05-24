@@ -67,14 +67,14 @@ Started: 2026-05-21
 - Mark-all-read wrapper: `justify-start` → button appears on right in RTL
 - Scrollbar on left side via inherited `dir="rtl"` from `<html>`
 
-**Unified Project + Demand Form** (branch: `feat/unified-project-form`)
-- Added optional inline requirements section to `CreateProjectModal` (create mode only)
-- New `InlineRequirement` interface: serviceName, resourceName, value, type
-- Row UI: service select → resource select (filtered by service) → value input → type select → delete button
-- Helper functions: `addRequirementRow`, `removeRequirementRow`, `updateRequirementRow`
-- On submit: after project creation succeeds, fires `createDemand` for each valid row (parallel Promise.all)
-- Valid row = serviceName + resourceName filled + value > 0; incomplete rows silently skipped
-- State reset on modal close
-- Imports: `MdAdd`, `MdDelete` from react-icons/md; `createDemand` from apiService directly
+**Decision Modal refactor** (branch: `feat/decision-modal-refactor`)
+- Replaced radio buttons with `<select>` dropdown (3 options: Approved, Rejected, ApprovedWithCondition)
+- State variable renamed from `decisionType: DecisionType` (was `ApprovalStatus | 'Rejected'`) to `decision: DecisionType` (now `'Approved' | 'Rejected' | 'ApprovedWithCondition' | ''`)
+- `approvedValue` changed from `number` (default 0) to `number | undefined` (default undefined)
+- Reason textarea shown for ALL decision types (when `decision !== ''`)
+- Approved Quantity input shown only for Approved and ApprovedWithCondition (not Rejected)
+- Submit logic branches on `decision === 'Rejected'` vs approve path
+- State reset to empty on modal open/close
+- Added `decision.*` i18n keys to both he and en translation files
 
 ---
