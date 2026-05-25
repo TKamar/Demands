@@ -99,3 +99,47 @@ Started: 2026-05-24
 - i18n: expanded `resourceAssignment` namespace in both `he` and `en` locales
 
 ---
+
+## Table Standardization & Filter UX Sprint
+
+Started: 2026-05-25
+
+| Task | Area | Status |
+|------|------|--------|
+| A1 | FilterSort for RequestsIOpened | ✅ Done |
+| A2 | FilterSort for MyApprovalRequests | ✅ Done |
+| A3 | FilterSort for CapacityManagement & WalletManagement | ✅ Done |
+| B  | MoreActionsMenu — portal positioning fix | ✅ Done |
+| C  | Checkbox ghost-selection dedup + Deselect All | ✅ Done |
+
+### 2026-05-25
+
+**Task A1 — RequestsIOpened filter panel**
+- Added `FilterSort` (compact) in header above table
+- Filter fields: status, serviceName, resourceName
+- Options derived from loaded demands via useMemo
+- `filteredDemands` piped through `useClientInfiniteScroll` before table render
+- All handlers in `useCallback`; stable module-level `noop` for `onSortChange`
+
+**Task A2 — MyApprovalRequests filter panel**
+- Same pattern as A1
+- Filter fields: serviceName, resourceName, projectName
+- `filteredDemands` replaces raw demands in table render
+
+**Task A3 — CapacityManagement & WalletManagement filter panels**
+- `FilterSort` added in section header of both parent management components
+- Capacity fields: service, resource, base, network, environment
+- Wallet fields: service, resource, center
+- Options derived from loaded capacities/wallets; all handlers memoized
+
+**Task B — MoreActionsMenu portal fix**
+- Replaced `absolute end-0 top-full mt-1` dropdown with `ReactDOM.createPortal` + `position: fixed`
+- Position computed via `getBoundingClientRect()` on trigger ref on each open
+- Click-outside handler checks both `containerRef` and `menuRef`
+- Added Escape key handler and `aria-haspopup`/`aria-expanded` on trigger
+
+**Task C — Checkbox fixes**
+- `RequirementsView`: deduplicates accumulated demands by `id` when appending pages
+- Filter/sort changes now clear selected demand IDs and locked center/resource
+- `DemandsTable`: new `onDeselectAll` prop; `IndeterminateCheckbox` helper renders in thead when `selectedIds.size > 0`
+- Branch: `fix/checkbox-selection` → merged to `dev`
