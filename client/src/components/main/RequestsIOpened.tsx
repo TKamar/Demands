@@ -3,28 +3,44 @@ import { useTranslation } from 'react-i18next';
 import DemandsTable, { demandColumnConfig } from '../projects/DemandsTable';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import ConfirmDialog from '../common/ConfirmDialog';
+import FilterSort from '../common/filters/FilterSort';
 import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
 import { useDemands } from '../../hooks/useDemands';
 import { useCachedProjects } from '../../hooks/useCachedProjects';
 import { useClientInfiniteScroll } from '../../hooks/useClientInfiniteScroll';
 import { useToast } from '../common/Toast';
 import type { Demand } from '../../types/domain';
+import type { FilterGroupConfig } from '../../types/filter';
 
-// Columns visible in My Requests view
 const MY_REQUESTS_COLUMNS = demandColumnConfig.filter((col) =>
   ['project', 'service', 'resource', 'status', 'value', 'unit', 'createdAt', 'actions'].includes(col.key)
 );
+
+type MyRequestsFilterKey = 'status' | 'serviceName' | 'resourceName';
+
+const INITIAL_FILTERS: Record<MyRequestsFilterKey, string> = {
+  status: '',
+  serviceName: '',
+  resourceName: '',
+};
+
+const STATUS_OPTIONS = [
+  { value: 'Pending', label: 'Pending' },
+  { value: 'Approved', label: 'Approved' },
+  { value: 'ApprovedWithCondition', label: 'ApprovedWithCondition' },
+  { value: 'Rejected', label: 'Rejected' },
+  { value: 'Cancelled', label: 'Cancelled' },
+];
 
 export const RequestsIOpened: React.FC = () => {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [demandToRestore, setDemandToRestore] = useState<Demand | null>(null);
+  const [filters, setFilters] = useState<Record<MyRequestsFilterKey, string>>(INITIAL_FILTERS);
 
-  // Fetch current user's demands (server returns only current user's demands for non-admin)
   const { demands, isLoading, restoreDemand } = useDemands({}, { page: 1, limit: 500 });
 
-  // Project map for DemandsTable
   const { projects } = useCachedProjects();
   const projectMap = useMemo(() => {
     const map = new Map();
@@ -32,8 +48,51 @@ export const RequestsIOpened: React.FC = () => {
     return map;
   }, [projects]);
 
-  // Client-side infinite scroll
-  const { displayedItems, sentinelRef, hasMore } = useClientInfiniteScroll(demands, 20);
+  const serviceOptions = useMemo(() => {
+    const seen = new Set<string>();
+    return demands
+      .filter(d => d.serviceName && !seen.has(d.serviceName) && !!seen.add(d.serviceName))
+      .map(d => ({ value: d.serviceName, label: d.serviceName }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [demands]);
+
+  const resourceOptions = useMemo(() => {
+    const seen = new Set<string>();
+    return demands
+      .filter(d => d.resourceName && !seen.has(d.resourceName) && !!seen.add(d.resourceName))
+      .map(d => ({ value: d.resourceName, label: d.resourceName }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [demands]);
+
+  const filterGroups = useMemo((): FilterGroupConfig<MyRequestsFilterKey>[] => [
+    {
+      id: 'main',
+      label: 'common.filters',
+      defaultExpanded: true,
+      fields: [
+        { key: 'status', label: 'projects.columns.status', inputType: 'select', options: STATUS_OPTIONS },
+        { key: 'serviceName', label: 'demands.service', inputType: 'select', options: serviceOptions },
+        { key: 'resourceName', label: 'demands.resource', inputType: 'select', options: resourceOptions },
+      ],
+    },
+  ], [serviceOptions, resourceOptions]);
+
+  const filteredDemands = useMemo(() => {
+    return demands.filter(d => {
+      if (filters.status && d.status !== filters.status) return false;
+      if (filters.serviceName && d.serviceName !== filters.serviceName) return false;
+      if (filters.resourceName && d.resourceName !== filters.resourceName) return false;
+      return true;
+    });
+  }, [demands, filters]);
+
+  const { displayedItems, sentinelRef, hasMore } = useClientInfiniteScroll(filteredDemands, 20);
+
+  const handleFilterChange = (key: MyRequestsFilterKey, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleClearFilters = () => setFilters(INITIAL_FILTERS);
 
   const handleRestore = (demand: Demand) => {
     setDemandToRestore(demand);
@@ -54,6 +113,19 @@ export const RequestsIOpened: React.FC = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
+        <div className="relative flex items-center justify-end gap-2 px-4 py-2 border-b border-divider">
+          <FilterSort
+            compact
+            filterGroups={filterGroups}
+            filterValues={filters}
+            onFilterChange={handleFilterChange}
+            onClearAllFilters={handleClearFilters}
+            sortOptions={[]}
+            sortState={{ field: null, direction: 'asc' }}
+            onSortChange={() => {}}
+          />
+        </div>
+
         <DemandsTable
           demands={displayedItems}
           projectMap={projectMap}
