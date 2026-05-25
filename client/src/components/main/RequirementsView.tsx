@@ -411,7 +411,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
       {/* Table card with embedded FilterSort in header */}
       <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
         {/* Table header with button and funnel icon */}
-        <div className="relative flex items-center justify-end gap-2 px-4 py-2 border-b border-divider">
+        <div className="relative flex items-center gap-2 px-4 py-2 border-b border-divider" dir="rtl">
           <button
             onClick={() => openModal('demand')}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap"
@@ -419,6 +419,28 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
             <MdAdd size={15} />
             {t('requirements.addRequirement', '+ הוסף דרישה')}
           </button>
+
+          {selectedDemandIds.size >= 2 && (
+            <>
+              <button
+                onClick={() => setIsBulkModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg hover:bg-primary/20 transition-colors border border-primary/30 cursor-pointer whitespace-nowrap"
+              >
+                {t('bulk.makeDecision', 'קבלת החלטה מרובה')}
+              </button>
+              <span className="text-sm text-text-secondary whitespace-nowrap">
+                {selectedDemandIds.size} {t('bulk.selected', 'נבחרו')}
+              </span>
+              <button
+                onClick={clearSelection}
+                className="text-sm text-text-secondary hover:text-text-primary border border-divider rounded-lg px-2 py-1 bg-transparent cursor-pointer whitespace-nowrap transition-colors"
+              >
+                {t('common.cancel', 'ביטול')}
+              </button>
+            </>
+          )}
+
+          <div className="flex-1" />
           <FilterSort
             compact
             filterGroups={filterGroupsWithOptions}
@@ -460,27 +482,6 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
                 onToggleSelect={handleToggleSelect}
               />
             </div>
-            {selectedDemandIds.size >= 2 && (
-              <div className="sticky bottom-0 bg-primary text-white px-4 py-3 flex items-center justify-between rounded-b-xl border-t border-primary/20" dir="rtl">
-                <span className="text-sm font-medium">
-                  {selectedDemandIds.size} {t('bulk.selected', 'דרישות נבחרו')}
-                </span>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setIsBulkModalOpen(true)}
-                    className="px-4 py-1.5 bg-white text-primary text-sm font-medium rounded-lg hover:opacity-90 transition-opacity cursor-pointer border-none"
-                  >
-                    {t('bulk.makeDecision', 'קבלת החלטה')}
-                  </button>
-                  <button
-                    onClick={clearSelection}
-                    className="px-3 py-1.5 bg-transparent text-white text-sm border border-white/50 rounded-lg hover:bg-white/10 cursor-pointer"
-                  >
-                    {t('common.cancel', 'ביטול')}
-                  </button>
-                </div>
-              </div>
-            )}
           </>
         )}
       </div>
