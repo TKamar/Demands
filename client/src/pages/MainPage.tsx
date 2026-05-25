@@ -117,7 +117,7 @@ export default function MainPage() {
           </div>
           <button
             onClick={() => openModal('project')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap"
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap ms-auto"
           >
             <MdAdd size={16} />
             {t('main.actions.newProject', 'New Project')}
