@@ -103,7 +103,7 @@ export default function WalletManagement() {
         setIsModalOpen(true);
     }, []);
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = useCallback(async (id: number) => {
         if (window.confirm(t('management.wallet.confirmDelete'))) {
             try {
                 await deleteWallet(id);
@@ -112,9 +112,11 @@ export default function WalletManagement() {
                 showToast(t('management.wallet.deleteFailed'), 'error');
             }
         }
-    };
+    }, [deleteWallet, showToast, t]);
 
-    const handleSubmit = async (data: any) => {
+    const handleClose = useCallback(() => setIsModalOpen(false), []);
+
+    const handleSubmit = useCallback(async (data: any) => {
         setIsSubmitting(true);
         try {
             if (selectedWallet) {
@@ -130,7 +132,7 @@ export default function WalletManagement() {
         } finally {
             setIsSubmitting(false);
         }
-    };
+    }, [selectedWallet, updateWallet, createWallet, showToast, t]);
 
     return (
         <div className="flex flex-col gap-6">
@@ -175,7 +177,7 @@ export default function WalletManagement() {
             {isModalOpen && (
                 <WalletModal
                     open={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    onClose={handleClose}
                     onSubmit={handleSubmit}
                     wallet={selectedWallet}
                     isLoading={isSubmitting}

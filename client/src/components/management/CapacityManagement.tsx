@@ -125,7 +125,7 @@ export default function CapacityManagement() {
         setIsModalOpen(true);
     }, []);
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = useCallback(async (id: number) => {
         if (window.confirm(t('Are you sure you want to delete this capacity?'))) {
             try {
                 await deleteCapacity(id);
@@ -134,9 +134,11 @@ export default function CapacityManagement() {
                 showToast('Failed to delete capacity', 'error');
             }
         }
-    };
+    }, [deleteCapacity, showToast, t]);
 
-    const handleSubmit = async (data: any) => {
+    const handleClose = useCallback(() => setIsModalOpen(false), []);
+
+    const handleSubmit = useCallback(async (data: any) => {
         setIsSubmitting(true);
         try {
             if (selectedCapacity) {
@@ -152,7 +154,7 @@ export default function CapacityManagement() {
         } finally {
             setIsSubmitting(false);
         }
-    };
+    }, [selectedCapacity, updateCapacity, createCapacity, showToast]);
 
     return (
         <div className="flex flex-col gap-6">
@@ -197,7 +199,7 @@ export default function CapacityManagement() {
             {isModalOpen && (
                 <CapacityModal
                     open={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    onClose={handleClose}
                     onSubmit={handleSubmit}
                     capacity={selectedCapacity}
                     isLoading={isSubmitting}
