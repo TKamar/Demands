@@ -89,7 +89,9 @@ interface DemandsTableProps {
   onDeselectAll?: () => void;
 }
 
-function IndeterminateCheckbox({ onClick }: { onClick: () => void }) {
+const NOOP = () => {};
+
+function IndeterminateCheckbox({ onDeselect }: { onDeselect: () => void }) {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (ref.current) ref.current.indeterminate = true;
@@ -98,8 +100,7 @@ function IndeterminateCheckbox({ onClick }: { onClick: () => void }) {
     <input
       ref={ref}
       type="checkbox"
-      onClick={onClick}
-      onChange={() => {}}
+      onChange={onDeselect}
       className="cursor-pointer"
       title="Deselect all"
     />
@@ -343,7 +344,7 @@ export default function DemandsTable({
             {showBulkSelect && (
               <th className="px-3 py-3 text-start font-semibold text-text-secondary whitespace-nowrap bg-bg-default">
                 {selectedIds && selectedIds.size > 0
-                  ? <IndeterminateCheckbox onClick={onDeselectAll ?? (() => {})} />
+                  ? <IndeterminateCheckbox onDeselect={onDeselectAll ?? NOOP} />
                   : '—'}
               </th>
             )}
