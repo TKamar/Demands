@@ -212,6 +212,7 @@ enum DemandStatus {
   ApprovedWithCondition
   Cancelled
   CenterManagerRejected
+  WaitingOnPrerequisite
 }
 
 enum Priority {
@@ -265,9 +266,15 @@ model Demand {
   type               DemandType
   status             DemandStatus     @default(Pending)
   clusterName        String?
-  approvedValue      Float?
-  assignedValue      Float?
-  approvedDate       DateTime?
+  approvedValue        Float?
+  assignedValue        Float?
+  requirementGroupId   Int?
+  prerequisiteDemandId Int?
+  isInternalTicket     Boolean  @default(false)
+
+  prerequisiteDemand   Demand?  @relation("PrerequisiteChain", fields: [prerequisiteDemandId], references: [id], onDelete: SetNull)
+  dependentDemands     Demand[] @relation("PrerequisiteChain")
+  approvedDate         DateTime?
   reason             String?
   centerName         String
   branchName         String
