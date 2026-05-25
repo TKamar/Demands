@@ -1,13 +1,20 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdAdd } from 'react-icons/md';
 import Modal from '../common/Modal';
 import Select from '../common/Select';
 import SearchableSelect from '../common/SearchableSelect';
+import ResourceRow from './ResourceRow';
+import type { ResourceEntry } from './ResourceRow';
 import { useToast } from '../common/Toast';
 import { useReferenceData } from '../../hooks/useReferenceData';
 import { useCachedProjects } from '../../hooks/useCachedProjects';
+import { createDemandGroup } from '../../api/apiService';
 import type { CreateDemandPayload, UpdateDemandPayload } from '../../api/types';
 import type { Demand, DemandType } from '../../types/domain';
+
+let rowIdCounter = 0;
+const newRowId = () => `row-${++rowIdCounter}`;
 
 interface CreateDemandModalProps {
   isOpen: boolean;
@@ -53,6 +60,11 @@ export default function CreateDemandModal({
   const [error, setError] = useState<string | null>(null);
 
   const isEditMode = !!editingDemand;
+
+  // Multi-resource rows (create mode only)
+  const [resourceRows, setResourceRows] = useState<ResourceEntry[]>([
+    { id: newRowId(), resourceName: '', value: '', unit: '' },
+  ]);
 
   // Populate form when editing
   useEffect(() => {
@@ -153,8 +165,19 @@ export default function CreateDemandModal({
     if (!form.service) return [];
     return referenceData.resources
       .filter((r) => r.serviceName === form.service && (r.isActive !== false || r.name === form.resource))
-      .map((r) => ({ value: r.name, label: r.name }));
+      .map((r) => ({ value: r.name, label: r.name, unit: r.unit ?? '' }));
   }, [referenceData.resources, form.service, form.resource]);
+
+  // Multi-row handlers (create mode)
+  function handleRowChange(index: number, updates: Partial<ResourceEntry>) {
+    setResourceRows((prev) => prev.map((row, i) => i === index ? { ...row, ...updates } : row));
+  }
+  function handleAddRow() {
+    setResourceRows((prev) => [...prev, { id: newRowId(), resourceName: '', value: '', unit: '' }]);
+  }
+  function handleRemoveRow(index: number) {
+    setResourceRows((prev) => prev.filter((_, i) => i !== index));
+  }
 
   const typeOptions = useMemo(
     () =>
@@ -301,47 +324,65 @@ export default function CreateDemandModal({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
-    const payload: CreateDemandPayload = {
-      projectName: form.project,
-      serviceName: form.service,
-      resourceName: form.resource,
-      resourceService: form.service,
-      value: Number(form.value),
-      type: form.type as DemandType,
-      centerName: form.overrideOrganization ? form.center : selectedProject?.centerName,
-      branchName: form.overrideOrganization ? form.branch : selectedProject?.branchName,
-      sectionName: form.overrideOrganization ? form.section : selectedProject?.sectionName,
-    };
-
-    if (form.type === 'Extension') {
-      payload.clusterName = form.clusterName.trim();
-    }
-
-    if (form.overrideLocation) {
-      const location = referenceData.locations.find(
-        (l) =>
-          l.baseName === form.base &&
-          l.environmentName === form.environment &&
-          l.networkName === form.network &&
-          l.clusterName === form.cluster
-      );
-      if (location) {
-        payload.locationId = location.id;
-      }
-    }
-
     setError(null);
     setIsSubmitting(true);
+
     try {
-      await onSubmit(payload, editingDemand?.id);
-      showToast(isEditMode ? t('demands.updateSuccess') : t('common.toast.demandCreated'), 'success');
+      if (isEditMode) {
+        // Edit: single-demand update
+        const payload: CreateDemandPayload = {
+          projectName: form.project,
+          serviceName: form.service,
+          resourceName: form.resource,
+          resourceService: form.service,
+          value: Number(form.value),
+          type: form.type as DemandType,
+          centerName: form.overrideOrganization ? form.center : selectedProject?.centerName,
+          branchName: form.overrideOrganization ? form.branch : selectedProject?.branchName,
+          sectionName: form.overrideOrganization ? form.section : selectedProject?.sectionName,
+        };
+        if (form.type === 'Extension') payload.clusterName = form.clusterName.trim();
+        if (form.overrideLocation) {
+          const location = referenceData.locations.find(
+            (l) =>
+              l.baseName === form.base &&
+              l.environmentName === form.environment &&
+              l.networkName === form.network &&
+              l.clusterName === form.cluster
+          );
+          if (location) payload.locationId = location.id;
+        }
+        await onSubmit(payload, editingDemand?.id);
+        showToast(t('demands.updateSuccess'), 'success');
+      } else {
+        // Create: multi-resource group
+        const resolvedLocationId = form.overrideLocation
+          ? (referenceData.locations.find(
+              (l) =>
+                l.baseName === form.base &&
+                l.environmentName === form.environment &&
+                l.networkName === form.network &&
+                l.clusterName === form.cluster
+            )?.id ?? 0)
+          : 0;
+
+        await createDemandGroup({
+          projectName: form.project,
+          serviceName: form.service,
+          type: form.type,
+          clusterName: form.type === 'Extension' ? form.clusterName.trim() : undefined,
+          rows: resourceRows.map((row) => ({
+            resourceName: row.resourceName,
+            resourceService: form.service,
+            value: Number(row.value),
+            locationId: resolvedLocationId,
+          })),
+        });
+        showToast(t('common.toast.demandCreated'), 'success');
+      }
       handleClose();
     } catch (err: any) {
-      const message =
-        err?.response?.data?.error ||
-        err?.message ||
-        t('common.errors.unknown');
+      const message = err?.response?.data?.error || err?.message || t('common.errors.unknown');
       setError(message);
       showToast(isEditMode ? t('demands.updateFailed') : t('common.toast.demandCreateFailed'), 'error');
     } finally {
@@ -353,6 +394,7 @@ export default function CreateDemandModal({
     if (isSubmitting) return;
     onClose();
     setForm(initialForm);
+    setResourceRows([{ id: newRowId(), resourceName: '', value: '', unit: '' }]);
     setError(null);
   }
 
@@ -405,53 +447,70 @@ export default function CreateDemandModal({
             />
           </div>
 
-          {/* Resource */}
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-1.5">
-              {t('projects.createDemand.resource')}{' '}
-              <span className="text-danger">*</span>
-            </label>
-            <Select
-              options={resourceOptions}
-              value={form.resource}
-              onChange={(v) => setField('resource', v)}
-              placeholder={placeholder}
-              disabled={!form.service}
-            />
-          </div>
-
-          {/* Unit (readonly) */}
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-1.5">
-              {t('projects.createDemand.unit')}
-            </label>
-            <input
-              type="text"
-              value={form.unit}
-              readOnly
-              disabled
-              className={`${inputClass} bg-gray-50 text-text-secondary`}
-            />
-          </div>
-
-          {/* Value */}
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-1.5">
-              {t('projects.createDemand.value')}{' '}
-              <span className="text-danger">*</span>
-            </label>
-            <input
-              type="number"
-              name="value"
-              required
-              min={0}
-              step="any"
-              value={form.value}
-              onChange={(e) => setField('value', e.target.value)}
-              placeholder={t('projects.createDemand.valuePlaceholder')}
-              className={inputClass}
-            />
-          </div>
+          {/* Resource rows (create) or single row (edit) */}
+          {isEditMode ? (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  {t('projects.createDemand.resource')} <span className="text-danger">*</span>
+                </label>
+                <Select
+                  options={resourceOptions}
+                  value={form.resource}
+                  onChange={(v) => setField('resource', v)}
+                  placeholder={placeholder}
+                  disabled={!form.service}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  {t('projects.createDemand.unit')}
+                </label>
+                <input type="text" value={form.unit} readOnly disabled className={`${inputClass} bg-gray-50 text-text-secondary`} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  {t('projects.createDemand.value')} <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="number"
+                  required
+                  min={0}
+                  step="any"
+                  value={form.value}
+                  onChange={(e) => setField('value', e.target.value)}
+                  placeholder={t('projects.createDemand.valuePlaceholder')}
+                  className={inputClass}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="md:col-span-2 flex flex-col gap-2">
+              <label className="block text-sm font-medium text-text-primary">
+                {t('projects.createDemand.resources')} <span className="text-danger">*</span>
+              </label>
+              {resourceRows.map((row, index) => (
+                <ResourceRow
+                  key={row.id}
+                  index={index}
+                  entry={row}
+                  resourceOptions={resourceOptions}
+                  onChange={handleRowChange}
+                  onRemove={handleRemoveRow}
+                  canRemove={resourceRows.length > 1}
+                />
+              ))}
+              <button
+                type="button"
+                onClick={handleAddRow}
+                disabled={!form.service}
+                className="flex items-center gap-1.5 self-start px-3 py-1.5 text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors bg-transparent cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <MdAdd size={16} />
+                {t('projects.createDemand.addResource', 'Add Resource')}
+              </button>
+            </div>
+          )}
 
           {/* Type */}
           <div>

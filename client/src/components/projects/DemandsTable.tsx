@@ -383,7 +383,7 @@ export default function DemandsTable({
                 onClick={() => onSelectDemand(demand)}
                 className={`border-b border-divider last:border-b-0 hover:bg-primary-light/30 transition-colors cursor-pointer ${
                   selectedDemand?.id === demand.id ? 'bg-primary-light' : ''
-                }`}
+                } ${demand.requirementGroupId != null ? 'border-s-2 border-s-indigo-400' : ''}`}
               >
                 {showBulkSelect && (
                   <td className="px-3 py-2">
