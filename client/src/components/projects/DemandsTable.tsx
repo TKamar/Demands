@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdEdit, MdCancel, MdGavel, MdArrowUpward, MdArrowDownward, MdUnfoldMore, MdRestore } from 'react-icons/md';
 import type { Demand, Project } from '../../types/domain';
@@ -85,6 +86,24 @@ interface DemandsTableProps {
   lockedCenter?: string | null;
   lockedResourceName?: string | null;
   onToggleSelect?: (demand: Demand) => void;
+  onDeselectAll?: () => void;
+}
+
+function IndeterminateCheckbox({ onClick }: { onClick: () => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.indeterminate = true;
+  }, []);
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      onClick={onClick}
+      onChange={() => {}}
+      className="cursor-pointer"
+      title="Deselect all"
+    />
+  );
 }
 
 export default function DemandsTable({
@@ -109,6 +128,7 @@ export default function DemandsTable({
   lockedCenter,
   lockedResourceName,
   onToggleSelect,
+  onDeselectAll,
 }: DemandsTableProps) {
   const { t } = useTranslation();
 
@@ -322,7 +342,9 @@ export default function DemandsTable({
           <tr className="border-b border-divider">
             {showBulkSelect && (
               <th className="px-3 py-3 text-start font-semibold text-text-secondary whitespace-nowrap bg-bg-default">
-                —
+                {selectedIds && selectedIds.size > 0
+                  ? <IndeterminateCheckbox onClick={onDeselectAll ?? (() => {})} />
+                  : '—'}
               </th>
             )}
             {visibleColumns.map((col) => {

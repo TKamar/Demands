@@ -144,9 +144,11 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
   // Accumulate pages as user scrolls
   useEffect(() => {
     if (isLoading) return;
-    setAccumulatedDemands((prev) =>
-      currentPage === 1 ? demands : [...prev, ...demands]
-    );
+    setAccumulatedDemands((prev) => {
+      if (currentPage === 1) return demands;
+      const existingIds = new Set(prev.map(d => d.id));
+      return [...prev, ...demands.filter(d => !existingIds.has(d.id))];
+    });
   }, [demands, currentPage, isLoading]);
 
   // Sentinel refs for IntersectionObserver (use refs to avoid stale closures)
@@ -209,18 +211,27 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
     setFilters((prev) => ({ ...prev, [key]: value }));
     setCurrentPage(1);
     setAccumulatedDemands([]);
+    setSelectedDemandIds(new Set());
+    setLockedCenter(null);
+    setLockedResource(null);
   }, []);
 
   const handleClearAllFilters = useCallback(() => {
     setFilters(initialDemandFilters);
     setCurrentPage(1);
     setAccumulatedDemands([]);
+    setSelectedDemandIds(new Set());
+    setLockedCenter(null);
+    setLockedResource(null);
   }, []);
 
   const handleSortChange = useCallback((field: DemandSortKey | null, direction: SortDirection) => {
     setSortState({ field, direction });
     setCurrentPage(1);
     setAccumulatedDemands([]);
+    setSelectedDemandIds(new Set());
+    setLockedCenter(null);
+    setLockedResource(null);
   }, []);
 
   const handleColumnSort = useCallback((key: DemandSortKey) => {
@@ -480,6 +491,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
                 lockedCenter={lockedCenter}
                 lockedResourceName={lockedResource}
                 onToggleSelect={handleToggleSelect}
+                onDeselectAll={clearSelection}
               />
             </div>
           </>
