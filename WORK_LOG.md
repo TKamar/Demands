@@ -100,6 +100,55 @@ Started: 2026-05-24
 
 ---
 
+## RBAC / Multi-Resource / Decision-Dialog Sprint
+
+Branch base: `dev` (SHA at sprint start: varies per phase)
+Started: 2026-05-25
+
+| Phase | Area | Status |
+|-------|------|--------|
+| 1 | DB schema: requirementGroupId, prerequisiteDemandId, isInternalTicket, WaitingOnPrerequisite | ✅ Done |
+| 2 | Backend: CM endpoints, history, group creation, transfer, atomic approve/reject | ✅ Done |
+| 3 | RBAC view architecture: role-aware tabs, sub-views, RequestHistory | ✅ Done |
+| 4 | Multi-resource demand form: ResourceRow, createDemandGroup, group indicator | ✅ Done |
+| 5 | Decision dialog refactor: CmDecisionModal, Moderator two-path (Manual/Transfer) | ⏳ Next |
+| 6 | Work log update + push | ⏳ Pending |
+
+### 2026-05-25
+
+**Phase 1 — DB Schema** (branch: `feat/db-schema-sprint4`)
+- Added to `Demand` model: `requirementGroupId Int?`, `prerequisiteDemandId Int?`, `isInternalTicket Boolean @default(false)`, self-relation `"PrerequisiteChain"`
+- Added `WaitingOnPrerequisite` to `DemandStatus` enum
+- Migration SQL at `server/prisma/migrations/20260525164536_sprint4_schema/migration.sql`
+- `prisma generate` ran successfully (no DB available for `migrate dev`)
+
+**Phase 2 — Backend Plumbing** (branch: `feat/backend-history-transfer`)
+- `demand.service.ts`: default status `Pending` → `PendingCenterManager` on create
+- New methods: `getHistoryDemands`, `createDemandGroup`, `centerManagerApprove`, `centerManagerReject`, `transferDemand`
+- `approve` and `reject` now wrap demand update + prerequisite unblock in `prisma.$transaction`
+- `transferDemand` validates target service exists and is active before creating internal demand
+- `demand.routes.ts`: `GET /history`, `POST /group`, `PATCH /:id/cm-approve`, `PATCH /:id/cm-reject`, `POST /:id/transfer`
+- `client/src/types/domain.ts`: `WaitingOnPrerequisite` status + `requirementGroupId`, `prerequisiteDemandId`, `isInternalTicket` fields
+- `client/src/api/apiService.ts`: `fetchDemandHistory`, `createDemandGroup`, `centerManagerApproveDemand`, `centerManagerRejectDemand`, `transferDemand`
+
+**Phase 3 — RBAC View Architecture** (branch: `feat/rbac-view-architecture`)
+- `client/src/utils/roleUtils.ts`: `getDefaultTab`, `getAvailableTabs`, `isModeratorOrAdmin`, `isCenterManagerOrAdmin`
+- `TopNavTabs.tsx`: accepts `role: UserRole`, derives tabs from `getAvailableTabs`; no toggle-to-deselect
+- `MainPage.tsx`: no null topNavTab state; `subViewByTab` persists sub-view per tab; renders `ApprovalRequestsPanel`, `MyRequestsPanel`, `HistoryPanel`
+- `panels/ApprovalRequestsPanel.tsx`: CM → MyApprovalRequests; Moderator → RequirementsView; includes CenterFilter
+- `panels/MyRequestsPanel.tsx`: Projects sub-view + RequestsIOpened requirements sub-view
+- `panels/HistoryPanel.tsx`: Projects sub-view + RequestHistory requirements sub-view
+- `RequestHistory.tsx`: read-only DemandsTable with server-side infinite scroll via `useHistoryDemands`
+- `useHistoryDemands.ts`: accumulates pages via IntersectionObserver sentinel
+
+**Phase 4 — Multi-Resource Form** (branch: `feat/multi-resource-form`)
+- `ResourceRow.tsx`: isolated resource+value+unit row component with remove button
+- `CreateDemandModal.tsx` create mode: multiple ResourceRows + "Add Resource" button → calls `createDemandGroup` API directly
+- Edit mode: unchanged single-row form calling `onSubmit`
+- `DemandsTable.tsx`: `border-s-2 border-s-indigo-400` indicator on rows with `requirementGroupId`
+
+---
+
 ## Table Standardization & Filter UX Sprint
 
 Started: 2026-05-25
