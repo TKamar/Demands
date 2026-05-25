@@ -670,4 +670,147 @@ export const demandController = {
       res.status(400).json({ error: "Failed to approve demand" });
     }
   },
+
+  getHistory: async (req: Request, res: Response) => {
+    try {
+      const user = req.auth!.user;
+      const { username, isAdmin, isModerator } = getUserContext(req);
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 20;
+
+      let role: 'ADMIN' | 'MODERATOR' | 'CENTER_MANAGER' | 'REGULAR_USER';
+      if (isAdmin) role = 'ADMIN';
+      else if (isModerator) role = 'MODERATOR';
+      else if (user.isCenterManager) role = 'CENTER_MANAGER';
+      else role = 'REGULAR_USER';
+
+      let managedServiceNames: string[] | undefined;
+      if (role === 'MODERATOR') {
+        const managed = await prisma.service.findMany({
+          where: { moderators: { has: username } },
+          select: { name: true },
+        });
+        managedServiceNames = managed.map((s) => s.name);
+      }
+
+      const result = await demandService.getHistoryDemands(
+        username,
+        role,
+        user.centerName ?? undefined,
+        managedServiceNames,
+        { page, limit }
+      );
+      res.json(result);
+    } catch (error) {
+      console.error('demandController.getHistory error:', error);
+      res.status(500).json({ error: 'Failed to fetch demand history' });
+    }
+  },
+
+  createGroup: async (req: Request, res: Response) => {
+    try {
+      const { username, fullName, isPrivileged } = getUserContext(req);
+      const { projectName, serviceName, type, clusterName, centerName, branchName, sectionName, rows } = req.body;
+
+      if (!Array.isArray(rows) || rows.length === 0) {
+        return res.status(400).json({ error: 'rows must be a non-empty array' });
+      }
+      if (type === DemandType.Extension && !clusterName) {
+        return res.status(400).json({ error: 'clusterName is required for Extension demands' });
+      }
+
+      const project = await projectService.findByName(projectName);
+      if (!project) return res.status(400).json({ error: 'Project not found' });
+      if (!isPrivileged && project.createdBy !== username) return res.status(400).json({ error: 'Project not found' });
+
+      const finalCenterName = centerName || project.centerName;
+      const finalBranchName = branchName || project.branchName;
+      const finalSectionName = sectionName || project.sectionName;
+
+      // Resolve missing locationIds from project
+      const resolvedRows = rows.map((row: any) => ({
+        resourceName: row.resourceName,
+        resourceService: row.resourceService || serviceName,
+        value: Number(row.value),
+        locationId: Number(row.locationId) || project.locationId,
+      }));
+
+      const demands = await demandService.createDemandGroup({
+        projectName,
+        serviceName,
+        type,
+        clusterName: type === DemandType.Extension ? clusterName : undefined,
+        centerName: finalCenterName,
+        branchName: finalBranchName,
+        sectionName: finalSectionName,
+        createdBy: username,
+        createdByName: fullName,
+        rows: resolvedRows,
+      });
+      res.status(201).json(demands);
+    } catch (error) {
+      console.error('demandController.createGroup error:', error);
+      res.status(400).json({ error: 'Failed to create demand group' });
+    }
+  },
+
+  centerManagerApprove: async (req: Request, res: Response) => {
+    try {
+      const user = req.auth!.user;
+      const centerName = user.centerName;
+      if (!centerName) return res.status(400).json({ error: 'No center associated with this user' });
+
+      const demand = await demandService.centerManagerApprove(Number(req.params.id), centerName);
+      res.json(demand);
+    } catch (error) {
+      if (error instanceof NotFoundError) return res.status(404).json({ error: 'Demand not found' });
+      if (error instanceof Error && (error.message.includes('Forbidden') || error.message.includes('pending'))) {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error('demandController.centerManagerApprove error:', error);
+      res.status(500).json({ error: 'Failed to approve demand' });
+    }
+  },
+
+  centerManagerReject: async (req: Request, res: Response) => {
+    try {
+      const user = req.auth!.user;
+      const centerName = user.centerName;
+      if (!centerName) return res.status(400).json({ error: 'No center associated with this user' });
+
+      const { reason } = req.body;
+      if (!reason || typeof reason !== 'string' || reason.trim() === '') {
+        return res.status(400).json({ error: 'reason is required for rejection' });
+      }
+
+      const demand = await demandService.centerManagerReject(Number(req.params.id), reason.trim(), centerName);
+      res.json(demand);
+    } catch (error) {
+      if (error instanceof NotFoundError) return res.status(404).json({ error: 'Demand not found' });
+      if (error instanceof Error && (error.message.includes('Forbidden') || error.message.includes('pending'))) {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error('demandController.centerManagerReject error:', error);
+      res.status(500).json({ error: 'Failed to reject demand' });
+    }
+  },
+
+  transferDemand: async (req: Request, res: Response) => {
+    try {
+      const { username } = getUserContext(req);
+      const { targetServiceName } = req.body;
+      if (!targetServiceName || typeof targetServiceName !== 'string') {
+        return res.status(400).json({ error: 'targetServiceName is required' });
+      }
+      const result = await demandService.transferDemand(Number(req.params.id), targetServiceName, username);
+      res.json(result);
+    } catch (error) {
+      if (error instanceof NotFoundError) return res.status(404).json({ error: 'Demand not found' });
+      if (error instanceof Error && error.message.includes('Only Pending')) {
+        return res.status(400).json({ error: error.message });
+      }
+      console.error('demandController.transferDemand error:', error);
+      res.status(500).json({ error: 'Failed to transfer demand' });
+    }
+  },
 };

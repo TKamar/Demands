@@ -243,6 +243,46 @@ export async function assignDemand(id: number, assignedValue: number | null): Pr
   return mapDemand(data);
 }
 
+export async function fetchDemandHistory(params: { page?: number; limit?: number }): Promise<PaginatedResponse<Demand>> {
+  const query = new URLSearchParams();
+  if (params.page) query.append('page', params.page.toString());
+  if (params.limit) query.append('limit', params.limit.toString());
+  const { data } = await api.get(`/demands/history?${query.toString()}`);
+  return {
+    data: data.data.map(mapDemand),
+    meta: data.meta,
+  };
+}
+
+export async function createDemandGroup(groupData: {
+  projectName: string;
+  serviceName: string;
+  type: string;
+  clusterName?: string;
+  rows: Array<{ resourceName: string; resourceService: string; value: number; locationId: number }>;
+}): Promise<Demand[]> {
+  const { data } = await api.post('/demands/group', groupData);
+  return (data as any[]).map(mapDemand);
+}
+
+export async function centerManagerApproveDemand(id: number): Promise<Demand> {
+  const { data } = await api.patch(`/demands/${id}/cm-approve`);
+  return mapDemand(data);
+}
+
+export async function centerManagerRejectDemand(id: number, reason: string): Promise<Demand> {
+  const { data } = await api.patch(`/demands/${id}/cm-reject`, { reason });
+  return mapDemand(data);
+}
+
+export async function transferDemand(id: number, targetServiceName: string): Promise<{ original: Demand; internal: Demand }> {
+  const { data } = await api.post(`/demands/${id}/transfer`, { targetServiceName });
+  return {
+    original: mapDemand(data.original),
+    internal: mapDemand(data.internal),
+  };
+}
+
 // --- Reference data ---
 
 export async function fetchBases(): Promise<ReferenceItem[]> {

@@ -11,7 +11,8 @@ export type DemandStatus =
   | 'PartiallyApproved'
   | 'ApprovedWithCondition'
   | 'Cancelled'
-  | 'CenterManagerRejected';
+  | 'CenterManagerRejected'
+  | 'WaitingOnPrerequisite';
 
 export type UserRole = 'ADMIN' | 'MODERATOR' | 'CENTER_MANAGER' | 'REGULAR_USER';
 
@@ -71,4 +72,7 @@ export interface Demand {
   centerName?: string;
   branchName?: string;
   sectionName?: string;
+  requirementGroupId?: number;
+  prerequisiteDemandId?: number;
+  isInternalTicket?: boolean;
 }
