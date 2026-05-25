@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import DemandsTable, { demandColumnConfig } from '../projects/DemandsTable';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
@@ -9,7 +9,7 @@ import { useDemands } from '../../hooks/useDemands';
 import { useCachedProjects } from '../../hooks/useCachedProjects';
 import { useClientInfiniteScroll } from '../../hooks/useClientInfiniteScroll';
 import { useToast } from '../common/Toast';
-import type { Demand } from '../../types/domain';
+import type { Demand, Project } from '../../types/domain';
 import type { FilterGroupConfig } from '../../types/filter';
 
 const MY_REQUESTS_COLUMNS = demandColumnConfig.filter((col) =>
@@ -28,9 +28,13 @@ const STATUS_OPTIONS = [
   { value: 'Pending', label: 'Pending' },
   { value: 'Approved', label: 'Approved' },
   { value: 'ApprovedWithCondition', label: 'ApprovedWithCondition' },
+  { value: 'PartiallyApproved', label: 'PartiallyApproved' },
   { value: 'Rejected', label: 'Rejected' },
+  { value: 'CenterManagerRejected', label: 'CenterManagerRejected' },
   { value: 'Cancelled', label: 'Cancelled' },
 ];
+
+const noop = () => {};
 
 export const RequestsIOpened: React.FC = () => {
   const { t } = useTranslation();
@@ -43,7 +47,7 @@ export const RequestsIOpened: React.FC = () => {
 
   const { projects } = useCachedProjects();
   const projectMap = useMemo(() => {
-    const map = new Map();
+    const map = new Map<string, Project>();
     projects.forEach((p) => map.set(p.name, p));
     return map;
   }, [projects]);
@@ -88,17 +92,17 @@ export const RequestsIOpened: React.FC = () => {
 
   const { displayedItems, sentinelRef, hasMore } = useClientInfiniteScroll(filteredDemands, 20);
 
-  const handleFilterChange = (key: MyRequestsFilterKey, value: string) => {
+  const handleFilterChange = useCallback((key: MyRequestsFilterKey, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-  };
+  }, []);
 
-  const handleClearFilters = () => setFilters(INITIAL_FILTERS);
+  const handleClearFilters = useCallback(() => setFilters(INITIAL_FILTERS), []);
 
-  const handleRestore = (demand: Demand) => {
+  const handleRestore = useCallback((demand: Demand) => {
     setDemandToRestore(demand);
-  };
+  }, []);
 
-  const confirmRestore = async () => {
+  const confirmRestore = useCallback(async () => {
     if (!demandToRestore) return;
     const target = demandToRestore;
     setDemandToRestore(null);
@@ -108,7 +112,7 @@ export const RequestsIOpened: React.FC = () => {
     } catch {
       showToast(t('demands.restoreError', 'שגיאה בהחזרת הדרישה'), 'error');
     }
-  };
+  }, [demandToRestore, restoreDemand, showToast, t]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -122,7 +126,7 @@ export const RequestsIOpened: React.FC = () => {
             onClearAllFilters={handleClearFilters}
             sortOptions={[]}
             sortState={{ field: null, direction: 'asc' }}
-            onSortChange={() => {}}
+            onSortChange={noop}
           />
         </div>
 
