@@ -764,7 +764,7 @@ export const demandController = {
       res.json(demand);
     } catch (error) {
       if (error instanceof NotFoundError) return res.status(404).json({ error: 'Demand not found' });
-      if (error instanceof Error && (error.message.includes('Forbidden') || error.message.includes('pending'))) {
+      if (error instanceof Error && (error.message.includes('Forbidden') || error.message.includes('not pending center manager'))) {
         return res.status(400).json({ error: error.message });
       }
       console.error('demandController.centerManagerApprove error:', error);
@@ -787,7 +787,7 @@ export const demandController = {
       res.json(demand);
     } catch (error) {
       if (error instanceof NotFoundError) return res.status(404).json({ error: 'Demand not found' });
-      if (error instanceof Error && (error.message.includes('Forbidden') || error.message.includes('pending'))) {
+      if (error instanceof Error && (error.message.includes('Forbidden') || error.message.includes('not pending center manager'))) {
         return res.status(400).json({ error: error.message });
       }
       console.error('demandController.centerManagerReject error:', error);

@@ -261,27 +261,30 @@ export const demandService = {
   },
 
   reject: async (id: number, reason: string) => {
-    const demand = await prisma.demand.update({
-      where: { id },
-      data: {
-        status: "Rejected",
-        reason,
-      },
-      include: {
-        project: true,
-        service: true,
-        resource: true,
-        location: true,
-      },
-    });
-
-    // If this was an internal ticket, unblock the waiting demand
-    if (demand.isInternalTicket) {
-      await prisma.demand.updateMany({
-        where: { prerequisiteDemandId: demand.id, status: 'WaitingOnPrerequisite' },
-        data: { status: 'Pending', prerequisiteDemandId: null },
+    const demand = await prisma.$transaction(async (tx) => {
+      const updated = await tx.demand.update({
+        where: { id },
+        data: {
+          status: "Rejected",
+          reason,
+        },
+        include: {
+          project: true,
+          service: true,
+          resource: true,
+          location: true,
+        },
       });
-    }
+
+      if (updated.isInternalTicket) {
+        await tx.demand.updateMany({
+          where: { prerequisiteDemandId: updated.id, status: 'WaitingOnPrerequisite' },
+          data: { status: 'Pending', prerequisiteDemandId: null },
+        });
+      }
+
+      return updated;
+    });
 
     if (demand.createdBy) {
       setImmediate(async () => {
@@ -380,29 +383,32 @@ export const demandService = {
       reason?: string;
     }
   ) => {
-    const demand = await prisma.demand.update({
-      where: { id },
-      data: {
-        status: data.status,
-        approvedValue: data.approvedValue,
-        approvedDate: new Date(),
-        reason: data.reason,
-      },
-      include: {
-        project: true,
-        service: true,
-        resource: true,
-        location: true,
-      },
-    });
-
-    // If this was an internal ticket, unblock the waiting demand
-    if (demand.isInternalTicket) {
-      await prisma.demand.updateMany({
-        where: { prerequisiteDemandId: demand.id, status: 'WaitingOnPrerequisite' },
-        data: { status: 'Pending', prerequisiteDemandId: null },
+    const demand = await prisma.$transaction(async (tx) => {
+      const updated = await tx.demand.update({
+        where: { id },
+        data: {
+          status: data.status,
+          approvedValue: data.approvedValue,
+          approvedDate: new Date(),
+          reason: data.reason,
+        },
+        include: {
+          project: true,
+          service: true,
+          resource: true,
+          location: true,
+        },
       });
-    }
+
+      if (updated.isInternalTicket) {
+        await tx.demand.updateMany({
+          where: { prerequisiteDemandId: updated.id, status: 'WaitingOnPrerequisite' },
+          data: { status: 'Pending', prerequisiteDemandId: null },
+        });
+      }
+
+      return updated;
+    });
 
     if (demand.createdBy) {
       const statusLabel: Record<string, string> = {
@@ -568,6 +574,10 @@ export const demandService = {
     });
     if (!original) throw new NotFoundError('Demand');
     if (original.status !== 'Pending') throw new Error('Only Pending demands can be transferred');
+
+    const targetService = await prisma.service.findUnique({ where: { name: targetServiceName } });
+    if (!targetService) throw new Error('Target service not found');
+    if (!targetService.isActive) throw new Error('Target service is not active');
 
     const result = await prisma.$transaction(async (tx) => {
       const internal = await tx.demand.create({
