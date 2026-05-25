@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { MdMoreVert } from 'react-icons/md';
 
@@ -23,10 +23,10 @@ export default function MoreActionsMenu({ actions, size = 'sm' }: MoreActionsMen
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     setOpen(false);
     setMenuPos(null);
-  };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -38,9 +38,16 @@ export default function MoreActionsMenu({ actions, size = 'sm' }: MoreActionsMen
         closeMenu();
       }
     };
+    const keyHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMenu();
+    };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+    document.addEventListener('keydown', keyHandler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('keydown', keyHandler);
+    };
+  }, [open, closeMenu]);
 
   const visibleActions = actions.filter(Boolean);
   if (visibleActions.length === 0) return null;
@@ -56,7 +63,9 @@ export default function MoreActionsMenu({ actions, size = 'sm' }: MoreActionsMen
           if (open) {
             closeMenu();
           } else {
-            const rect = triggerRef.current!.getBoundingClientRect();
+            const el = triggerRef.current;
+            if (!el) return;
+            const rect = el.getBoundingClientRect();
             setMenuPos({
               top: rect.bottom + 4,
               right: window.innerWidth - rect.right,
@@ -66,6 +75,8 @@ export default function MoreActionsMenu({ actions, size = 'sm' }: MoreActionsMen
         }}
         className="p-1 rounded text-text-secondary hover:text-text-primary hover:bg-gray-100 bg-transparent border-none cursor-pointer transition-colors"
         title="More actions"
+        aria-haspopup="menu"
+        aria-expanded={open}
       >
         <MdMoreVert size={iconSize} />
       </button>
@@ -76,9 +87,9 @@ export default function MoreActionsMenu({ actions, size = 'sm' }: MoreActionsMen
           style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 400 }}
           className="bg-bg-paper border border-divider rounded-xl shadow-lg py-1 min-w-[148px]"
         >
-          {visibleActions.map((action, i) => (
+          {visibleActions.map((action) => (
             <button
-              key={i}
+              key={action.label}
               onClick={(e) => {
                 e.stopPropagation();
                 if (!action.disabled) {
