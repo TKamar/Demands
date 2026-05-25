@@ -155,7 +155,7 @@ export const demandService = {
     const demand = await prisma.demand.create({
       data: {
         ...data,
-        status: "Pending",
+        status: "PendingCenterManager",
       },
       include: {
         project: true,
@@ -261,18 +261,29 @@ export const demandService = {
   },
 
   reject: async (id: number, reason: string) => {
-    const demand = await prisma.demand.update({
-      where: { id },
-      data: {
-        status: "Rejected",
-        reason,
-      },
-      include: {
-        project: true,
-        service: true,
-        resource: true,
-        location: true,
-      },
+    const demand = await prisma.$transaction(async (tx) => {
+      const updated = await tx.demand.update({
+        where: { id },
+        data: {
+          status: "Rejected",
+          reason,
+        },
+        include: {
+          project: true,
+          service: true,
+          resource: true,
+          location: true,
+        },
+      });
+
+      if (updated.isInternalTicket) {
+        await tx.demand.updateMany({
+          where: { prerequisiteDemandId: updated.id, status: 'WaitingOnPrerequisite' },
+          data: { status: 'Pending', prerequisiteDemandId: null },
+        });
+      }
+
+      return updated;
     });
 
     if (demand.createdBy) {
@@ -372,20 +383,31 @@ export const demandService = {
       reason?: string;
     }
   ) => {
-    const demand = await prisma.demand.update({
-      where: { id },
-      data: {
-        status: data.status,
-        approvedValue: data.approvedValue,
-        approvedDate: new Date(),
-        reason: data.reason,
-      },
-      include: {
-        project: true,
-        service: true,
-        resource: true,
-        location: true,
-      },
+    const demand = await prisma.$transaction(async (tx) => {
+      const updated = await tx.demand.update({
+        where: { id },
+        data: {
+          status: data.status,
+          approvedValue: data.approvedValue,
+          approvedDate: new Date(),
+          reason: data.reason,
+        },
+        include: {
+          project: true,
+          service: true,
+          resource: true,
+          location: true,
+        },
+      });
+
+      if (updated.isInternalTicket) {
+        await tx.demand.updateMany({
+          where: { prerequisiteDemandId: updated.id, status: 'WaitingOnPrerequisite' },
+          data: { status: 'Pending', prerequisiteDemandId: null },
+        });
+      }
+
+      return updated;
     });
 
     if (demand.createdBy) {
@@ -450,5 +472,144 @@ export const demandService = {
       include: { project: true, location: true, service: true, resource: true },
       orderBy: { createdAt: 'asc' },
     });
+  },
+
+  getHistoryDemands: async (
+    userId: string,
+    role: 'ADMIN' | 'MODERATOR' | 'CENTER_MANAGER' | 'REGULAR_USER',
+    centerName: string | undefined,
+    managedServiceNames: string[] | undefined,
+    pagination: { page: number; limit: number }
+  ) => {
+    const terminalStatuses = ['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled'];
+    const where: any = { status: { in: terminalStatuses }, isInternalTicket: false };
+
+    if (role === 'REGULAR_USER') {
+      where.createdBy = userId;
+    } else if (role === 'CENTER_MANAGER') {
+      where.centerName = centerName;
+    } else if (role === 'MODERATOR' && managedServiceNames) {
+      where.serviceName = { in: managedServiceNames };
+    }
+    // ADMIN: no additional restriction
+
+    const { page, limit } = pagination;
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      prisma.demand.findMany({
+        where,
+        include: { project: true, service: true, resource: true, location: true },
+        orderBy: { updatedAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.demand.count({ where }),
+    ]);
+    return { data, meta: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+  },
+
+  createDemandGroup: async (groupData: {
+    projectName: string;
+    serviceName: string;
+    type: DemandType;
+    clusterName?: string;
+    centerName: string;
+    branchName: string;
+    sectionName: string;
+    createdBy: string;
+    createdByName: string;
+    rows: Array<{ resourceName: string; resourceService: string; value: number; locationId: number }>;
+  }) => {
+    const { rows, ...shared } = groupData;
+    // Get next requirementGroupId in same transaction
+    const result = await prisma.$transaction(async (tx) => {
+      const agg = await tx.demand.aggregate({ _max: { requirementGroupId: true } });
+      const nextGroupId = (agg._max.requirementGroupId ?? 0) + 1;
+      const created = await Promise.all(
+        rows.map((row) =>
+          tx.demand.create({
+            data: {
+              ...shared,
+              ...row,
+              status: 'PendingCenterManager',
+              requirementGroupId: nextGroupId,
+            },
+            include: { project: true, service: true, resource: true, location: true },
+          })
+        )
+      );
+      return created;
+    });
+    return result;
+  },
+
+  centerManagerApprove: async (id: number, centerName: string) => {
+    const demand = await prisma.demand.findUnique({ where: { id } });
+    if (!demand) throw new NotFoundError('Demand');
+    if (demand.status !== 'PendingCenterManager') throw new Error('Demand is not pending center manager approval');
+    if (demand.centerName !== centerName) throw new Error('Forbidden');
+    return prisma.demand.update({
+      where: { id },
+      data: { status: 'Pending' },
+      include: { project: true, service: true, resource: true, location: true },
+    });
+  },
+
+  centerManagerReject: async (id: number, reason: string, centerName: string) => {
+    const demand = await prisma.demand.findUnique({ where: { id } });
+    if (!demand) throw new NotFoundError('Demand');
+    if (demand.status !== 'PendingCenterManager') throw new Error('Demand is not pending center manager approval');
+    if (demand.centerName !== centerName) throw new Error('Forbidden');
+    return prisma.demand.update({
+      where: { id },
+      data: { status: 'CenterManagerRejected', reason },
+      include: { project: true, service: true, resource: true, location: true },
+    });
+  },
+
+  transferDemand: async (id: number, targetServiceName: string, requesterId: string) => {
+    const original = await prisma.demand.findUnique({
+      where: { id },
+      include: { service: true, resource: true, location: true, project: true },
+    });
+    if (!original) throw new NotFoundError('Demand');
+    if (original.status !== 'Pending') throw new Error('Only Pending demands can be transferred');
+
+    const targetService = await prisma.service.findUnique({ where: { name: targetServiceName } });
+    if (!targetService) throw new Error('Target service not found');
+    if (!targetService.isActive) throw new Error('Target service is not active');
+
+    const result = await prisma.$transaction(async (tx) => {
+      const internal = await tx.demand.create({
+        data: {
+          projectName: original.projectName,
+          serviceName: targetServiceName,
+          resourceName: original.resourceName,
+          resourceService: targetServiceName,
+          value: original.value,
+          locationId: original.locationId,
+          type: original.type,
+          clusterName: original.clusterName ?? undefined,
+          centerName: original.centerName,
+          branchName: original.branchName,
+          sectionName: original.sectionName,
+          createdBy: requesterId,
+          createdByName: original.createdByName ?? original.createdBy ?? 'System',
+          status: 'Pending',
+          isInternalTicket: true,
+        },
+        include: { project: true, service: true, resource: true, location: true },
+      });
+
+      const updated = await tx.demand.update({
+        where: { id },
+        data: { status: 'WaitingOnPrerequisite', prerequisiteDemandId: internal.id },
+        include: { project: true, service: true, resource: true, location: true },
+      });
+
+      return { original: updated, internal };
+    });
+
+    return result;
   },
 };
