@@ -24,14 +24,12 @@ const INITIAL_FILTERS: Record<MyRequestsFilterKey, string> = {
   resourceName: '',
 };
 
+const ACTIVE_STATUSES = new Set(['PendingCenterManager', 'Pending', 'WaitingOnPrerequisite']);
+
 const STATUS_OPTIONS = [
+  { value: 'PendingCenterManager', label: 'PendingCenterManager' },
   { value: 'Pending', label: 'Pending' },
-  { value: 'Approved', label: 'Approved' },
-  { value: 'ApprovedWithCondition', label: 'ApprovedWithCondition' },
-  { value: 'PartiallyApproved', label: 'PartiallyApproved' },
-  { value: 'Rejected', label: 'Rejected' },
-  { value: 'CenterManagerRejected', label: 'CenterManagerRejected' },
-  { value: 'Cancelled', label: 'Cancelled' },
+  { value: 'WaitingOnPrerequisite', label: 'WaitingOnPrerequisite' },
 ];
 
 const noop = () => {};
@@ -83,6 +81,7 @@ export const RequestsIOpened: React.FC = () => {
 
   const filteredDemands = useMemo(() => {
     return demands.filter(d => {
+      if (!ACTIVE_STATUSES.has(d.status)) return false;
       if (filters.status && d.status !== filters.status) return false;
       if (filters.serviceName && d.serviceName !== filters.serviceName) return false;
       if (filters.resourceName && d.resourceName !== filters.resourceName) return false;
