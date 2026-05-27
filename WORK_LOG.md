@@ -111,8 +111,8 @@ Started: 2026-05-25
 | 2 | Backend: CM endpoints, history, group creation, transfer, atomic approve/reject | ✅ Done |
 | 3 | RBAC view architecture: role-aware tabs, sub-views, RequestHistory | ✅ Done |
 | 4 | Multi-resource demand form: ResourceRow, createDemandGroup, group indicator | ✅ Done |
-| 5 | Decision dialog refactor: CmDecisionModal, Moderator two-path (Manual/Transfer) | ⏳ Next |
-| 6 | Work log update + push | ⏳ Pending |
+| 5 | Decision dialog refactor: CmDecisionModal, Moderator two-path (Manual/Transfer) | ✅ Done |
+| 6 | Work log update + push | ✅ Done |
 
 ### 2026-05-25
 
@@ -146,6 +146,13 @@ Started: 2026-05-25
 - `CreateDemandModal.tsx` create mode: multiple ResourceRows + "Add Resource" button → calls `createDemandGroup` API directly
 - Edit mode: unchanged single-row form calling `onSubmit`
 - `DemandsTable.tsx`: `border-s-2 border-s-indigo-400` indicator on rows with `requirementGroupId`
+
+**Phase 5 — Decision Dialog Refactor** (branch: `feat/decision-dialog-refactor`)
+- `CmDecisionModal.tsx`: two-step modal for Center Manager — choice step (Approve/Reject buttons) and reject step (textarea + submit); calls `centerManagerApproveDemand` or `centerManagerRejectDemand` from apiService; shows toasts on success/error
+- `MyApprovalRequests.tsx`: removed `onApprove`/`onReject` props; added `selectedDemand` state; single "קבל החלטה" button opens `CmDecisionModal`; `onSuccess` calls `reload()`
+- `DecisionModal.tsx`: added `DecisionPath` state machine (`select | manual | transfer`); `select` view shows two clickable card buttons; `manual` view is existing form with Back button; `transfer` view has active-service selector (excluding demand's current service) + notes textarea + calls `transferDemand` API; added optional `onSuccess` prop
+- `DemandsTable.tsx`: `WaitingOnPrerequisite` demands show disabled `MdGavel` button with RTL tooltip explaining the prerequisite lock
+- `ApprovalRequestsPanel.tsx` + `MainPage.tsx`: removed `onApprove`/`onReject` props (no longer needed; CM decision is internal to `MyApprovalRequests`)
 
 ---
 
