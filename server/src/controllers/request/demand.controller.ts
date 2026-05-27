@@ -671,33 +671,11 @@ export const demandController = {
 
   getHistory: async (req: Request, res: Response) => {
     try {
-      const user = req.auth!.user;
-      const { username, isAdmin, isModerator } = getUserContext(req);
+      const { username } = getUserContext(req);
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 20;
 
-      let role: 'ADMIN' | 'MODERATOR' | 'CENTER_MANAGER' | 'REGULAR_USER';
-      if (isAdmin) role = 'ADMIN';
-      else if (isModerator) role = 'MODERATOR';
-      else if (user.isCenterManager) role = 'CENTER_MANAGER';
-      else role = 'REGULAR_USER';
-
-      let managedServiceNames: string[] | undefined;
-      if (role === 'MODERATOR') {
-        const managed = await prisma.service.findMany({
-          where: { moderators: { has: username } },
-          select: { name: true },
-        });
-        managedServiceNames = managed.map((s) => s.name);
-      }
-
-      const result = await demandService.getHistoryDemands(
-        username,
-        role,
-        user.centerName ?? undefined,
-        managedServiceNames,
-        { page, limit }
-      );
+      const result = await demandService.getHistoryDemands(username, { page, limit });
       res.json(result);
     } catch (error) {
       console.error('demandController.getHistory error:', error);

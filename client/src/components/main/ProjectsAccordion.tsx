@@ -375,9 +375,10 @@ function DemandSubTable({
 interface ProjectsAccordionProps {
   selectedCenters: string[];
   mode?: 'active' | 'history';
+  createdBy?: string;
 }
 
-export default function ProjectsAccordion({ selectedCenters, mode = 'active' }: ProjectsAccordionProps) {
+export default function ProjectsAccordion({ selectedCenters, mode = 'active', createdBy }: ProjectsAccordionProps) {
   const { t } = useTranslation();
   const auth = useAuth();
   const { showToast } = useToast();
@@ -404,7 +405,7 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active' }: 
 
   // Fetch all projects — center/type/priority filters applied client-side
   const { projects: allProjects, isLoading, updateProject, deleteProject, duplicateProject } =
-    useProjects({}, { page: 1, limit: 1000 });
+    useProjects({ createdBy }, { page: 1, limit: 1000 });
 
   const handleColumnSort = useCallback((field: string) => {
     setSortState((prev) =>

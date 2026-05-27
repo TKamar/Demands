@@ -476,22 +476,10 @@ export const demandService = {
 
   getHistoryDemands: async (
     userId: string,
-    role: 'ADMIN' | 'MODERATOR' | 'CENTER_MANAGER' | 'REGULAR_USER',
-    centerName: string | undefined,
-    managedServiceNames: string[] | undefined,
     pagination: { page: number; limit: number }
   ) => {
     const terminalStatuses = ['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled'];
-    const where: any = { status: { in: terminalStatuses }, isInternalTicket: false };
-
-    if (role === 'REGULAR_USER') {
-      where.createdBy = userId;
-    } else if (role === 'CENTER_MANAGER') {
-      where.centerName = centerName;
-    } else if (role === 'MODERATOR' && managedServiceNames) {
-      where.serviceName = { in: managedServiceNames };
-    }
-    // ADMIN: no additional restriction
+    const where: any = { status: { in: terminalStatuses }, isInternalTicket: false, createdBy: userId };
 
     const { page, limit } = pagination;
     const skip = (page - 1) * limit;

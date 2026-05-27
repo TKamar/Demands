@@ -36,9 +36,10 @@ import type { FilterGroupConfig, SortState, SortDirection } from '../../types/fi
 
 interface RequirementsViewProps {
   selectedCenters: string[];
+  managed?: boolean;
 }
 
-export default function RequirementsView({ selectedCenters }: RequirementsViewProps) {
+export default function RequirementsView({ selectedCenters, managed }: RequirementsViewProps) {
   const { t } = useTranslation();
   const auth = useAuth();
   const { showToast } = useToast();
@@ -115,8 +116,9 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
       branchName: debouncedFilters.branch || undefined,
       sectionName: debouncedFilters.section || undefined,
       projectPriority: (debouncedFilters.priority || undefined) as DemandFilterParams['projectPriority'],
+      managed: managed || undefined,
     };
-  }, [debouncedFilters, selectedCenters]);
+  }, [debouncedFilters, selectedCenters, managed]);
 
   const {
     demands,
