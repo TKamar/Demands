@@ -199,3 +199,27 @@ Started: 2026-05-25
 - Filter/sort changes now clear selected demand IDs and locked center/resource
 - `DemandsTable`: new `onDeselectAll` prop; `IndeterminateCheckbox` helper renders in thead when `selectedIds.size > 0`
 - Branch: `fix/checkbox-selection` → merged to `dev`
+
+---
+
+## Role-Based Data Filtering, Mock Data Overhaul & Admin Management Panel
+
+Branch base: `dev` (SHA: ef0dba8)
+Started: 2026-05-27
+
+| Phase/Step | Area | Status |
+|------------|------|--------|
+| 1 | RBAC backend: GET /me managedServices + createdBy demand/project filter | ⏳ Pending |
+| 2 | RBAC frontend: AppUser type, filter params, component threading | ⏳ Pending |
+| 3 | Mock data overhaul: seed User records, E2E scenario data | ⏳ Pending |
+| 4 | Admin panel: moderator service assignment backend | ⏳ Pending |
+| 5 | Admin panel: moderator service assignment frontend (UserManagement UI) | ⏳ Pending |
+
+---
+
+## Log
+
+### 2026-05-27
+
+- Sprint initialized
+- Three branches planned: `feature/rbac-data-filtering`, `feature/mock-data-overhaul`, `feature/admin-moderator-resource-assignment`
