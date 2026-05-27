@@ -15,16 +15,12 @@ interface ApprovalRequestsPanelProps {
   subView: SubViewId;
   onSubViewChange: (view: SubViewId) => void;
   role: UserRole;
-  onApprove: (demand: any) => void;
-  onReject: (demand: any) => void;
 }
 
 export default function ApprovalRequestsPanel({
   subView,
   onSubViewChange,
   role,
-  onApprove,
-  onReject,
 }: ApprovalRequestsPanelProps) {
   const { t } = useTranslation();
   const { openModal } = useModal();
@@ -94,7 +90,7 @@ export default function ApprovalRequestsPanel({
         )}
         {subView === 'requirements' && (
           isCM
-            ? <MyApprovalRequests onApprove={onApprove} onReject={onReject} />
+            ? <MyApprovalRequests />
             : <RequirementsView selectedCenters={selectedCenters} />
         )}
       </div>

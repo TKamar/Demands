@@ -531,6 +531,7 @@ export default function RequirementsView({ selectedCenters }: RequirementsViewPr
         onReject={handleReject}
         demand={decisionDemand}
         isLoading={isDecisionModalLoading}
+        onSuccess={() => { setDecisionDemand(null); setCurrentPage(1); setAccumulatedDemands([]); }}
       />
 
       <BulkDecisionModal

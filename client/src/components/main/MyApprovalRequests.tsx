@@ -1,14 +1,11 @@
 import { useEffect, useState, useCallback, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import FilterSort from '../common/filters/FilterSort';
+import CmDecisionModal from '../management/CmDecisionModal';
 import type { Demand } from '../../types/domain';
-import type { FilterGroupConfig } from '../../types/filter';
 import { fetchCenterPendingDemands } from '../../api/apiService';
 
-interface MyApprovalRequestsProps {
-  onApprove: (demand: Demand) => void;
-  onReject: (demand: Demand) => void;
-}
+interface MyApprovalRequestsProps {}
 
 export interface MyApprovalRequestsHandle {
   reload: () => void;
@@ -25,11 +22,12 @@ const INITIAL_FILTERS: Record<ApprovalFilterKey, string> = {
 const noop = () => {};
 
 export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprovalRequestsProps>(
-  ({ onApprove, onReject }, ref) => {
+  (_props, ref) => {
     const { t } = useTranslation();
     const [demands, setDemands] = useState<Demand[]>([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState<Record<ApprovalFilterKey, string>>(INITIAL_FILTERS);
+    const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
 
     const reload = useCallback(() => {
       setLoading(true);
@@ -139,12 +137,9 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                     <td className="p-2">{demand.value} {demand.unit}</td>
                     <td className="p-2">{demand.createdByName ?? demand.createdBy}</td>
                     <td className="p-2">{new Date(demand.createdAt).toLocaleDateString('he-IL')}</td>
-                    <td className="p-2 flex gap-2">
-                      <button onClick={() => onApprove(demand)} className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
-                        {t('actions.approve')}
-                      </button>
-                      <button onClick={() => onReject(demand)} className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
-                        {t('actions.reject')}
+                    <td className="p-2">
+                      <button onClick={() => setSelectedDemand(demand)} className="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/90">
+                        {t('management.makeDecision', 'קבל החלטה')}
                       </button>
                     </td>
                   </tr>
@@ -153,7 +148,13 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
             </table>
           )}
         </div>
-      </div>
-    );
-  }
-);
+
+      <CmDecisionModal
+        open={selectedDemand !== null}
+        onClose={() => setSelectedDemand(null)}
+        demand={selectedDemand}
+        onSuccess={() => { setSelectedDemand(null); reload(); }}
+      />
+    </div>
+  );
+});
