@@ -147,13 +147,18 @@ function ColumnHeader({
   );
 }
 
+const ACTIVE_STATUSES = new Set(['PendingCenterManager', 'Pending', 'WaitingOnPrerequisite']);
+const TERMINAL_STATUSES = new Set(['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled']);
+
 // Demand sub-table inside an expanded project row
 function DemandSubTable({
   projectName,
   canDecide,
+  mode = 'active',
 }: {
   projectName: string;
   canDecide: boolean;
+  mode?: 'active' | 'history';
 }) {
   const { t } = useTranslation();
   const auth = useAuth();
@@ -165,9 +170,14 @@ function DemandSubTable({
   const [decidingDemand, setDecidingDemand] = useState<Demand | null>(null);
   const [isDecisionLoading, setIsDecisionLoading] = useState(false);
 
-  const { demands, isLoading, updateDemand, deleteDemand, cancelDemand, approveDemand, rejectDemand } = useDemands(
+  const { demands: allDemands, isLoading, updateDemand, deleteDemand, cancelDemand, approveDemand, rejectDemand } = useDemands(
     { projectName },
     { page: 1, limit: 100 }
+  );
+
+  const demands = useMemo(
+    () => allDemands.filter(d => mode === 'history' ? TERMINAL_STATUSES.has(d.status) : ACTIVE_STATUSES.has(d.status)),
+    [allDemands, mode]
   );
 
   async function handleSubmitDemand(
@@ -364,9 +374,10 @@ function DemandSubTable({
 
 interface ProjectsAccordionProps {
   selectedCenters: string[];
+  mode?: 'active' | 'history';
 }
 
-export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordionProps) {
+export default function ProjectsAccordion({ selectedCenters, mode = 'active' }: ProjectsAccordionProps) {
   const { t } = useTranslation();
   const auth = useAuth();
   const { showToast } = useToast();
@@ -672,7 +683,7 @@ export default function ProjectsAccordion({ selectedCenters }: ProjectsAccordion
                 </div>
 
                 {isExpanded && (
-                  <DemandSubTable projectName={project.name} canDecide={canDecide} />
+                  <DemandSubTable projectName={project.name} canDecide={canDecide} mode={mode} />
                 )}
               </div>
             );

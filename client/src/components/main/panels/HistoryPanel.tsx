@@ -35,7 +35,7 @@ export default function HistoryPanel({ subView, onSubViewChange }: HistoryPanelP
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
-        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} />}
+        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} mode="history" />}
         {subView === 'requirements' && <RequestHistory />}
       </div>
     </div>

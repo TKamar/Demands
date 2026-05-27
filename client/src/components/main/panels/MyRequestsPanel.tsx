@@ -55,7 +55,7 @@ export default function MyRequestsPanel({ subView, onSubViewChange }: MyRequests
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
-        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} />}
+        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} mode="active" />}
         {subView === 'requirements' && <RequestsIOpened />}
       </div>
     </div>
