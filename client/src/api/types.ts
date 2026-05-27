@@ -281,4 +281,5 @@ export interface BulkDecisionResult {
 export interface UpdateUserPayload {
   role: UserRole;
   centerName?: string;
+  managedServices?: string[];
 }
