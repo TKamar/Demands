@@ -38,8 +38,6 @@ export default function MainPage() {
     setSubViewByTab((prev) => ({ ...prev, [topNavTab]: view }));
   };
 
-  const noop = () => {};
-
   return (
     <div className="flex flex-col h-full">
       <TopNavTabs activeTab={topNavTab} onTabChange={setTopNavTab} role={role} />
@@ -50,8 +48,6 @@ export default function MainPage() {
             subView={subView}
             onSubViewChange={handleSubViewChange}
             role={role}
-            onApprove={noop}
-            onReject={noop}
           />
         )}
         {topNavTab === 'myRequests' && (

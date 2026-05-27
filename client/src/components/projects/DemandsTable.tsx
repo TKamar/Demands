@@ -282,16 +282,24 @@ export default function DemandsTable({
                   </span>
                 </span>
               )}
-              {demand.status === 'Pending' && (
+              {(demand.status === 'Pending' || demand.status === 'WaitingOnPrerequisite') && (
                 <div className="flex items-center gap-1">
                   {isModerator ? (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onMakeDecision?.(demand); }}
-                      className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
-                      title={t('management.makeDecision')}
-                    >
-                      <MdGavel size={18} />
-                    </button>
+                    <span className="relative group">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); if (demand.status !== 'WaitingOnPrerequisite') onMakeDecision?.(demand); }}
+                        disabled={demand.status === 'WaitingOnPrerequisite'}
+                        className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                        title={demand.status !== 'WaitingOnPrerequisite' ? t('management.makeDecision') : undefined}
+                      >
+                        <MdGavel size={18} />
+                      </button>
+                      {demand.status === 'WaitingOnPrerequisite' && (
+                        <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                          {t('demands.waitingOnPrerequisite.tooltip', 'ממתין לתנאי מוקדם — ההחלטה תיפתח כשהדרישה הפנימית תושלם')}
+                        </span>
+                      )}
+                    </span>
                   ) : (
                     <>
                       <button
