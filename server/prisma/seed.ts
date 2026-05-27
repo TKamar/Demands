@@ -1,4 +1,4 @@
-import { PrismaClient, ProjectType, Median, DemandType, DemandStatus, Priority } from '@prisma/client';
+import { PrismaClient, ProjectType, Median, DemandType, DemandStatus, Priority, UserRole } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -295,10 +295,34 @@ async function main() {
   // Request Models
   // ============================================
 
+  /*
+   * Test User Accounts — Keycloak Realm Prerequisites
+   *
+   * The following accounts must exist in the local Keycloak realm to log in during development.
+   * DB User records are seeded below so roles persist through OIDC login without being reset.
+   *
+   * Username    | Role            | Center       | Managed Services
+   * ------------|-----------------|--------------|-------------------
+   * admin1      | ADMIN           | -            | -
+   * admin2      | ADMIN           | -            | -
+   * cm1         | CENTER_MANAGER  | IT Center    | -
+   * mod1        | MODERATOR       | -            | Compute, Database
+   * mod2        | MODERATOR       | -            | Compute, Container
+   * mod3        | MODERATOR       | -            | Storage
+   * mod4        | MODERATOR       | -            | Storage
+   * mod5        | MODERATOR       | -            | Network
+   * mod6        | MODERATOR       | -            | Database
+   * mod7        | MODERATOR       | -            | Container
+   * user1       | REGULAR_USER    | IT Center    | -
+   * user2       | REGULAR_USER    | IT Center    | -
+   * user3       | REGULAR_USER    | Operations Center | -
+   */
+
   // Keycloak users (username = username, since UUIDs are generated at realm import)
   const USERS = {
     admin1: { username: 'admin1', name: 'Admin One' },
     admin2: { username: 'admin2', name: 'Admin Two' },
+    cm1: { username: 'cm1', name: 'Center Manager One' },
     mod1: { username: 'mod1', name: 'Moderator One' },
     mod2: { username: 'mod2', name: 'Moderator Two' },
     mod3: { username: 'mod3', name: 'Moderator Three' },
@@ -513,6 +537,145 @@ async function main() {
   `;
 
   console.log('Updated capacity allocated and available values');
+
+  // ============================================
+  // User Records
+  // ============================================
+
+  await Promise.all([
+    prisma.user.upsert({
+      where: { username: 'admin1' },
+      create: { username: 'admin1', fullName: 'Admin One', role: UserRole.ADMIN, centerName: null },
+      update: { fullName: 'Admin One' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'admin2' },
+      create: { username: 'admin2', fullName: 'Admin Two', role: UserRole.ADMIN, centerName: null },
+      update: { fullName: 'Admin Two' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'cm1' },
+      create: { username: 'cm1', fullName: 'Center Manager One', role: UserRole.CENTER_MANAGER, centerName: 'IT Center' },
+      update: { fullName: 'Center Manager One' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'mod1' },
+      create: { username: 'mod1', fullName: 'Moderator One', role: UserRole.MODERATOR, centerName: null },
+      update: { fullName: 'Moderator One' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'mod2' },
+      create: { username: 'mod2', fullName: 'Moderator Two', role: UserRole.MODERATOR, centerName: null },
+      update: { fullName: 'Moderator Two' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'mod3' },
+      create: { username: 'mod3', fullName: 'Moderator Three', role: UserRole.MODERATOR, centerName: null },
+      update: { fullName: 'Moderator Three' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'mod4' },
+      create: { username: 'mod4', fullName: 'Moderator Four', role: UserRole.MODERATOR, centerName: null },
+      update: { fullName: 'Moderator Four' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'mod5' },
+      create: { username: 'mod5', fullName: 'Moderator Five', role: UserRole.MODERATOR, centerName: null },
+      update: { fullName: 'Moderator Five' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'mod6' },
+      create: { username: 'mod6', fullName: 'Moderator Six', role: UserRole.MODERATOR, centerName: null },
+      update: { fullName: 'Moderator Six' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'mod7' },
+      create: { username: 'mod7', fullName: 'Moderator Seven', role: UserRole.MODERATOR, centerName: null },
+      update: { fullName: 'Moderator Seven' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'user1' },
+      create: { username: 'user1', fullName: 'User One', role: UserRole.REGULAR_USER, centerName: 'IT Center' },
+      update: { fullName: 'User One' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'user2' },
+      create: { username: 'user2', fullName: 'User Two', role: UserRole.REGULAR_USER, centerName: 'IT Center' },
+      update: { fullName: 'User Two' },
+    }),
+    prisma.user.upsert({
+      where: { username: 'user3' },
+      create: { username: 'user3', fullName: 'User Three', role: UserRole.REGULAR_USER, centerName: 'Operations Center' },
+      update: { fullName: 'User Three' },
+    }),
+  ]);
+  console.log('Seeded 13 user records (admin1, admin2, cm1, mod1-mod7, user1-user3)');
+
+  // ============================================
+  // E2E Test Scenario
+  // ============================================
+
+  const e2eProject = await prisma.project.upsert({
+    where: { name: 'E2E Test Project' },
+    update: {},
+    create: {
+      name: 'E2E Test Project',
+      purpose: 'End-to-end testing of the RBAC approval flow',
+      type: ProjectType.Semiannual,
+      kindName: 'App',
+      locationId: locations[0].id,
+      year: 2026,
+      median: Median.H1,
+      priority: Priority.P1,
+      centerName: 'IT Center',
+      branchName: 'Development',
+      sectionName: 'Backend Team',
+      createdBy: 'user1',
+      createdByName: 'User One',
+    },
+  });
+
+  await prisma.demand.deleteMany({ where: { projectName: 'E2E Test Project' } });
+
+  // Demand A: awaiting center manager approval (user1 → cm1 flow)
+  await prisma.demand.create({
+    data: {
+      projectName: 'E2E Test Project',
+      serviceName: 'Compute',
+      resourceName: 'CPU',
+      resourceService: 'Compute',
+      value: 16,
+      locationId: locations[0].id,
+      type: DemandType.New,
+      status: DemandStatus.PendingCenterManager,
+      centerName: 'IT Center',
+      branchName: 'Development',
+      sectionName: 'Backend Team',
+      createdBy: 'user1',
+      createdByName: 'User One',
+    },
+  });
+
+  // Demand B: awaiting moderator approval (after CM approval, user1 → mod1 flow)
+  await prisma.demand.create({
+    data: {
+      projectName: 'E2E Test Project',
+      serviceName: 'Compute',
+      resourceName: 'RAM',
+      resourceService: 'Compute',
+      value: 32,
+      locationId: locations[0].id,
+      type: DemandType.New,
+      status: DemandStatus.Pending,
+      centerName: 'IT Center',
+      branchName: 'Development',
+      sectionName: 'Backend Team',
+      createdBy: 'user1',
+      createdByName: 'User One',
+    },
+  });
+
+  console.log('Created E2E test scenario (project + 2 demands for user1)');
 
   console.log('Seeding completed.');
 }
