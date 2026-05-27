@@ -51,10 +51,10 @@ export default function MainPage() {
           />
         )}
         {topNavTab === 'myRequests' && (
-          <MyRequestsPanel subView={subView} onSubViewChange={handleSubViewChange} />
+          <MyRequestsPanel subView={subView} onSubViewChange={handleSubViewChange} currentUser={currentUser} />
         )}
         {topNavTab === 'history' && (
-          <HistoryPanel subView={subView} onSubViewChange={handleSubViewChange} />
+          <HistoryPanel subView={subView} onSubViewChange={handleSubViewChange} currentUser={currentUser} />
         )}
       </div>
     </div>

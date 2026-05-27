@@ -34,14 +34,18 @@ const STATUS_OPTIONS = [
 
 const noop = () => {};
 
-export const RequestsIOpened: React.FC = () => {
+interface RequestsIOpenedProps {
+  createdBy: string;
+}
+
+export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy }) => {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [demandToRestore, setDemandToRestore] = useState<Demand | null>(null);
   const [filters, setFilters] = useState<Record<MyRequestsFilterKey, string>>(INITIAL_FILTERS);
 
-  const { demands, isLoading, restoreDemand } = useDemands({}, { page: 1, limit: 500 });
+  const { demands, isLoading, restoreDemand } = useDemands({ createdBy }, { page: 1, limit: 500 });
 
   const { projects } = useCachedProjects();
   const projectMap = useMemo(() => {

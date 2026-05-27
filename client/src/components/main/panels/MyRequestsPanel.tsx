@@ -4,13 +4,15 @@ import { useModal } from '../../../contexts/ModalContext';
 import ProjectsAccordion from '../ProjectsAccordion';
 import { RequestsIOpened } from '../RequestsIOpened';
 import type { SubViewId } from '../../../utils/roleUtils';
+import type { AppUser } from '../../../types/domain';
 
 interface MyRequestsPanelProps {
   subView: SubViewId;
   onSubViewChange: (view: SubViewId) => void;
+  currentUser: AppUser | null;
 }
 
-export default function MyRequestsPanel({ subView, onSubViewChange }: MyRequestsPanelProps) {
+export default function MyRequestsPanel({ subView, onSubViewChange, currentUser }: MyRequestsPanelProps) {
   const { t } = useTranslation();
   const { openModal } = useModal();
 
@@ -55,8 +57,8 @@ export default function MyRequestsPanel({ subView, onSubViewChange }: MyRequests
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
-        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} mode="active" />}
-        {subView === 'requirements' && <RequestsIOpened />}
+        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} mode="active" createdBy={currentUser?.username} />}
+        {subView === 'requirements' && currentUser && <RequestsIOpened createdBy={currentUser.username} />}
       </div>
     </div>
   );

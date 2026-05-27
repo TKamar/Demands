@@ -2,13 +2,15 @@ import { useTranslation } from 'react-i18next';
 import ProjectsAccordion from '../ProjectsAccordion';
 import RequestHistory from '../RequestHistory';
 import type { SubViewId } from '../../../utils/roleUtils';
+import type { AppUser } from '../../../types/domain';
 
 interface HistoryPanelProps {
   subView: SubViewId;
   onSubViewChange: (view: SubViewId) => void;
+  currentUser: AppUser | null;
 }
 
-export default function HistoryPanel({ subView, onSubViewChange }: HistoryPanelProps) {
+export default function HistoryPanel({ subView, onSubViewChange, currentUser }: HistoryPanelProps) {
   const { t } = useTranslation();
 
   return (
@@ -35,7 +37,7 @@ export default function HistoryPanel({ subView, onSubViewChange }: HistoryPanelP
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
-        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} mode="history" />}
+        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} mode="history" createdBy={currentUser?.username} />}
         {subView === 'requirements' && <RequestHistory />}
       </div>
     </div>

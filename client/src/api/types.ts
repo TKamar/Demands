@@ -110,6 +110,7 @@ export interface PaginatedResponse<T> {
 
 export interface ProjectFilterParams {
   name?: string;
+  createdBy?: string;
 }
 
 export interface CreateDemandPayload {
@@ -161,6 +162,7 @@ export interface DemandFilterParams {
   sectionName?: string;
   projectPriority?: Priority;
   managed?: boolean;
+  createdBy?: string;
 }
 
 export interface Capacity {

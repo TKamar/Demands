@@ -21,6 +21,7 @@ export interface AppUser {
   fullName: string;
   role: UserRole;
   centerName: string | null;
+  managedServices: string[];
 }
 
 export interface Project {

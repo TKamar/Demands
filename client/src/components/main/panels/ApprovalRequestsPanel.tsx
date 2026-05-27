@@ -91,7 +91,7 @@ export default function ApprovalRequestsPanel({
         {subView === 'requirements' && (
           isCM
             ? <MyApprovalRequests />
-            : <RequirementsView selectedCenters={selectedCenters} />
+            : <RequirementsView selectedCenters={selectedCenters} managed={true} />
         )}
       </div>
     </div>

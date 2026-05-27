@@ -100,9 +100,10 @@ export async function fetchProjects(
   if (params?.page) query.append('page', params.page.toString());
   if (params?.limit) query.append('limit', params.limit.toString());
   if (params?.name) query.append('name', params.name);
+  if (params?.createdBy) query.append('createdBy', params.createdBy);
 
-  // If filtering by name, use /projects/filter, otherwise /projects
-  const endpoint = params?.name ? '/projects/filter' : '/projects';
+  // If filtering by name or createdBy, use /projects/filter, otherwise /projects
+  const endpoint = (params?.name || params?.createdBy) ? '/projects/filter' : '/projects';
 
   const { data } = await api.get(`${endpoint}?${query.toString()}`, { signal });
   return {
@@ -167,6 +168,7 @@ export async function fetchDemands(
     if (params.emergencyOption) query.append('emergencyOption', params.emergencyOption);
     if (params.managed) query.append('managed', 'true');
     if (params.centerName) query.append('center', params.centerName);
+    if (params.createdBy) query.append('createdBy', params.createdBy);
   }
 
   // If any filter is present (besides pagination), use /demands/filter, otherwise /demands
@@ -175,7 +177,7 @@ export async function fetchDemands(
     params.locationId || params.baseName || params.environmentName ||
     params.networkName || params.clusterName || params.type || params.status ||
     params.projectType || params.median || params.year || params.relatedTo || params.emergencyOption || params.projectPriority ||
-    params.managed || params.centerName
+    params.managed || params.centerName || params.createdBy
   );
 
   const endpoint = isFiltering ? '/demands/filter' : '/demands';
