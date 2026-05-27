@@ -156,6 +156,45 @@ Started: 2026-05-25
 
 ---
 
+## RBAC Data Filtering, Mock Data & Admin Management Sprint
+
+Started: 2026-05-27
+
+| Branch | Area | Status |
+|--------|------|--------|
+| `feature/rbac-data-filtering` | Backend: GET /me + createdBy scoping; Frontend: user prop threading, component filters | ✅ Done |
+| `feature/mock-data-overhaul` | seed.ts: 13 User records + E2E test scenario | ✅ Done |
+| `feature/admin-moderator-resource-assignment` | Backend: Service.moderators PATCH + GET /users; Frontend: UserManagement service multi-select | ✅ Done |
+
+### 2026-05-27
+
+**feature/rbac-data-filtering**
+- Server `GET /me`: extended to return `managedServices: string[]` (queries `Service.moderators` array)
+- `demand.service.ts` `getHistoryDemands`: all roles now see only their own created demands in History tab
+- `demand.controller.ts` `getByFilters`: `createdBy` query param only honoured for privileged users (admin/moderator); non-privileged users always scoped to own username — prevents cross-user data exposure
+- `project.controller.ts` `getByFilters`: same `createdBy` scoping pattern
+- `client/src/types/domain.ts`: `AppUser.managedServices: string[]` added
+- `client/src/api/types.ts`: `DemandFilterParams.createdBy?`, `ProjectFilterParams.createdBy?` added
+- `client/src/api/apiService.ts`: `createdBy` forwarded in demand and project fetch calls
+- `MainPage.tsx`: threads `currentUser` to `MyRequestsPanel` and `HistoryPanel`
+- `MyRequestsPanel.tsx`: accepts `currentUser`, passes `createdBy` to `RequestsIOpened` and `ProjectsAccordion`
+- `HistoryPanel.tsx`: accepts `currentUser`, passes `createdBy` to `ProjectsAccordion`
+- `ApprovalRequestsPanel.tsx`: passes `managed={true}` to `RequirementsView` (no currentUser needed)
+- `RequestsIOpened.tsx`: accepts `createdBy: string` prop, passes to `useDemands`
+- `ProjectsAccordion.tsx`: accepts `createdBy?: string`, passes to `useProjects` and `DemandSubTable`
+- `RequirementsView.tsx`: accepts `managed?: boolean`, includes in `demandFilterParams`
+
+**feature/mock-data-overhaul**
+- `server/prisma/seed.ts`: added `UserRole` import; Keycloak prerequisites comment block; 13 User upserts (admin1, admin2, cm1, mod1–mod7, user1, user2, user3) with correct roles/centerNames; `update: { fullName }` only (safe — OIDC login won't overwrite roles); Service.moderators set for all 5 services; E2E test scenario: project "E2E Test Project" + Demand A (CPU, PendingCenterManager, user1→cm1 flow) + Demand B (RAM, Pending, cm1→mod1 flow)
+
+**feature/admin-moderator-resource-assignment**
+- `server/src/services/admin/user.service.ts`: `getAll()` returns `managedServices: string[]` per user via parallel user+service fetch and Map join; `updateRoleAndCenter()` wraps user update + Service.moderators changes in `prisma.$transaction`; raw SQL `array_remove` for bulk clear, individual `push` per service for additions; clearing all assignments when role changes away from MODERATOR
+- `server/src/controllers/admin/user.controller.ts`: destructures and validates `managedServices?: string[]` from request body; passes to service layer
+- `client/src/api/types.ts`: `UpdateUserPayload.managedServices?: string[]` added
+- `client/src/components/settings/UserManagement.tsx`: fetches services alongside users/centers; new "Managed Services" table column; `<select multiple>` appears when role is MODERATOR; role change clears services selection; `changed` includes array comparison; Save payload includes `managedServices` for MODERATOR role
+
+---
+
 ## Table Standardization & Filter UX Sprint
 
 Started: 2026-05-25
