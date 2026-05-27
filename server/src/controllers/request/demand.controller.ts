@@ -66,7 +66,7 @@ export const demandController = {
 
   getByFilters: async (req: Request, res: Response) => {
     try {
-      const { username, isAdmin, isModerator } = getUserContext(req);
+      const { username, isAdmin, isModerator, isPrivileged } = getUserContext(req);
       const {
         project,
         resource,
@@ -110,8 +110,8 @@ export const demandController = {
         }
         // Admin on management page: no restrictions (all demands visible)
       } else {
-        // Demands page: admins can filter by any createdBy (or omit for all); non-admins are always clamped to own username
-        createdByFilter = isAdmin ? (typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined) : username;
+        // Demands page: privileged users (admin/moderator) can filter by any createdBy (or omit for all); others are always clamped to own username
+        createdByFilter = isPrivileged ? (typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined) : username;
       }
 
       const result = await demandService.findByFilters(
