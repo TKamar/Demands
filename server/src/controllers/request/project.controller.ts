@@ -47,7 +47,7 @@ export const projectController = {
       const result = await projectService.findByFilters(
         {
           name: name as string | undefined,
-          createdBy: typeof req.query.createdBy === 'string' ? req.query.createdBy : (isPrivileged ? undefined : username),
+          createdBy: isPrivileged ? (typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined) : username,
         },
         { page, limit }
       );

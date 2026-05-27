@@ -43,18 +43,23 @@ const router = Router();
 
 // Current user endpoint
 router.get('/me', authenticate, requireAuth, async (req, res) => {
-  const u = req.auth!.user;
-  const managedServicesRows = await prisma.service.findMany({
-    where: { moderators: { has: u.username } },
-    select: { name: true },
-  });
-  res.json({
-    username: u.username,
-    fullName: u.fullName,
-    role: u.role,
-    centerName: u.centerName,
-    managedServices: managedServicesRows.map((s) => s.name),
-  });
+  try {
+    const u = req.auth!.user;
+    const managedServicesRows = await prisma.service.findMany({
+      where: { moderators: { has: u.username } },
+      select: { name: true },
+    });
+    res.json({
+      username: u.username,
+      fullName: u.fullName,
+      role: u.role,
+      centerName: u.centerName,
+      managedServices: managedServicesRows.map((s) => s.name),
+    });
+  } catch (error) {
+    console.error('GET /me error:', error);
+    res.status(500).json({ error: 'Failed to fetch user info' });
+  }
 });
 
 // Auth endpoints

@@ -110,8 +110,8 @@ export const demandController = {
         }
         // Admin on management page: no restrictions (all demands visible)
       } else {
-        // Demands page: honor explicit createdBy param for all roles; non-admins default to own username
-        createdByFilter = typeof req.query.createdBy === 'string' ? req.query.createdBy : (isAdmin ? undefined : username);
+        // Demands page: admins can filter by any createdBy (or omit for all); non-admins are always clamped to own username
+        createdByFilter = isAdmin ? (typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined) : username;
       }
 
       const result = await demandService.findByFilters(
