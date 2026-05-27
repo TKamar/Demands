@@ -3,13 +3,35 @@ import { UserRole } from '@prisma/client';
 
 export const userService = {
   async getAll() {
-    return prisma.user.findMany({
-      include: { center: { select: { name: true } } },
-      orderBy: { username: 'asc' },
-    });
+    const [users, services] = await Promise.all([
+      prisma.user.findMany({
+        include: { center: { select: { name: true } } },
+        orderBy: { username: 'asc' },
+      }),
+      prisma.service.findMany({
+        where: { moderators: { isEmpty: false } },
+        select: { name: true, moderators: true },
+      }),
+    ]);
+
+    const moderatorMap = new Map<string, string[]>();
+    for (const svc of services) {
+      for (const mod of svc.moderators) {
+        if (!moderatorMap.has(mod)) moderatorMap.set(mod, []);
+        moderatorMap.get(mod)!.push(svc.name);
+      }
+    }
+
+    return users.map((u) => ({ ...u, managedServices: moderatorMap.get(u.username) ?? [] }));
   },
 
-  async updateRoleAndCenter(username: string, role: UserRole, centerName: string | null, requestingUsername: string) {
+  async updateRoleAndCenter(
+    username: string,
+    role: UserRole,
+    centerName: string | null,
+    requestingUsername: string,
+    managedServices: string[] | null = null,
+  ) {
     if (role === UserRole.CENTER_MANAGER && !centerName) {
       throw new Error('centerName is required for CENTER_MANAGER role');
     }
@@ -31,9 +53,30 @@ export const userService = {
       }
     }
 
-    return prisma.user.update({
-      where: { username },
-      data: { role, centerName: role === UserRole.CENTER_MANAGER ? centerName : null },
+    const needsServiceUpdate = role === UserRole.MODERATOR
+      ? managedServices !== null
+      : true;
+
+    return prisma.$transaction(async (tx) => {
+      const updatedUser = await tx.user.update({
+        where: { username },
+        data: { role, centerName: role === UserRole.CENTER_MANAGER ? centerName : null },
+      });
+
+      if (needsServiceUpdate) {
+        await tx.$executeRaw`UPDATE "Service" SET moderators = array_remove(moderators, ${username})`;
+
+        if (role === UserRole.MODERATOR && managedServices && managedServices.length > 0) {
+          for (const serviceName of managedServices) {
+            await tx.service.update({
+              where: { name: serviceName },
+              data: { moderators: { push: username } },
+            });
+          }
+        }
+      }
+
+      return updatedUser;
     });
   },
 };
