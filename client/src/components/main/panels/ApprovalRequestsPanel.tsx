@@ -9,20 +9,18 @@ import { ResourcesForAssignment } from '../ResourcesForAssignment';
 import CenterFilter from '../CenterFilter';
 import ResourceSummaryStrip from '../ResourceSummaryStrip';
 import type { SubViewId } from '../../../utils/roleUtils';
-import type { UserRole, AppUser } from '../../../types/domain';
+import type { UserRole } from '../../../types/domain';
 
 interface ApprovalRequestsPanelProps {
   subView: SubViewId;
   onSubViewChange: (view: SubViewId) => void;
   role: UserRole;
-  currentUser: AppUser | null;
 }
 
 export default function ApprovalRequestsPanel({
   subView,
   onSubViewChange,
   role,
-  currentUser: _currentUser,
 }: ApprovalRequestsPanelProps) {
   const { t } = useTranslation();
   const { openModal } = useModal();

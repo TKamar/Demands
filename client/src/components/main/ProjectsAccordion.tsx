@@ -155,10 +155,12 @@ function DemandSubTable({
   projectName,
   canDecide,
   mode = 'active',
+  createdBy,
 }: {
   projectName: string;
   canDecide: boolean;
   mode?: 'active' | 'history';
+  createdBy?: string;
 }) {
   const { t } = useTranslation();
   const auth = useAuth();
@@ -171,7 +173,7 @@ function DemandSubTable({
   const [isDecisionLoading, setIsDecisionLoading] = useState(false);
 
   const { demands: allDemands, isLoading, updateDemand, deleteDemand, cancelDemand, approveDemand, rejectDemand } = useDemands(
-    { projectName },
+    { projectName, createdBy },
     { page: 1, limit: 100 }
   );
 
@@ -684,7 +686,7 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
                 </div>
 
                 {isExpanded && (
-                  <DemandSubTable projectName={project.name} canDecide={canDecide} mode={mode} />
+                  <DemandSubTable projectName={project.name} canDecide={canDecide} mode={mode} createdBy={createdBy} />
                 )}
               </div>
             );

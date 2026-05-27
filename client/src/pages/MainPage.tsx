@@ -48,7 +48,6 @@ export default function MainPage() {
             subView={subView}
             onSubViewChange={handleSubViewChange}
             role={role}
-            currentUser={currentUser}
           />
         )}
         {topNavTab === 'myRequests' && (

@@ -479,6 +479,7 @@ export const demandService = {
     pagination: { page: number; limit: number }
   ) => {
     const terminalStatuses = ['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled'];
+    // All roles see only their own created demands in the History tab — no role-based scoping
     const where: any = { status: { in: terminalStatuses }, isInternalTicket: false, createdBy: userId };
 
     const { page, limit } = pagination;
