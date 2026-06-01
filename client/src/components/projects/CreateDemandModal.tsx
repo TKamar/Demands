@@ -21,6 +21,7 @@ interface CreateDemandModalProps {
   onClose: () => void;
   onSubmit: (payload: CreateDemandPayload | UpdateDemandPayload, demandId?: number) => Promise<void>;
   editingDemand?: Demand | null;
+  onCreated?: () => void;
 }
 
 const initialForm = {
@@ -50,6 +51,7 @@ export default function CreateDemandModal({
   onClose,
   onSubmit,
   editingDemand,
+  onCreated,
 }: CreateDemandModalProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -379,6 +381,7 @@ export default function CreateDemandModal({
           })),
         });
         showToast(t('common.toast.demandCreated'), 'success');
+        onCreated?.();
       }
       handleClose();
     } catch (err: any) {
