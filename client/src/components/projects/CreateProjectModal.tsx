@@ -643,62 +643,153 @@ export default function CreateProjectModal({
             {inlineRequirements.length > 0 && (
               <div className="space-y-2">
                 {inlineRequirements.map((req, idx) => (
-                  <div key={idx} className="flex items-center gap-2 flex-wrap">
-                    {/* Service select */}
-                    <select
-                      value={req.serviceName}
-                      onChange={e => updateRequirementRow(idx, 'serviceName', e.target.value)}
-                      className="flex-1 min-w-[120px] px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
-                    >
-                      <option value="">{t('demand.service', 'שירות')}</option>
-                      {referenceData.services.map(s => (
-                        <option key={s.name} value={s.name}>{s.name}</option>
-                      ))}
-                    </select>
-
-                    {/* Resource select (filtered by service) */}
-                    <select
-                      value={req.resourceName}
-                      onChange={e => updateRequirementRow(idx, 'resourceName', e.target.value)}
-                      className="flex-1 min-w-[120px] px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
-                      disabled={!req.serviceName}
-                    >
-                      <option value="">{t('demand.resource', 'משאב')}</option>
-                      {referenceData.resources
-                        .filter(r => r.serviceName === req.serviceName)
-                        .map(r => (
-                          <option key={r.name} value={r.name}>{r.name}</option>
+                  <div key={idx} className="flex flex-col gap-1">
+                    {/* Main row */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Service select */}
+                      <select
+                        value={req.serviceName}
+                        onChange={e => updateRequirementRow(idx, 'serviceName', e.target.value)}
+                        className="flex-1 min-w-[120px] px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                      >
+                        <option value="">{t('demand.service', 'שירות')}</option>
+                        {referenceData.services.map(s => (
+                          <option key={s.name} value={s.name}>{s.name}</option>
                         ))}
-                    </select>
+                      </select>
 
-                    {/* Value input */}
-                    <input
-                      type="number"
-                      min={1}
-                      value={req.value || ''}
-                      onChange={e => updateRequirementRow(idx, 'value', Number(e.target.value))}
-                      placeholder={t('demand.value', 'כמות')}
-                      className="w-20 px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
-                    />
+                      {/* Resource select (filtered by service) */}
+                      <select
+                        value={req.resourceName}
+                        onChange={e => updateRequirementRow(idx, 'resourceName', e.target.value)}
+                        className="flex-1 min-w-[120px] px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                        disabled={!req.serviceName}
+                      >
+                        <option value="">{t('demand.resource', 'משאב')}</option>
+                        {referenceData.resources
+                          .filter(r => r.serviceName === req.serviceName)
+                          .map(r => (
+                            <option key={r.name} value={r.name}>{r.name}</option>
+                          ))}
+                      </select>
 
-                    {/* Type select */}
-                    <select
-                      value={req.type}
-                      onChange={e => updateRequirementRow(idx, 'type', e.target.value as 'New' | 'Extension')}
-                      className="w-28 px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
-                    >
-                      <option value="New">{t('demand.type.new', 'חדש')}</option>
-                      <option value="Extension">{t('demand.type.extension', 'הרחבה')}</option>
-                    </select>
+                      {/* Value input */}
+                      <input
+                        type="number"
+                        min={1}
+                        value={req.value || ''}
+                        onChange={e => updateRequirementRow(idx, 'value', Number(e.target.value))}
+                        placeholder={t('demand.value', 'כמות')}
+                        className="w-20 px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                      />
 
-                    {/* Delete row button */}
-                    <button
-                      type="button"
-                      onClick={() => removeRequirementRow(idx)}
-                      className="text-text-secondary hover:text-red-500 transition-colors cursor-pointer bg-transparent border-none p-1"
-                    >
-                      <MdDelete size={16} />
-                    </button>
+                      {/* Type select */}
+                      <select
+                        value={req.type}
+                        onChange={e => updateRequirementRow(idx, 'type', e.target.value as 'New' | 'Extension')}
+                        className="w-28 px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                      >
+                        <option value="New">{t('demand.type.new', 'חדש')}</option>
+                        <option value="Extension">{t('demand.type.extension', 'הרחבה')}</option>
+                      </select>
+
+                      {/* Location override toggle */}
+                      <button
+                        type="button"
+                        onClick={() => updateRequirementRow(idx, 'overrideLocation', !req.overrideLocation)}
+                        title={req.overrideLocation
+                          ? t('project.inlineRequirements.locationCustom', 'מיקום מותאם')
+                          : t('project.inlineRequirements.locationFromProject', 'מיקום מהפרויקט')}
+                        className={`transition-colors cursor-pointer bg-transparent border-none p-1 ${
+                          req.overrideLocation ? 'text-primary' : 'text-text-secondary hover:text-primary'
+                        }`}
+                      >
+                        <MdLocationOn size={16} />
+                      </button>
+
+                      {/* Delete row button */}
+                      <button
+                        type="button"
+                        onClick={() => removeRequirementRow(idx)}
+                        className="text-text-secondary hover:text-red-500 transition-colors cursor-pointer bg-transparent border-none p-1"
+                      >
+                        <MdDelete size={16} />
+                      </button>
+                    </div>
+
+                    {/* Location sub-row — visible only when override is active */}
+                    {req.overrideLocation && (
+                      <div className="flex items-center gap-2 flex-wrap ps-2">
+                        {/* Network */}
+                        <select
+                          value={req.network}
+                          onChange={e => updateRequirementRow(idx, 'network', e.target.value)}
+                          className="flex-1 min-w-[100px] px-2 py-1.5 text-sm border border-primary/40 rounded-lg bg-bg-default"
+                        >
+                          <option value="">{t('projects.createProject.network', 'רשת')}</option>
+                          {referenceData.networks
+                            .filter(v => v.isActive !== false)
+                            .map(v => (
+                              <option key={v.name} value={v.name}>{v.displayName || v.name}</option>
+                            ))}
+                        </select>
+
+                        {/* Base */}
+                        <select
+                          value={req.base}
+                          onChange={e => updateRequirementRow(idx, 'base', e.target.value)}
+                          disabled={!req.network}
+                          className="flex-1 min-w-[100px] px-2 py-1.5 text-sm border border-primary/40 rounded-lg bg-bg-default disabled:opacity-50"
+                        >
+                          <option value="">{t('projects.createProject.base', 'בסיס')}</option>
+                          {referenceData.locations
+                            .filter(l => l.networkName === req.network)
+                            .reduce<string[]>((acc, l) => acc.includes(l.baseName) ? acc : [...acc, l.baseName], [])
+                            .map(name => {
+                              const ref = referenceData.bases.find(b => b.name === name);
+                              return <option key={name} value={name}>{ref?.displayName || name}</option>;
+                            })}
+                        </select>
+
+                        {/* Environment */}
+                        <select
+                          value={req.environment}
+                          onChange={e => updateRequirementRow(idx, 'environment', e.target.value)}
+                          disabled={!req.base}
+                          className="flex-1 min-w-[100px] px-2 py-1.5 text-sm border border-primary/40 rounded-lg bg-bg-default disabled:opacity-50"
+                        >
+                          <option value="">{t('projects.createProject.environment', 'סביבה')}</option>
+                          {referenceData.locations
+                            .filter(l => l.networkName === req.network && l.baseName === req.base)
+                            .reduce<string[]>((acc, l) => acc.includes(l.environmentName) ? acc : [...acc, l.environmentName], [])
+                            .map(name => {
+                              const ref = referenceData.environments.find(e => e.name === name);
+                              return <option key={name} value={name}>{ref?.displayName || name}</option>;
+                            })}
+                        </select>
+
+                        {/* Cluster */}
+                        <select
+                          value={req.cluster}
+                          onChange={e => updateRequirementRow(idx, 'cluster', e.target.value)}
+                          disabled={!req.environment}
+                          className="flex-1 min-w-[100px] px-2 py-1.5 text-sm border border-primary/40 rounded-lg bg-bg-default disabled:opacity-50"
+                        >
+                          <option value="">{t('projects.createProject.cluster', 'אשכול')}</option>
+                          {referenceData.locations
+                            .filter(l =>
+                              l.networkName === req.network &&
+                              l.baseName === req.base &&
+                              l.environmentName === req.environment
+                            )
+                            .reduce<string[]>((acc, l) => acc.includes(l.clusterName) ? acc : [...acc, l.clusterName], [])
+                            .map(name => {
+                              const ref = referenceData.clusters.find(c => c.name === name);
+                              return <option key={name} value={name}>{ref?.displayName || name}</option>;
+                            })}
+                        </select>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
