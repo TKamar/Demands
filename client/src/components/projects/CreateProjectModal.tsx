@@ -423,6 +423,7 @@ export default function CreateProjectModal({
     setError(null);
     setInlineRequirements([]);
     setProjectDemands([]);
+    setIsDemandSectionLoading(false);
     setIsAddingDemand(false);
     setEditingDemandInProject(null);
     setDemandToCancel(null);
