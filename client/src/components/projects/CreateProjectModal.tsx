@@ -163,10 +163,12 @@ export default function CreateProjectModal({
       setProjectDemands([]);
       return;
     }
+    const controller = new AbortController();
     setIsDemandSectionLoading(true);
-    fetchDemands({ projectName: editingProject.name, page: 1, limit: 200 })
-      .then(res => setProjectDemands(res.data))
-      .finally(() => setIsDemandSectionLoading(false));
+    fetchDemands({ projectName: editingProject.name, page: 1, limit: 200 }, controller.signal)
+      .then(res => { if (!controller.signal.aborted) setProjectDemands(res.data); })
+      .finally(() => { if (!controller.signal.aborted) setIsDemandSectionLoading(false); });
+    return () => controller.abort();
   }, [isOpen, isEditMode, editingProject?.name]);
 
   // --- Derived State for Hierarchies ---
@@ -956,7 +958,9 @@ export default function CreateProjectModal({
           <CreateDemandModal
             isOpen={true}
             onClose={() => setIsAddingDemand(false)}
-            onSubmit={async () => {}}
+            onSubmit={async () => {
+              // Create mode: CreateDemandModal calls createDemandGroup internally — onSubmit is never invoked
+            }}
             onCreated={async () => {
               await refreshProjectDemands();
               setIsAddingDemand(false);
