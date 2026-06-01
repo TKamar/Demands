@@ -1,13 +1,15 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdAdd, MdDelete, MdLocationOn } from 'react-icons/md';
 import Modal from '../common/Modal';
+import CreateDemandModal from './CreateDemandModal';
+import ConfirmDialog from '../common/ConfirmDialog';
 import Select from '../common/Select';
 import { useToast } from '../common/Toast';
 import { useReferenceData } from '../../hooks/useReferenceData';
-import { createDemand } from '../../api/apiService';
-import type { Project, ProjectType, Median } from '../../types/domain';
-import type { CreateProjectPayload, UpdateProjectPayload, Priority } from '../../api/types';
+import { createDemand, fetchDemands, updateDemand as apiUpdateDemand, cancelDemand as apiCancelDemand } from '../../api/apiService';
+import type { Project, ProjectType, Median, Demand } from '../../types/domain';
+import type { CreateProjectPayload, UpdateProjectPayload, Priority, UpdateDemandPayload } from '../../api/types';
 
 interface CreateProjectModalProps {
   isOpen: boolean;
@@ -15,6 +17,11 @@ interface CreateProjectModalProps {
   onSubmit: (payload: CreateProjectPayload | UpdateProjectPayload, projectName?: string) => Promise<void>;
   editingProject?: Project | null;
 }
+
+const TERMINAL_DEMAND_STATUSES = new Set([
+  'Approved', 'PartiallyApproved', 'ApprovedWithCondition',
+  'Rejected', 'CenterManagerRejected', 'Cancelled',
+]);
 
 const initialForm = {
   name: '',
@@ -51,7 +58,38 @@ export default function CreateProjectModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Edit-mode demands section state
+  const [projectDemands, setProjectDemands] = useState<Demand[]>([]);
+  const [isDemandSectionLoading, setIsDemandSectionLoading] = useState(false);
+  const [isAddingDemand, setIsAddingDemand] = useState(false);
+  const [editingDemandInProject, setEditingDemandInProject] = useState<Demand | null>(null);
+  const [demandToCancel, setDemandToCancel] = useState<Demand | null>(null);
+
   const isEditMode = !!editingProject;
+
+  const refreshProjectDemands = useCallback(async () => {
+    if (!editingProject) return;
+    setIsDemandSectionLoading(true);
+    try {
+      const res = await fetchDemands({ projectName: editingProject.name, page: 1, limit: 200 });
+      setProjectDemands(res.data);
+    } finally {
+      setIsDemandSectionLoading(false);
+    }
+  }, [editingProject?.name]);
+
+  const confirmCancelProjectDemand = useCallback(async () => {
+    if (!demandToCancel) return;
+    const target = demandToCancel;
+    setDemandToCancel(null);
+    try {
+      await apiCancelDemand(target.id);
+      await refreshProjectDemands();
+      showToast(t('demands.cancelSuccess', 'הדרישה בוטלה'), 'success');
+    } catch {
+      showToast(t('demands.cancelError', 'שגיאה בביטול'), 'error');
+    }
+  }, [demandToCancel, refreshProjectDemands, showToast, t]);
 
   // --- Inline Requirements ---
   interface InlineRequirement {
@@ -119,6 +157,17 @@ export default function CreateProjectModal({
       setForm(initialForm);
     }
   }, [editingProject, isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !isEditMode || !editingProject) {
+      setProjectDemands([]);
+      return;
+    }
+    setIsDemandSectionLoading(true);
+    fetchDemands({ projectName: editingProject.name, page: 1, limit: 200 })
+      .then(res => setProjectDemands(res.data))
+      .finally(() => setIsDemandSectionLoading(false));
+  }, [isOpen, isEditMode, editingProject?.name]);
 
   // --- Derived State for Hierarchies ---
 
@@ -373,6 +422,10 @@ export default function CreateProjectModal({
     setForm(initialForm);
     setError(null);
     setInlineRequirements([]);
+    setProjectDemands([]);
+    setIsAddingDemand(false);
+    setEditingDemandInProject(null);
+    setDemandToCancel(null);
   }
 
   const placeholder = t('projects.createProject.selectOption');
@@ -623,6 +676,78 @@ export default function CreateProjectModal({
           </div>
         </div>
 
+        {/* Demands Section — edit mode only */}
+        {isEditMode && (
+          <div className="border-t border-divider pt-4 mt-4" dir="rtl">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-text-primary">
+                {t('project.demands.title', 'דרישות')}
+                {projectDemands.length > 0 && (
+                  <span className="ms-2 text-xs font-normal text-text-secondary">
+                    ({projectDemands.length})
+                  </span>
+                )}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsAddingDemand(true)}
+                className="flex items-center gap-1 text-sm text-primary hover:underline cursor-pointer bg-transparent border-none"
+              >
+                <MdAdd size={15} />
+                {t('project.demands.add', 'הוסף דרישה')}
+              </button>
+            </div>
+
+            {isDemandSectionLoading && (
+              <p className="text-sm text-text-secondary py-2">{t('common.loading', 'טוען...')}</p>
+            )}
+
+            {!isDemandSectionLoading && projectDemands.length === 0 && (
+              <p className="text-sm text-text-secondary py-2">{t('project.demands.empty', 'אין דרישות')}</p>
+            )}
+
+            {projectDemands.length > 0 && (
+              <div className="space-y-2">
+                {projectDemands.map(demand => {
+                  const isTerminal = TERMINAL_DEMAND_STATUSES.has(demand.status);
+                  return (
+                    <div key={demand.id} className="flex items-center gap-2 flex-wrap text-sm">
+                      <span className="flex-1 min-w-[110px] text-text-primary font-medium truncate">
+                        {demand.serviceName}
+                      </span>
+                      <span className="flex-1 min-w-[110px] text-text-secondary truncate">
+                        {demand.resourceName}
+                      </span>
+                      <span className="w-20 text-text-primary shrink-0">
+                        {demand.value} {demand.unit}
+                      </span>
+                      <span className="w-24 text-text-secondary text-xs shrink-0">
+                        {demand.location.network}/{demand.location.base}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => { if (!isTerminal) setEditingDemandInProject(demand); }}
+                        disabled={isTerminal}
+                        className="px-2 py-1 text-xs border border-divider rounded-lg hover:border-primary transition-colors bg-transparent cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {t('common.edit', 'ערוך')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { if (!isTerminal) setDemandToCancel(demand); }}
+                        disabled={isTerminal}
+                        className="px-2 py-1 text-xs border border-divider rounded-lg hover:border-red-400 text-text-secondary hover:text-red-500 transition-colors bg-transparent cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        {t('common.cancel', 'בטל')}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Inline Requirements Section — create mode only */}
         {!editingProject && (
           <div className="border-t border-divider pt-4 mt-4" dir="rtl">
@@ -825,6 +950,41 @@ export default function CreateProjectModal({
           </button>
         </div>
       </form>
+
+        {isAddingDemand && (
+          <CreateDemandModal
+            isOpen={true}
+            onClose={() => setIsAddingDemand(false)}
+            onSubmit={async () => {}}
+            onCreated={async () => {
+              await refreshProjectDemands();
+              setIsAddingDemand(false);
+            }}
+          />
+        )}
+
+        {editingDemandInProject && (
+          <CreateDemandModal
+            isOpen={true}
+            onClose={() => setEditingDemandInProject(null)}
+            onSubmit={async (payload, demandId) => {
+              if (!demandId) return;
+              await apiUpdateDemand(demandId, payload as UpdateDemandPayload);
+              await refreshProjectDemands();
+              setEditingDemandInProject(null);
+            }}
+            editingDemand={editingDemandInProject}
+          />
+        )}
+
+        <ConfirmDialog
+          isOpen={demandToCancel !== null}
+          title={t('demands.cancelTitle', 'ביטול דרישה')}
+          message={t('demands.cancelConfirm', 'לבטל דרישה זו?')}
+          onConfirm={confirmCancelProjectDemand}
+          onCancel={() => setDemandToCancel(null)}
+          danger
+        />
     </Modal>
   );
 }
