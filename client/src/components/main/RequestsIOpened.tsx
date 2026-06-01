@@ -1,16 +1,19 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdAdd } from 'react-icons/md';
 import DemandsTable, { demandColumnConfig } from '../projects/DemandsTable';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import ConfirmDialog from '../common/ConfirmDialog';
 import FilterSort from '../common/filters/FilterSort';
 import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
+import CreateDemandModal from '../projects/CreateDemandModal';
 import { useDemands } from '../../hooks/useDemands';
 import { useCachedProjects } from '../../hooks/useCachedProjects';
 import { useClientInfiniteScroll } from '../../hooks/useClientInfiniteScroll';
 import { useToast } from '../common/Toast';
 import type { Demand, Project } from '../../types/domain';
 import type { FilterGroupConfig } from '../../types/filter';
+import type { CreateDemandPayload, UpdateDemandPayload } from '../../api/types';
 
 const MY_REQUESTS_COLUMNS = demandColumnConfig.filter((col) =>
   ['project', 'service', 'resource', 'status', 'value', 'unit', 'createdAt', 'actions'].includes(col.key)
@@ -44,11 +47,17 @@ export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, sel
   const { showToast } = useToast();
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [demandToRestore, setDemandToRestore] = useState<Demand | null>(null);
+  const [isCreatingDemand, setIsCreatingDemand] = useState(false);
+  const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
+  const [demandToCancel, setDemandToCancel] = useState<Demand | null>(null);
   const [filters, setFilters] = useState<Record<MyRequestsFilterKey, string>>(INITIAL_FILTERS);
 
   const centerName = selectedCenters && selectedCenters.length > 0 ? selectedCenters.join(',') : undefined;
 
-  const { demands, isLoading, restoreDemand } = useDemands({ createdBy, centerName }, { page: 1, limit: 500 });
+  const { demands, isLoading, restoreDemand, createDemand, updateDemand, cancelDemand } = useDemands(
+    { createdBy, centerName },
+    { page: 1, limit: 500 }
+  );
 
   const { projects } = useCachedProjects();
   const projectMap = useMemo(() => {
@@ -104,6 +113,30 @@ export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, sel
 
   const handleClearFilters = useCallback(() => setFilters(INITIAL_FILTERS), []);
 
+  const handleSubmitDemand = useCallback(
+    async (payload: CreateDemandPayload | UpdateDemandPayload, demandId?: number) => {
+      if (demandId) {
+        await updateDemand(demandId, payload as UpdateDemandPayload);
+        setEditingDemand(null);
+      } else {
+        await createDemand(payload as CreateDemandPayload);
+      }
+    },
+    [createDemand, updateDemand]
+  );
+
+  const confirmCancel = useCallback(async () => {
+    if (!demandToCancel) return;
+    const target = demandToCancel;
+    setDemandToCancel(null);
+    try {
+      await cancelDemand(target.id);
+      showToast(t('demands.cancelSuccess', 'הדרישה בוטלה'), 'success');
+    } catch {
+      showToast(t('demands.cancelError', 'שגיאה בביטול הדרישה'), 'error');
+    }
+  }, [demandToCancel, cancelDemand, showToast, t]);
+
   const handleRestore = useCallback((demand: Demand) => {
     setDemandToRestore(demand);
   }, []);
@@ -123,7 +156,15 @@ export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, sel
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
-        <div className="relative flex items-center justify-end gap-2 px-4 py-2 border-b border-divider">
+        <div className="relative flex items-center gap-2 px-4 py-2 border-b border-divider" dir="rtl">
+          <button
+            onClick={() => setIsCreatingDemand(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap"
+          >
+            <MdAdd size={15} />
+            {t('requirements.addRequirement', '+ הוסף דרישה')}
+          </button>
+          <div className="flex-1" />
           <FilterSort
             compact
             filterGroups={filterGroups}
@@ -143,6 +184,8 @@ export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, sel
           visibleColumns={MY_REQUESTS_COLUMNS}
           selectedDemand={selectedDemand}
           onSelectDemand={setSelectedDemand}
+          onEdit={setEditingDemand}
+          onCancel={setDemandToCancel}
           onRestore={handleRestore}
         />
         <InfiniteScrollSentinel
@@ -166,6 +209,33 @@ export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, sel
         message={t('demands.restoreConfirm', 'להחזיר דרישה זו לסטטוס ממתין?')}
         onConfirm={confirmRestore}
         onCancel={() => setDemandToRestore(null)}
+      />
+
+      {isCreatingDemand && (
+        <CreateDemandModal
+          isOpen={true}
+          onClose={() => setIsCreatingDemand(false)}
+          onSubmit={handleSubmitDemand}
+          onCreated={() => setIsCreatingDemand(false)}
+        />
+      )}
+
+      {editingDemand && (
+        <CreateDemandModal
+          isOpen={true}
+          onClose={() => setEditingDemand(null)}
+          onSubmit={handleSubmitDemand}
+          editingDemand={editingDemand}
+        />
+      )}
+
+      <ConfirmDialog
+        isOpen={demandToCancel !== null}
+        title={t('demands.cancelTitle', 'ביטול דרישה')}
+        message={t('demands.cancelConfirm', 'לבטל דרישה זו?')}
+        onConfirm={confirmCancel}
+        onCancel={() => setDemandToCancel(null)}
+        danger
       />
     </div>
   );
