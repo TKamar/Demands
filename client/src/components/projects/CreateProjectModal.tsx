@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdAdd, MdDelete } from 'react-icons/md';
+import { MdAdd, MdDelete, MdLocationOn } from 'react-icons/md';
 import Modal from '../common/Modal';
 import Select from '../common/Select';
 import { useToast } from '../common/Toast';
@@ -59,19 +59,37 @@ export default function CreateProjectModal({
     resourceName: string;
     value: number;
     type: 'New' | 'Extension';
+    overrideLocation: boolean;
+    network: string;
+    base: string;
+    environment: string;
+    cluster: string;
   }
   const [inlineRequirements, setInlineRequirements] = useState<InlineRequirement[]>([]);
 
   const addRequirementRow = () =>
-    setInlineRequirements(prev => [...prev, { serviceName: '', resourceName: '', value: 0, type: 'New' }]);
+    setInlineRequirements(prev => [
+      ...prev,
+      { serviceName: '', resourceName: '', value: 0, type: 'New',
+        overrideLocation: false, network: '', base: '', environment: '', cluster: '' },
+    ]);
   const removeRequirementRow = (idx: number) =>
     setInlineRequirements(prev => prev.filter((_, i) => i !== idx));
-  const updateRequirementRow = (idx: number, field: keyof InlineRequirement, value: string | number) =>
+  const updateRequirementRow = (idx: number, field: keyof InlineRequirement, value: string | number | boolean) =>
     setInlineRequirements(prev =>
       prev.map((r, i) => {
         if (i !== idx) return r;
         const updated = { ...r, [field]: value };
         if (field === 'serviceName') updated.resourceName = '';
+        if (field === 'overrideLocation' && !value) {
+          updated.network = '';
+          updated.base = '';
+          updated.environment = '';
+          updated.cluster = '';
+        }
+        if (field === 'network') { updated.base = ''; updated.environment = ''; updated.cluster = ''; }
+        if (field === 'base') { updated.environment = ''; updated.cluster = ''; }
+        if (field === 'environment') { updated.cluster = ''; }
         return updated;
       })
     );
@@ -300,20 +318,31 @@ export default function CreateProjectModal({
         );
         if (validRequirements.length > 0) {
           const results = await Promise.allSettled(
-            validRequirements.map(r =>
-              createDemand({
+            validRequirements.map(r => {
+              let reqLocationId = location.id;
+              if (r.overrideLocation && r.network && r.base && r.environment && r.cluster) {
+                const overrideLoc = referenceData.locations.find(
+                  l =>
+                    l.networkName === r.network &&
+                    l.baseName === r.base &&
+                    l.environmentName === r.environment &&
+                    l.clusterName === r.cluster
+                );
+                if (overrideLoc) reqLocationId = overrideLoc.id;
+              }
+              return createDemand({
                 projectName: form.name.trim(),
                 serviceName: r.serviceName,
                 resourceName: r.resourceName,
                 resourceService: r.serviceName,
                 value: r.value,
-                locationId: location.id,
+                locationId: reqLocationId,
                 type: r.type,
                 centerName: form.center || undefined,
                 branchName: form.branch || undefined,
                 sectionName: form.section || undefined,
-              })
-            )
+              });
+            })
           );
           const failedCount = results.filter(r => r.status === 'rejected').length;
           const succeededCount = results.filter(r => r.status === 'fulfilled').length;
