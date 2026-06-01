@@ -8,9 +8,10 @@ interface HistoryPanelProps {
   subView: SubViewId;
   onSubViewChange: (view: SubViewId) => void;
   currentUser: AppUser | null;
+  selectedCenters: string[];
 }
 
-export default function HistoryPanel({ subView, onSubViewChange, currentUser }: HistoryPanelProps) {
+export default function HistoryPanel({ subView, onSubViewChange, currentUser, selectedCenters }: HistoryPanelProps) {
   const { t } = useTranslation();
 
   return (
@@ -37,8 +38,12 @@ export default function HistoryPanel({ subView, onSubViewChange, currentUser }: 
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
-        {subView === 'projects' && <ProjectsAccordion selectedCenters={[]} mode="history" createdBy={currentUser?.username} />}
-        {subView === 'requirements' && <RequestHistory />}
+        {subView === 'projects' && (
+          <ProjectsAccordion selectedCenters={selectedCenters} mode="history" createdBy={currentUser?.username} />
+        )}
+        {subView === 'requirements' && (
+          <RequestHistory selectedCenters={selectedCenters} />
+        )}
       </div>
     </div>
   );

@@ -6,7 +6,6 @@ import ProjectsAccordion from '../ProjectsAccordion';
 import RequirementsView from '../RequirementsView';
 import { MyApprovalRequests } from '../MyApprovalRequests';
 import { ResourcesForAssignment } from '../ResourcesForAssignment';
-import CenterFilter from '../CenterFilter';
 import ResourceSummaryStrip from '../ResourceSummaryStrip';
 import type { SubViewId } from '../../../utils/roleUtils';
 import type { UserRole } from '../../../types/domain';
@@ -15,16 +14,17 @@ interface ApprovalRequestsPanelProps {
   subView: SubViewId;
   onSubViewChange: (view: SubViewId) => void;
   role: UserRole;
+  selectedCenters: string[];
 }
 
 export default function ApprovalRequestsPanel({
   subView,
   onSubViewChange,
   role,
+  selectedCenters,
 }: ApprovalRequestsPanelProps) {
   const { t } = useTranslation();
   const { openModal } = useModal();
-  const [selectedCenters, setSelectedCenters] = useState<string[]>([]);
   const [resourceSummaryOpen, setResourceSummaryOpen] = useState(false);
 
   const isCM = role === 'CENTER_MANAGER';
@@ -51,10 +51,9 @@ export default function ApprovalRequestsPanel({
         ))}
       </div>
 
-      {/* Center filter row (Projects sub-view only, not for CM who has fixed center) */}
+      {/* Resource summary strip (Projects sub-view only, not for CM) */}
       {subView === 'projects' && !isCM && (
         <div className="bg-bg-paper border-b border-divider px-6 py-3 flex items-center gap-4 flex-wrap">
-          <CenterFilter selectedCenters={selectedCenters} onChange={setSelectedCenters} />
           <ResourceSummaryStrip
             selectedCenters={selectedCenters}
             open={resourceSummaryOpen}
