@@ -745,6 +745,10 @@ export default function CreateProjectModal({
                           {referenceData.locations
                             .filter(l => l.networkName === req.network)
                             .reduce<string[]>((acc, l) => acc.includes(l.baseName) ? acc : [...acc, l.baseName], [])
+                            .filter(name => {
+                              const ref = referenceData.bases.find(b => b.name === name);
+                              return ref?.isActive !== false || name === req.base;
+                            })
                             .map(name => {
                               const ref = referenceData.bases.find(b => b.name === name);
                               return <option key={name} value={name}>{ref?.displayName || name}</option>;
@@ -762,6 +766,10 @@ export default function CreateProjectModal({
                           {referenceData.locations
                             .filter(l => l.networkName === req.network && l.baseName === req.base)
                             .reduce<string[]>((acc, l) => acc.includes(l.environmentName) ? acc : [...acc, l.environmentName], [])
+                            .filter(name => {
+                              const ref = referenceData.environments.find(e => e.name === name);
+                              return ref?.isActive !== false || name === req.environment;
+                            })
                             .map(name => {
                               const ref = referenceData.environments.find(e => e.name === name);
                               return <option key={name} value={name}>{ref?.displayName || name}</option>;
@@ -783,6 +791,10 @@ export default function CreateProjectModal({
                               l.environmentName === req.environment
                             )
                             .reduce<string[]>((acc, l) => acc.includes(l.clusterName) ? acc : [...acc, l.clusterName], [])
+                            .filter(name => {
+                              const ref = referenceData.clusters.find(c => c.name === name);
+                              return ref?.isActive !== false || name === req.cluster;
+                            })
                             .map(name => {
                               const ref = referenceData.clusters.find(c => c.name === name);
                               return <option key={name} value={name}>{ref?.displayName || name}</option>;
