@@ -14,10 +14,16 @@ const HISTORY_COLUMNS = demandColumnConfig.filter((col) =>
   ['project', 'service', 'resource', 'status', 'value', 'approvedValue', 'createdBy', 'createdAt', 'actions'].includes(col.key)
 );
 
-export default function RequestHistory() {
+interface RequestHistoryProps {
+  selectedCenters?: string[];
+}
+
+export default function RequestHistory({ selectedCenters }: RequestHistoryProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
-  const { demands, isLoading, isFetchingMore, hasMore, sentinelRef } = useHistoryDemands();
+  const centerName = selectedCenters && selectedCenters.length > 0 ? selectedCenters.join(',') : undefined;
+
+  const { demands, isLoading, isFetchingMore, hasMore, sentinelRef } = useHistoryDemands({ centerName });
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [demandToRestore, setDemandToRestore] = useState<Demand | null>(null);
 

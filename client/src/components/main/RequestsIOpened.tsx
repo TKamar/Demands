@@ -36,16 +36,19 @@ const noop = () => {};
 
 interface RequestsIOpenedProps {
   createdBy: string;
+  selectedCenters?: string[];
 }
 
-export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy }) => {
+export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, selectedCenters }) => {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [demandToRestore, setDemandToRestore] = useState<Demand | null>(null);
   const [filters, setFilters] = useState<Record<MyRequestsFilterKey, string>>(INITIAL_FILTERS);
 
-  const { demands, isLoading, restoreDemand } = useDemands({ createdBy }, { page: 1, limit: 500 });
+  const centerName = selectedCenters && selectedCenters.length > 0 ? selectedCenters.join(',') : undefined;
+
+  const { demands, isLoading, restoreDemand } = useDemands({ createdBy, centerName }, { page: 1, limit: 500 });
 
   const { projects } = useCachedProjects();
   const projectMap = useMemo(() => {
