@@ -245,10 +245,11 @@ export async function assignDemand(id: number, assignedValue: number | null): Pr
   return mapDemand(data);
 }
 
-export async function fetchDemandHistory(params: { page?: number; limit?: number }): Promise<PaginatedResponse<Demand>> {
+export async function fetchDemandHistory(params: { page?: number; limit?: number; centerName?: string }): Promise<PaginatedResponse<Demand>> {
   const query = new URLSearchParams();
   if (params.page) query.append('page', params.page.toString());
   if (params.limit) query.append('limit', params.limit.toString());
+  if (params.centerName) query.append('center', params.centerName);
   const { data } = await api.get(`/demands/history?${query.toString()}`);
   return {
     data: data.data.map(mapDemand),

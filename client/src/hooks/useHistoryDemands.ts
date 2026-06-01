@@ -4,7 +4,7 @@ import type { Demand } from '../types/domain';
 
 const PAGE_SIZE = 20;
 
-export function useHistoryDemands() {
+export function useHistoryDemands(filters?: { centerName?: string }) {
   const [demands, setDemands] = useState<Demand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -19,7 +19,11 @@ export function useHistoryDemands() {
     if (isFresh) setIsLoading(true);
     else setIsFetchingMore(true);
     try {
-      const result = await fetchDemandHistory({ page: pageNum, limit: PAGE_SIZE });
+      const result = await fetchDemandHistory({
+        page: pageNum,
+        limit: PAGE_SIZE,
+        centerName: filters?.centerName,
+      });
       setDemands(prev => isFresh ? result.data : [...prev, ...result.data]);
       setHasMore(result.meta.page < result.meta.totalPages);
       stateRef.current.page = pageNum;
@@ -28,9 +32,14 @@ export function useHistoryDemands() {
       if (isFresh) setIsLoading(false);
       else setIsFetchingMore(false);
     }
-  }, []);
+  }, [filters?.centerName]);
 
-  useEffect(() => { fetchPage(1); }, [fetchPage]);
+  useEffect(() => {
+    stateRef.current = { page: 0, fetching: false };
+    setDemands([]);
+    setHasMore(true);
+    fetchPage(1);
+  }, [fetchPage]);
 
   const sentinelRef = useCallback((node: HTMLDivElement | null) => {
     if (observerRef.current) {
