@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdAdd, MdDelete, MdLocationOn } from 'react-icons/md';
 import Modal from '../common/Modal';
@@ -65,16 +65,24 @@ export default function CreateProjectModal({
   const [editingDemandInProject, setEditingDemandInProject] = useState<Demand | null>(null);
   const [demandToCancel, setDemandToCancel] = useState<Demand | null>(null);
 
+  const refreshControllerRef = useRef<AbortController | null>(null);
+
   const isEditMode = !!editingProject;
 
   const refreshProjectDemands = useCallback(async () => {
     if (!editingProject) return;
+    refreshControllerRef.current?.abort();
+    const controller = new AbortController();
+    refreshControllerRef.current = controller;
     setIsDemandSectionLoading(true);
     try {
-      const res = await fetchDemands({ projectName: editingProject.name, page: 1, limit: 200 });
-      setProjectDemands(res.data);
+      const res = await fetchDemands(
+        { projectName: editingProject.name, page: 1, limit: 200 },
+        controller.signal
+      );
+      if (!controller.signal.aborted) setProjectDemands(res.data);
     } finally {
-      setIsDemandSectionLoading(false);
+      if (!controller.signal.aborted) setIsDemandSectionLoading(false);
     }
   }, [editingProject?.name]);
 
@@ -170,6 +178,10 @@ export default function CreateProjectModal({
       .finally(() => { if (!controller.signal.aborted) setIsDemandSectionLoading(false); });
     return () => controller.abort();
   }, [isOpen, isEditMode, editingProject?.name]);
+
+  useEffect(() => {
+    return () => { refreshControllerRef.current?.abort(); };
+  }, []);
 
   // --- Derived State for Hierarchies ---
 
