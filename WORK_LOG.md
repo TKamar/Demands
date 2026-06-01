@@ -238,3 +238,24 @@ Started: 2026-05-25
 - Filter/sort changes now clear selected demand IDs and locked center/resource
 - `DemandsTable`: new `onDeselectAll` prop; `IndeterminateCheckbox` helper renders in thead when `selectedIds.size > 0`
 - Branch: `fix/checkbox-selection` → merged to `dev`
+
+---
+
+## Requirements Location & Create Button Fix
+
+Branch: `feature/requirements-location-create-button`
+Started: 2026-06-01
+
+| Task | Area | Status |
+|------|------|--------|
+| 1 | InlineRequirement state + submit logic | ✅ Done |
+| 2 | Per-row location toggle UI | ✅ Done |
+| 3 | CreateDemandModal onCreated prop | ✅ Done |
+| 4 | RequirementsView button fix | ✅ Done |
+
+### 2026-06-01
+
+**feature/requirements-location-create-button**
+- `CreateProjectModal`: extended `InlineRequirement` with `overrideLocation`, `network`, `base`, `environment`, `cluster`; `updateRequirementRow` now cascades resets on location field changes; each row gains a location-pin toggle button revealing a 4-level cascade sub-row; submit resolves per-row `locationId` (falls back to project location if override is off or incomplete)
+- `CreateDemandModal`: added optional `onCreated?: () => void` prop; called after successful `createDemandGroup` in create mode
+- `RequirementsView`: replaced `openModal('demand')` with local `isCreatingDemand` state; local `CreateDemandModal` instance resets page + accumulated demands via `onCreated` callback
