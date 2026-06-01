@@ -15,7 +15,6 @@ import { useReferenceData } from '../../hooks/useReferenceData';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useDelayedLoading } from '../../hooks/useDelayedLoading';
 import { useToast } from '../common/Toast';
-import { useModal } from '../../contexts/ModalContext';
 import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
 import {
   demandFilterGroups,
@@ -43,7 +42,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
   const { t } = useTranslation();
   const auth = useAuth();
   const { showToast } = useToast();
-  const { openModal } = useModal();
   const role = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase() || 'user';
   const isModerator = role === 'admin' || role === 'moderator';
 
@@ -79,6 +77,7 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
   // Sidebar / modal state
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
+  const [isCreatingDemand, setIsCreatingDemand] = useState(false);
   const [decisionDemand, setDecisionDemand] = useState<Demand | null>(null);
   const [isDecisionModalLoading, setIsDecisionModalLoading] = useState(false);
 
@@ -426,7 +425,7 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
         {/* Table header with button and funnel icon */}
         <div className="relative flex items-center gap-2 px-4 py-2 border-b border-divider" dir="rtl">
           <button
-            onClick={() => openModal('demand')}
+            onClick={() => setIsCreatingDemand(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap"
           >
             <MdAdd size={15} />
@@ -523,6 +522,18 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
           onClose={() => setEditingDemand(null)}
           onSubmit={handleSubmitDemand}
           editingDemand={editingDemand}
+        />
+      )}
+
+      {isCreatingDemand && (
+        <CreateDemandModal
+          isOpen={true}
+          onClose={() => setIsCreatingDemand(false)}
+          onSubmit={handleSubmitDemand}
+          onCreated={() => {
+            setCurrentPage(1);
+            setAccumulatedDemands([]);
+          }}
         />
       )}
 
