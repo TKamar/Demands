@@ -728,7 +728,7 @@ export default function CreateProjectModal({
                         >
                           <option value="">{t('projects.createProject.network', 'רשת')}</option>
                           {referenceData.networks
-                            .filter(v => v.isActive !== false)
+                            .filter(v => v.isActive !== false || v.name === req.network)
                             .map(v => (
                               <option key={v.name} value={v.name}>{v.displayName || v.name}</option>
                             ))}

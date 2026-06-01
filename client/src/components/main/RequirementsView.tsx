@@ -382,10 +382,10 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
     async (payload: CreateDemandPayload | UpdateDemandPayload, demandId?: number) => {
       if (demandId) {
         await updateDemand(demandId, payload as UpdateDemandPayload);
+        setEditingDemand(null);
       } else {
         await createDemand(payload as CreateDemandPayload);
       }
-      setEditingDemand(null);
     },
     [createDemand, updateDemand]
   );
