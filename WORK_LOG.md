@@ -259,3 +259,30 @@ Started: 2026-06-01
 - `CreateProjectModal`: extended `InlineRequirement` with `overrideLocation`, `network`, `base`, `environment`, `cluster`; `updateRequirementRow` now cascades resets on location field changes; each row gains a location-pin toggle button revealing a 4-level cascade sub-row; submit resolves per-row `locationId` (falls back to project location if override is off or incomplete)
 - `CreateDemandModal`: added optional `onCreated?: () => void` prop; called after successful `createDemandGroup` in create mode
 - `RequirementsView`: replaced `openModal('demand')` with local `isCreatingDemand` state; local `CreateDemandModal` instance resets page + accumulated demands via `onCreated` callback
+
+---
+
+## Sub-Project A: Bug Fixes
+
+Branch: `feature/sub-project-a-bug-fixes`
+Started: 2026-06-01
+
+| Task | Area | Status |
+|------|------|--------|
+| 1 | apiService + useHistoryDemands center filter plumbing | ✅ Done |
+| 2 | MainPage + panel prop threading | ✅ Done |
+| 3 | RequestsIOpened + RequestHistory center filter consumers | ✅ Done |
+| 4 | Create/Edit/Cancel in RequestsIOpened | ✅ Done |
+| 5 | Project edit form demands section | ✅ Done |
+
+### 2026-06-01
+
+**feature/sub-project-a-bug-fixes**
+- `fetchDemandHistory`: added `centerName` query param
+- `useHistoryDemands`: accepts `{ centerName? }` filter; resets and re-fetches when filter changes
+- `MainPage`: owns `selectedCenters` state; renders global `CenterFilter` bar for admin/moderator only; passes to all three panels
+- `ApprovalRequestsPanel`: removed local center state and CenterFilter render; accepts `selectedCenters` prop; ResourceSummaryStrip kept
+- `MyRequestsPanel`, `HistoryPanel`: accept and thread `selectedCenters` to sub-components
+- `RequestsIOpened`: added `selectedCenters` filter; added create/edit/cancel demand actions mirroring RequirementsView
+- `RequestHistory`: added `selectedCenters` filter via `useHistoryDemands`
+- `CreateProjectModal`: added edit-mode demands section — fetches project demands with AbortController, lists them with Edit/Cancel per row, stacks `CreateDemandModal` and `ConfirmDialog` for actions
