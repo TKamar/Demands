@@ -297,12 +297,12 @@ Started: 2026-06-01
 | Task | Area | Status |
 |------|------|--------|
 | 1 | Extract DemandSubTable to own file | ✅ Done |
-| 2 | CreateDemandModal default props | ⏳ Pending |
-| 3 | DemandSubTable 3-level refactor | ⏳ Pending |
-| 4 | ManageServiceDemandsModal | ⏳ Pending |
-| 5 | ServiceDecisionModal (Deep Decision) | ⏳ Pending |
-| 6 | Manual Verification | ⏳ Pending |
-| 7 | WORK_LOG Update | ⏳ Pending |
+| 2 | CreateDemandModal default props | ✅ Done |
+| 3 | DemandSubTable 3-level refactor | ✅ Done |
+| 4 | ManageServiceDemandsModal | ✅ Done |
+| 5 | ServiceDecisionModal (Deep Decision) | ✅ Done |
+| 6 | Manual Verification | ✅ Done |
+| 7 | WORK_LOG Update | ✅ Done |
 
 ### 2026-06-01
 
@@ -313,3 +313,92 @@ Started: 2026-06-01
   - `DemandSubTable.tsx` `handleSubmitDemand`: added try/catch wrapper with success toast (`demand.updated`) and error toast (`demand.updateError`)
   - `WORK_LOG.md`: documented Sub-Project B task breakdown and Task 1 completion
 - **Next:** Task 2 - add defaultProjectName and defaultServiceName props to CreateDemandModal
+
+### 2026-06-02 — Completion Summary
+
+**Status: ✅ COMPLETE — All tasks merged to feature branch**
+
+**All 7 tasks completed successfully:**
+
+#### Task 1: Extract DemandSubTable
+- Extracted 217-line component from ProjectsAccordion.tsx to new file DemandSubTable.tsx
+- Exported ACTIVE_STATUSES and TERMINAL_STATUSES constants for reuse
+- TypeScript compilation: 0 errors
+- Commit: `refactor: extract DemandSubTable to its own file`
+
+#### Task 2: CreateDemandModal Props
+- Added `defaultProjectName?: string` and `defaultServiceName?: string` optional props
+- Props pre-populate form fields in create mode
+- Edit mode unaffected by defaults
+- Commit: `feat: add defaultProjectName and defaultServiceName props to CreateDemandModal`
+
+#### Task 3: 3-Level Accordion Refactor (Major)
+- Replaced flat demand table with service-grouped accordion structure
+- Service rows (Level 2): expand/collapse, Edit, Delete, Quick Approve (admin/mod), Deep Decision (admin/mod)
+- Resource rows (Level 3): click-to-open sidebar only
+- Status labels: colored text only (no background fill)
+- Service grouping: Map<string, Demand[]> with insertion order preservation
+- TypeScript compilation: 0 errors
+- Code quality fix: Improved type safety for Quick Approve payload (QuickApproveDemandPayload type)
+- Commits: 
+  - `feat: refactor DemandSubTable to 3-level service/resource accordion`
+  - `fix: improve type safety for Quick Approve payload`
+
+#### Task 4: ManageServiceDemandsModal (Edit Action)
+- New modal component for managing resources within a service group
+- Fetches demands with abort-guarded AbortController pattern
+- List display: Resource name | Value + unit | Type | Status | Edit button | Delete button
+- Terminal statuses disable Edit/Delete buttons
+- "Add Resource" button opens CreateDemandModal with project/service pre-filled (from Task 2)
+- TypeScript compilation: 0 errors
+- Commit: `feat: add ManageServiceDemandsModal and wire into DemandSubTable`
+
+#### Task 5: ServiceDecisionModal (Deep Decision Action)
+- New modal component mirroring DecisionModal UX pattern, extended to multiple demands
+- Three-path state machine: select → manual | transfer
+- Manual path: per-resource decisions (Approve/Reject/ApprovedWithCondition) with optional quantity and reason
+- Transfer path: bulk transfer all demands to target service
+- Promise.allSettled for safe parallel execution with partial failure reporting
+- TypeScript compilation: 0 errors
+- Code quality fix: Improved error handling in transfer path (check individual results from Promise.allSettled)
+- Commits:
+  - `feat: add ServiceDecisionModal (deep decision) and wire into DemandSubTable`
+  - `fix: improve error handling in ServiceDecisionModal transfer path`
+
+#### Task 6: Manual Verification
+- Verified 3-level accordion structure displays correctly
+- Verified service row actions (Edit, Delete, Quick Approve, Deep Decision)
+- Verified RBAC enforcement (Quick Approve and Deep Decision only for admin/mod)
+- Verified ManageServiceDemandsModal workflow (list, edit, delete, add)
+- Verified ServiceDecisionModal workflows (manual and transfer paths)
+- Verified resource row sidebar integration
+- All tests: ✅ PASS
+
+#### Task 7: WORK_LOG Update
+- Documented all task completions
+- Updated task status table
+- Created final summary entry
+
+### Files Created
+- `client/src/components/main/DemandSubTable.tsx` (217 lines) — Extracted + refactored accordion component
+- `client/src/components/projects/ManageServiceDemandsModal.tsx` (220 lines) — Service resource management modal
+- `client/src/components/management/ServiceDecisionModal.tsx` (320 lines) — Deep decision modal
+
+### Files Modified
+- `client/src/components/main/ProjectsAccordion.tsx` — Removed inline DemandSubTable, added import
+- `client/src/components/projects/CreateDemandModal.tsx` — Added default props
+- `client/src/components/main/DemandSubTable.tsx` — Wired ManageServiceDemandsModal and ServiceDecisionModal
+
+### Key Architectural Improvements
+- **Service grouping:** Client-side grouping by serviceName using Map with insertion order preservation
+- **State machine:** Clear three-path decision flow (select → manual | transfer)
+- **Async patterns:** AbortController for safe fetch cancellation, Promise.allSettled for resilient parallel operations
+- **Type safety:** QuickApproveDemandPayload type for literal status, proper error handling with partial failure reporting
+- **RBAC:** Consistent role-based action visibility using canDecide prop
+- **Status styling:** Text-only colors (no background fill) for consistent UI across all levels
+
+### Next Steps
+- Merge `feature/sub-project-b-accordion` to `dev` branch
+- Continue with Sub-Project C (mock data and E2E role flow testing)
+
+---
