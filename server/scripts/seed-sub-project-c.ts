@@ -37,6 +37,12 @@ async function main() {
   });
 
   // Clear existing test data
+  await prisma.project.deleteMany({
+    where: {
+      name: { in: ['Project Alpha', 'Project Beta', 'Project Gamma'] }
+    }
+  });
+
   await prisma.user.deleteMany({
     where: {
       username: { in: ['admin1', 'mod1', 'manager1', 'user1'] }
@@ -386,7 +392,7 @@ async function main() {
   const p3d6 = await createDemand(project3, 'Compute', 'Load Balancer', 2, 'Units', DemandStatus.Approved, user.username);
 
   console.log('✅ Created test demands:');
-  console.log(`  - Pending: 4`);
+  console.log(`  - Pending: 5`);
   console.log(`  - CenterManagerApproved: 3`);
   console.log(`  - Approved: 2`);
   console.log(`  - Rejected: 2`);
