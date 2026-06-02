@@ -286,7 +286,7 @@ export default function ServiceDecisionModal({
               {t('management.decisionModal.targetService', 'שירות יעד')} <span className="text-danger">*</span>
             </label>
             {availableServices.length === 0
-              ? <p className="text-sm text-muted">{t('service.noCompatibleTransfer', 'No compatible services available')}</p>
+              ? <p className="text-sm text-text-secondary">{t('service.noCompatibleTransfer', 'No compatible services available')}</p>
               : <select
                   value={targetService}
                   onChange={e => setTargetService(e.target.value)}

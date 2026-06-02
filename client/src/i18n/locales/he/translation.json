@@ -25,7 +25,16 @@
       "requestedValue": "כמות מבוקשת",
       "reason": "סיבה",
       "reasonPlaceholder": "הזן סיבה להחלטה זו...",
-      "submit": "שלח החלטה"
+      "submit": "שלח החלטה",
+      "manualDecision": "קבלת החלטה ידנית",
+      "manualDecisionDesc": "אשר, דחה, או אשר באופן מותנה",
+      "transfer": "העברה למנהל שירות אחר",
+      "transferDesc": "העבר את הדרישה לטיפול שירות אחר",
+      "targetService": "שירות יעד",
+      "selectService": "בחר שירות",
+      "transferNotes": "הערות",
+      "transferNotesPlaceholder": "הערות להעברה (אופציונלי)...",
+      "transferSubmit": "העבר"
     },
     "success": {
       "approved": "הדרישה אושרה בהצלחה",

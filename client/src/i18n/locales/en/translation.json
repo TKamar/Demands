@@ -25,7 +25,16 @@
       "requestedValue": "Requested",
       "reason": "Reason",
       "reasonPlaceholder": "Enter reason for this decision...",
-      "submit": "Submit Decision"
+      "submit": "Submit Decision",
+      "manualDecision": "Make Decision",
+      "manualDecisionDesc": "Approve, reject, or approve with conditions",
+      "transfer": "Transfer to Another Service Manager",
+      "transferDesc": "Transfer the demand to another service for handling",
+      "targetService": "Target Service",
+      "selectService": "Select a service",
+      "transferNotes": "Notes",
+      "transferNotesPlaceholder": "Notes for transfer (optional)...",
+      "transferSubmit": "Transfer"
     },
     "success": {
       "approved": "Demand approved successfully",
