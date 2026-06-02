@@ -229,115 +229,85 @@ async function main() {
   console.log(`  - ${project3.name} (${project3.centerName})`);
 
   // Create services
-  const computeService = await prisma.service.upsert({
-    where: { name: 'Compute' },
+  const vmService = await prisma.service.upsert({
+    where: { name: 'VM' },
     update: {},
-    create: { name: 'Compute', isActive: true }
+    create: { name: 'VM', isActive: true }
   });
 
-  const storageService = await prisma.service.upsert({
-    where: { name: 'Storage' },
+  const hdfsService = await prisma.service.upsert({
+    where: { name: 'HDFS' },
     update: {},
-    create: { name: 'Storage', isActive: true }
+    create: { name: 'HDFS', isActive: true }
   });
 
-  const networkService = await prisma.service.upsert({
-    where: { name: 'Network' },
+  const kafkaService = await prisma.service.upsert({
+    where: { name: 'KAFKA' },
     update: {},
-    create: { name: 'Network', isActive: true }
+    create: { name: 'KAFKA', isActive: true }
   });
 
-  // Create resources for Compute service
+  // Create resources for VM service
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'CPU', serviceName: 'Compute' } },
+    where: { name_serviceName: { name: 'vCPU', serviceName: 'VM' } },
     update: {},
-    create: { name: 'CPU', unit: 'Cores', serviceName: 'Compute', isActive: true }
-  });
-
-  await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'RAM', serviceName: 'Compute' } },
-    update: {},
-    create: { name: 'RAM', unit: 'GB', serviceName: 'Compute', isActive: true }
+    create: { name: 'vCPU', unit: 'count', serviceName: 'VM', isActive: true }
   });
 
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'GPU', serviceName: 'Compute' } },
+    where: { name_serviceName: { name: 'Memory', serviceName: 'VM' } },
     update: {},
-    create: { name: 'GPU', unit: 'Units', serviceName: 'Compute', isActive: true }
+    create: { name: 'Memory', unit: 'GB', serviceName: 'VM', isActive: true }
   });
 
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'vCPU', serviceName: 'Compute' } },
+    where: { name_serviceName: { name: 'CPU', serviceName: 'VM' } },
     update: {},
-    create: { name: 'vCPU', unit: 'Cores', serviceName: 'Compute', isActive: true }
+    create: { name: 'CPU', unit: 'GHz', serviceName: 'VM', isActive: true }
   });
 
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'Kubernetes Nodes', serviceName: 'Compute' } },
+    where: { name_serviceName: { name: 'GPU type', serviceName: 'VM' } },
     update: {},
-    create: { name: 'Kubernetes Nodes', unit: 'Units', serviceName: 'Compute', isActive: true }
+    create: { name: 'GPU type', unit: 'A100/T4/H100', serviceName: 'VM', isActive: true }
+  });
+
+  // Create resources for HDFS service
+  await prisma.resource.upsert({
+    where: { name_serviceName: { name: 'Files Amount', serviceName: 'HDFS' } },
+    update: {},
+    create: { name: 'Files Amount', unit: 'count', serviceName: 'HDFS', isActive: true }
   });
 
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'Load Balancer', serviceName: 'Compute' } },
+    where: { name_serviceName: { name: 'Space Quota', serviceName: 'HDFS' } },
     update: {},
-    create: { name: 'Load Balancer', unit: 'Units', serviceName: 'Compute', isActive: true }
+    create: { name: 'Space Quota', unit: 'GB', serviceName: 'HDFS', isActive: true }
   });
 
-  // Create resources for Storage service
+  // Create resources for KAFKA service
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'SSD', serviceName: 'Storage' } },
+    where: { name_serviceName: { name: 'Storage (no backup)', serviceName: 'KAFKA' } },
     update: {},
-    create: { name: 'SSD', unit: 'GB', serviceName: 'Storage', isActive: true }
-  });
-
-  await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'HDD', serviceName: 'Storage' } },
-    update: {},
-    create: { name: 'HDD', unit: 'GB', serviceName: 'Storage', isActive: true }
+    create: { name: 'Storage (no backup)', unit: 'GB', serviceName: 'KAFKA', isActive: true }
   });
 
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'Backup Space', serviceName: 'Storage' } },
+    where: { name_serviceName: { name: 'Throughput in', serviceName: 'KAFKA' } },
     update: {},
-    create: { name: 'Backup Space', unit: 'GB', serviceName: 'Storage', isActive: true }
+    create: { name: 'Throughput in', unit: 'MB/s', serviceName: 'KAFKA', isActive: true }
   });
 
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'Archive', serviceName: 'Storage' } },
+    where: { name_serviceName: { name: 'Throughput out', serviceName: 'KAFKA' } },
     update: {},
-    create: { name: 'Archive', unit: 'GB', serviceName: 'Storage', isActive: true }
+    create: { name: 'Throughput out', unit: 'MB/s', serviceName: 'KAFKA', isActive: true }
   });
 
   await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'Cache', serviceName: 'Storage' } },
+    where: { name_serviceName: { name: 'Partitions', serviceName: 'KAFKA' } },
     update: {},
-    create: { name: 'Cache', unit: 'GB', serviceName: 'Storage', isActive: true }
-  });
-
-  // Create resources for Network service
-  await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'Bandwidth', serviceName: 'Network' } },
-    update: {},
-    create: { name: 'Bandwidth', unit: 'Mbps', serviceName: 'Network', isActive: true }
-  });
-
-  await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'IP Addresses', serviceName: 'Network' } },
-    update: {},
-    create: { name: 'IP Addresses', unit: 'Units', serviceName: 'Network', isActive: true }
-  });
-
-  await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'VPN', serviceName: 'Network' } },
-    update: {},
-    create: { name: 'VPN', unit: 'Mbps', serviceName: 'Network', isActive: true }
-  });
-
-  await prisma.resource.upsert({
-    where: { name_serviceName: { name: 'Firewall', serviceName: 'Network' } },
-    update: {},
-    create: { name: 'Firewall', unit: 'Units', serviceName: 'Network', isActive: true }
+    create: { name: 'Partitions', unit: 'count', serviceName: 'KAFKA', isActive: true }
   });
 
   // Helper function to create demands
@@ -370,26 +340,26 @@ async function main() {
     });
   }
 
-  // Project 1 - 5 demands
-  const p1d1 = await createDemand(project1, 'Compute', 'CPU', 32, 'Cores', DemandStatus.Pending, user.username);
-  const p1d2 = await createDemand(project1, 'Compute', 'RAM', 128, 'GB', DemandStatus.Pending, user.username);
-  const p1d3 = await createDemand(project1, 'Compute', 'GPU', 2, 'Units', DemandStatus.Pending, user.username);
-  const p1d4 = await createDemand(project1, 'Storage', 'SSD', 500, 'GB', DemandStatus.CenterManagerApproved, user.username);
-  const p1d5 = await createDemand(project1, 'Storage', 'HDD', 2000, 'GB', DemandStatus.Approved, user.username);
+  // Project 1 - 5 demands (VM + HDFS)
+  const p1d1 = await createDemand(project1, 'VM', 'vCPU', 32, 'count', DemandStatus.Pending, user.username);
+  const p1d2 = await createDemand(project1, 'VM', 'Memory', 128, 'GB', DemandStatus.Pending, user.username);
+  const p1d3 = await createDemand(project1, 'VM', 'CPU', 2, 'GHz', DemandStatus.Pending, user.username);
+  const p1d4 = await createDemand(project1, 'HDFS', 'Space Quota', 500, 'GB', DemandStatus.CenterManagerApproved, user.username);
+  const p1d5 = await createDemand(project1, 'HDFS', 'Files Amount', 2000, 'count', DemandStatus.Approved, user.username);
 
-  // Project 2 - 4 demands
-  const p2d1 = await createDemand(project2, 'Compute', 'vCPU', 8, 'Cores', DemandStatus.Pending, user.username);
-  const p2d2 = await createDemand(project2, 'Network', 'Bandwidth', 100, 'Mbps', DemandStatus.Rejected, user.username);
-  const p2d3 = await createDemand(project2, 'Network', 'IP Addresses', 10, 'Units', DemandStatus.ApprovedWithCondition, user.username);
-  const p2d4 = await createDemand(project2, 'Storage', 'Backup Space', 500, 'GB', DemandStatus.Cancelled, user.username);
+  // Project 2 - 4 demands (VM + KAFKA)
+  const p2d1 = await createDemand(project2, 'VM', 'vCPU', 8, 'count', DemandStatus.Pending, user.username);
+  const p2d2 = await createDemand(project2, 'KAFKA', 'Throughput in', 100, 'MB/s', DemandStatus.Rejected, user.username);
+  const p2d3 = await createDemand(project2, 'KAFKA', 'Partitions', 10, 'count', DemandStatus.ApprovedWithCondition, user.username);
+  const p2d4 = await createDemand(project2, 'KAFKA', 'Storage (no backup)', 500, 'GB', DemandStatus.Cancelled, user.username);
 
-  // Project 3 - 5 demands
-  const p3d1 = await createDemand(project3, 'Storage', 'Archive', 5000, 'GB', DemandStatus.Pending, user.username);
-  const p3d2 = await createDemand(project3, 'Storage', 'Cache', 1000, 'GB', DemandStatus.Rejected, user.username);
-  const p3d3 = await createDemand(project3, 'Network', 'VPN', 50, 'Mbps', DemandStatus.CenterManagerApproved, user.username);
-  const p3d4 = await createDemand(project3, 'Network', 'Firewall', 1, 'Units', DemandStatus.CenterManagerApproved, user.username);
-  const p3d5 = await createDemand(project3, 'Compute', 'Kubernetes Nodes', 5, 'Units', DemandStatus.PartiallyApproved, user.username);
-  const p3d6 = await createDemand(project3, 'Compute', 'Load Balancer', 2, 'Units', DemandStatus.Approved, user.username);
+  // Project 3 - 6 demands (HDFS + KAFKA + VM)
+  const p3d1 = await createDemand(project3, 'HDFS', 'Files Amount', 5000, 'count', DemandStatus.Pending, user.username);
+  const p3d2 = await createDemand(project3, 'HDFS', 'Space Quota', 1000, 'GB', DemandStatus.Rejected, user.username);
+  const p3d3 = await createDemand(project3, 'KAFKA', 'Throughput in', 50, 'MB/s', DemandStatus.CenterManagerApproved, user.username);
+  const p3d4 = await createDemand(project3, 'KAFKA', 'Throughput out', 1, 'MB/s', DemandStatus.CenterManagerApproved, user.username);
+  const p3d5 = await createDemand(project3, 'VM', 'vCPU', 5, 'count', DemandStatus.PartiallyApproved, user.username);
+  const p3d6 = await createDemand(project3, 'VM', 'Memory', 2, 'GB', DemandStatus.Approved, user.username);
 
   console.log('✅ Created test demands:');
   console.log(`  - Pending: 5`);
