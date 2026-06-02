@@ -29,11 +29,14 @@
     },
     "success": {
       "approved": "הדרישה אושרה בהצלחה",
-      "rejected": "הדרישה נדחתה בהצלחה"
+      "rejected": "הדרישה נדחתה בהצלחה",
+      "transferred": "הדרישה הועברה בהצלחה",
+      "decided": "ההחלטה נשמרה"
     },
     "error": {
       "approveFailed": "אישור הדרישה נכשל",
-      "rejectFailed": "דחיית הדרישה נכשלה"
+      "rejectFailed": "דחיית הדרישה נכשלה",
+      "transferFailed": "ההעברה נכשלה"
     },
     "bulk": {
       "noneSelected": "בחר דרישות לביצוע פעולה קבוצתית",
@@ -607,5 +610,18 @@
       "addRow": "הוסף דרישה",
       "partialError": "{{succeeded}} דרישות נוצרו, {{failed}} נכשלו"
     }
+  },
+  "service": {
+    "resources": "משאבים",
+    "deleteGroupTitle": "מחיקת קבוצת שירות",
+    "deleteGroupMessage": "האם למחוק את כל הדרישות בקבוצת שירות זו?",
+    "deleteGroupSuccess": "קבוצת השירות נמחקה",
+    "quickApprove": "אישור מהיר",
+    "quickApproveTitle": "אישור מהיר",
+    "quickApproveMessage": "לאשר את כל המשאבים הממתינים בשירות זה?",
+    "quickApproveSuccess": "אושר בהצלחה",
+    "deepDecision": "החלטה מעמיקה",
+    "noDecisionNote": "ללא החלטה",
+    "noCompatibleTransfer": "אין שירותים תואמים להעברה"
   }
 }

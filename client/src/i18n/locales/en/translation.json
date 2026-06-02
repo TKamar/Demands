@@ -29,11 +29,14 @@
     },
     "success": {
       "approved": "Demand approved successfully",
-      "rejected": "Demand rejected successfully"
+      "rejected": "Demand rejected successfully",
+      "transferred": "Demand transferred successfully",
+      "decided": "Decision saved"
     },
     "error": {
       "approveFailed": "Failed to approve demand",
-      "rejectFailed": "Failed to reject demand"
+      "rejectFailed": "Failed to reject demand",
+      "transferFailed": "Transfer failed"
     },
     "bulk": {
       "noneSelected": "Select demands to take bulk action",
@@ -607,5 +610,18 @@
       "addRow": "Add Requirement",
       "partialError": "{{succeeded}} requirements created, {{failed}} failed"
     }
+  },
+  "service": {
+    "resources": "Resources",
+    "deleteGroupTitle": "Delete Service Group",
+    "deleteGroupMessage": "Delete all demands in this service group?",
+    "deleteGroupSuccess": "Service group deleted",
+    "quickApprove": "Quick Approve",
+    "quickApproveTitle": "Quick Approve",
+    "quickApproveMessage": "Approve all pending resources in this service?",
+    "quickApproveSuccess": "Approved successfully",
+    "deepDecision": "Deep Decision",
+    "noDecisionNote": "No decision",
+    "noCompatibleTransfer": "No compatible services available"
   }
 }
