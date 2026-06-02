@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { MdExpandMore, MdChevronLeft, MdEdit, MdDelete, MdGavel } from 'react-icons/md';
 import ConfirmDialog from '../common/ConfirmDialog';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
+import ManageServiceDemandsModal from '../projects/ManageServiceDemandsModal';
 import { useDemands } from '../../hooks/useDemands';
 import { useToast } from '../common/Toast';
 import type { Demand } from '../../types/domain';
@@ -249,9 +250,13 @@ export default function DemandSubTable({
         onCancel={() => setQuickApproveTarget(null)}
       />
 
-      {/* ManageServiceDemandsModal placeholder — wired in Task 4 */}
       {managingServiceName !== null && (
-        <div style={{ display: 'none' }} />
+        <ManageServiceDemandsModal
+          isOpen={true}
+          onClose={() => setManagingServiceName(null)}
+          projectName={projectName}
+          serviceName={managingServiceName}
+        />
       )}
 
       {/* ServiceDecisionModal placeholder — wired in Task 5 */}
