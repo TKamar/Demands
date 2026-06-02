@@ -14,6 +14,17 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding test data for Sub-Project C...');
 
+  // Ensure Center A exists
+  await prisma.center.upsert({
+    where: { name: 'Center A' },
+    update: {},
+    create: {
+      name: 'Center A',
+      displayName: 'Center A',
+      isActive: true
+    }
+  });
+
   // Clear existing test data
   await prisma.user.deleteMany({
     where: {
@@ -45,7 +56,7 @@ async function main() {
       username: 'manager1',
       fullName: 'Center Manager User',
       role: 'CENTER_MANAGER',
-      centerName: 'IT Center'
+      centerName: 'Center A'
     }
   });
 
