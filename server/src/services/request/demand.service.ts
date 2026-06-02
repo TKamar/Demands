@@ -568,6 +568,15 @@ export const demandService = {
     if (!targetService) throw new Error('Target service not found');
     if (!targetService.isActive) throw new Error('Target service is not active');
 
+    const targetResource = await prisma.resource.findUnique({
+      where: { name_serviceName: { name: original.resourceName, serviceName: targetServiceName } },
+    });
+    if (!targetResource || !targetResource.isActive) {
+      throw new Error(
+        `Service "${targetServiceName}" does not support resource "${original.resourceName}"`
+      );
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       const internal = await tx.demand.create({
         data: {

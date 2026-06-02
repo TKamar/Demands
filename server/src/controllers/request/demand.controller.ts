@@ -785,6 +785,9 @@ export const demandController = {
       if (error instanceof Error && error.message.includes('Only Pending')) {
         return res.status(400).json({ error: error.message });
       }
+      if (error instanceof Error && error.message.includes('does not support')) {
+        return res.status(400).json({ error: error.message });
+      }
       console.error('demandController.transferDemand error:', error);
       res.status(500).json({ error: 'Failed to transfer demand' });
     }
