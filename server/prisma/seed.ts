@@ -171,89 +171,116 @@ async function main() {
 
   // Service moderator assignments - each service has at least 1 responsible moderator
   // Moderators: mod1-mod7 (defined in Keycloak realm)
+
+  // Clean up stale services from old taxonomy
+  await prisma.service.deleteMany({
+    where: { name: { in: ['Compute', 'Storage', 'Network', 'Database', 'Container'] } },
+  });
+  console.log('Removed stale services');
+
   const services = await Promise.all([
-    prisma.service.upsert({
-      where: { name: 'Compute' },
-      update: { moderators: ['mod1', 'mod2'] },
-      create: { name: 'Compute', moderators: ['mod1', 'mod2'], isActive: true },
-    }),
-    prisma.service.upsert({
-      where: { name: 'Storage' },
-      update: { moderators: ['mod3', 'mod4'] },
-      create: { name: 'Storage', moderators: ['mod3', 'mod4'], isActive: true },
-    }),
-    prisma.service.upsert({
-      where: { name: 'Network' },
-      update: { moderators: ['mod5'] },
-      create: { name: 'Network', moderators: ['mod5'], isActive: true },
-    }),
-    prisma.service.upsert({
-      where: { name: 'Database' },
-      update: { moderators: ['mod6', 'mod1'] },
-      create: { name: 'Database', moderators: ['mod6', 'mod1'], isActive: true },
-    }),
-    prisma.service.upsert({
-      where: { name: 'Container' },
-      update: { moderators: ['mod7', 'mod2'] },
-      create: { name: 'Container', moderators: ['mod7', 'mod2'], isActive: true },
-    }),
+    // Storage
+    prisma.service.upsert({ where: { name: 'HDFS' }, update: { moderators: ['mod3'] }, create: { name: 'HDFS', moderators: ['mod3'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'NAS' }, update: { moderators: ['mod3'] }, create: { name: 'NAS', moderators: ['mod3'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'S3' }, update: { moderators: ['mod3'] }, create: { name: 'S3', moderators: ['mod3'], isActive: true } }),
+    // Databases
+    prisma.service.upsert({ where: { name: 'MongoK' }, update: { moderators: ['mod4'] }, create: { name: 'MongoK', moderators: ['mod4'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'MongoVM' }, update: { moderators: ['mod4'] }, create: { name: 'MongoVM', moderators: ['mod4'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Postgres (PG)' }, update: { moderators: ['mod4'] }, create: { name: 'Postgres (PG)', moderators: ['mod4'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'ECK' }, update: { moderators: ['mod6'] }, create: { name: 'ECK', moderators: ['mod6'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Redis' }, update: { moderators: ['mod6'] }, create: { name: 'Redis', moderators: ['mod6'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Oracle' }, update: { moderators: ['mod5'] }, create: { name: 'Oracle', moderators: ['mod5'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'MSSQL' }, update: { moderators: ['mod5'] }, create: { name: 'MSSQL', moderators: ['mod5'], isActive: true } }),
+    // Processing
+    prisma.service.upsert({ where: { name: 'Openshift' }, update: { moderators: ['mod1'] }, create: { name: 'Openshift', moderators: ['mod1'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Spark' }, update: { moderators: ['mod6', 'mod7'] }, create: { name: 'Spark', moderators: ['mod6', 'mod7'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'VM' }, update: { moderators: ['mod1'] }, create: { name: 'VM', moderators: ['mod1'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'RUNAI' }, update: { moderators: ['mod1', 'mod7'] }, create: { name: 'RUNAI', moderators: ['mod1', 'mod7'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'LLM' }, update: { moderators: ['mod1', 'mod7'] }, create: { name: 'LLM', moderators: ['mod1', 'mod7'], isActive: true } }),
+    // Data Transport
+    prisma.service.upsert({ where: { name: 'NIFI' }, update: { moderators: ['mod2'] }, create: { name: 'NIFI', moderators: ['mod2'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'CAAS' }, update: { moderators: ['mod2'] }, create: { name: 'CAAS', moderators: ['mod2'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'KAFKA' }, update: { moderators: ['mod2', 'mod7'] }, create: { name: 'KAFKA', moderators: ['mod2', 'mod7'], isActive: true } }),
   ]);
   console.log(`Created ${services.length} services`);
 
   const resources = await Promise.all([
-    prisma.resource.upsert({
-      where: { name_serviceName: { name: 'CPU', serviceName: 'Compute' } },
-      update: {},
-      create: { name: 'CPU', unit: 'vCPU', serviceName: 'Compute', isActive: true },
-    }),
-    prisma.resource.upsert({
-      where: { name_serviceName: { name: 'RAM', serviceName: 'Compute' } },
-      update: {},
-      create: { name: 'RAM', unit: 'GB', serviceName: 'Compute', isActive: true },
-    }),
-    prisma.resource.upsert({
-      where: { name_serviceName: { name: 'SSD', serviceName: 'Storage' } },
-      update: {},
-      create: { name: 'SSD', unit: 'TB', serviceName: 'Storage', isActive: true },
-    }),
-    prisma.resource.upsert({
-      where: { name_serviceName: { name: 'Bandwidth', serviceName: 'Network' } },
-      update: {},
-      create: { name: 'Bandwidth', unit: 'Gbps', serviceName: 'Network', isActive: true },
-    }),
-    prisma.resource.upsert({
-      where: { name_serviceName: { name: 'Pods', serviceName: 'Container' } },
-      update: {},
-      create: { name: 'Pods', unit: 'units', serviceName: 'Container', isActive: true },
-    }),
+    // HDFS
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Files Amount', serviceName: 'HDFS' } }, update: {}, create: { name: 'Files Amount', unit: 'count', serviceName: 'HDFS', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Space Quota', serviceName: 'HDFS' } }, update: {}, create: { name: 'Space Quota', unit: 'GB', serviceName: 'HDFS', isActive: true } }),
+    // NAS
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'NAS' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'NAS', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Hardware Type', serviceName: 'NAS' } }, update: {}, create: { name: 'Hardware Type', unit: 'HDD/SSD', serviceName: 'NAS', isActive: true } }),
+    // S3
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'S3' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'S3', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Files Amount', serviceName: 'S3' } }, update: {}, create: { name: 'Files Amount', unit: 'count', serviceName: 'S3', isActive: true } }),
+    // MongoK, MongoVM, Postgres (PG), Oracle, MSSQL
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'MongoK' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'MongoK', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'MongoVM' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'MongoVM', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'Postgres (PG)' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'Postgres (PG)', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'Oracle' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'Oracle', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'MSSQL' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'MSSQL', isActive: true } }),
+    // ECK
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Elastic Type', serviceName: 'ECK' } }, update: {}, create: { name: 'Elastic Type', unit: 'Logs/Text/geo/Vector', serviceName: 'ECK', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'License', serviceName: 'ECK' } }, update: {}, create: { name: 'License', unit: 'count', serviceName: 'ECK', isActive: true } }),
+    // Redis
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Memory (Shards X7)', serviceName: 'Redis' } }, update: {}, create: { name: 'Memory (Shards X7)', unit: 'GB', serviceName: 'Redis', isActive: true } }),
+    // Openshift
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Memory', serviceName: 'Openshift' } }, update: {}, create: { name: 'Memory', unit: 'GB', serviceName: 'Openshift', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Pods', serviceName: 'Openshift' } }, update: {}, create: { name: 'Pods', unit: 'count', serviceName: 'Openshift', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Cores', serviceName: 'Openshift' } }, update: {}, create: { name: 'Cores', unit: 'count', serviceName: 'Openshift', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'CPU', serviceName: 'Openshift' } }, update: {}, create: { name: 'CPU', unit: 'count', serviceName: 'Openshift', isActive: true } }),
+    // Spark
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Memory', serviceName: 'Spark' } }, update: {}, create: { name: 'Memory', unit: 'GB', serviceName: 'Spark', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'Spark' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'Spark', isActive: true } }),
+    // VM
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'vCPU', serviceName: 'VM' } }, update: {}, create: { name: 'vCPU', unit: 'count', serviceName: 'VM', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'CPU', serviceName: 'VM' } }, update: {}, create: { name: 'CPU', unit: 'GHz', serviceName: 'VM', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Memory', serviceName: 'VM' } }, update: {}, create: { name: 'Memory', unit: 'GB', serviceName: 'VM', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'GPU type', serviceName: 'VM' } }, update: {}, create: { name: 'GPU type', unit: 'A100/T4/H100', serviceName: 'VM', isActive: true } }),
+    // RUNAI
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage', serviceName: 'RUNAI' } }, update: {}, create: { name: 'Storage', unit: 'GB', serviceName: 'RUNAI', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Memory', serviceName: 'RUNAI' } }, update: {}, create: { name: 'Memory', unit: 'GB', serviceName: 'RUNAI', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'GPU', serviceName: 'RUNAI' } }, update: {}, create: { name: 'GPU', unit: 'count', serviceName: 'RUNAI', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'CPU', serviceName: 'RUNAI' } }, update: {}, create: { name: 'CPU', unit: 'count', serviceName: 'RUNAI', isActive: true } }),
+    // LLM
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Model Size', serviceName: 'LLM' } }, update: {}, create: { name: 'Model Size', unit: 'count', serviceName: 'LLM', isActive: true } }),
+    // NIFI
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'CPU', serviceName: 'NIFI' } }, update: {}, create: { name: 'CPU', unit: 'count', serviceName: 'NIFI', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Memory', serviceName: 'NIFI' } }, update: {}, create: { name: 'Memory', unit: 'GB', serviceName: 'NIFI', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Messages per Second', serviceName: 'NIFI' } }, update: {}, create: { name: 'Messages per Second', unit: 'count', serviceName: 'NIFI', isActive: true } }),
+    // CAAS
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Throughput', serviceName: 'CAAS' } }, update: {}, create: { name: 'Throughput', unit: 'MB/s', serviceName: 'CAAS', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'files type', serviceName: 'CAAS' } }, update: {}, create: { name: 'files type', unit: 'Schematic/Binary', serviceName: 'CAAS', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'files Size', serviceName: 'CAAS' } }, update: {}, create: { name: 'files Size', unit: 'small/big', serviceName: 'CAAS', isActive: true } }),
+    // KAFKA
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Storage (no backup)', serviceName: 'KAFKA' } }, update: {}, create: { name: 'Storage (no backup)', unit: 'GB', serviceName: 'KAFKA', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Throughput in', serviceName: 'KAFKA' } }, update: {}, create: { name: 'Throughput in', unit: 'MB/s', serviceName: 'KAFKA', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Throughput out', serviceName: 'KAFKA' } }, update: {}, create: { name: 'Throughput out', unit: 'MB/s', serviceName: 'KAFKA', isActive: true } }),
+    prisma.resource.upsert({ where: { name_serviceName: { name: 'Partitions', serviceName: 'KAFKA' } }, update: {}, create: { name: 'Partitions', unit: 'count', serviceName: 'KAFKA', isActive: true } }),
   ]);
   console.log(`Created ${resources.length} resources`);
 
   const capacities = await Promise.all([
     prisma.capacity.upsert({
-      where: { locationId_resourceName_resourceService: { locationId: locations[0].id, resourceName: 'CPU', resourceService: 'Compute' } },
+      where: { locationId_resourceName_resourceService: { locationId: locations[0].id, resourceName: 'vCPU', resourceService: 'VM' } },
       update: {},
-      create: { locationId: locations[0].id, resourceName: 'CPU', resourceService: 'Compute', value: 1000 },
+      create: { locationId: locations[0].id, resourceName: 'vCPU', resourceService: 'VM', value: 1000 },
     }),
     prisma.capacity.upsert({
-      where: { locationId_resourceName_resourceService: { locationId: locations[0].id, resourceName: 'RAM', resourceService: 'Compute' } },
+      where: { locationId_resourceName_resourceService: { locationId: locations[0].id, resourceName: 'Memory', resourceService: 'VM' } },
       update: {},
-      create: { locationId: locations[0].id, resourceName: 'RAM', resourceService: 'Compute', value: 4096 },
+      create: { locationId: locations[0].id, resourceName: 'Memory', resourceService: 'VM', value: 4096 },
     }),
     prisma.capacity.upsert({
-      where: { locationId_resourceName_resourceService: { locationId: locations[0].id, resourceName: 'SSD', resourceService: 'Storage' } },
+      where: { locationId_resourceName_resourceService: { locationId: locations[0].id, resourceName: 'Space Quota', resourceService: 'HDFS' } },
       update: {},
-      create: { locationId: locations[0].id, resourceName: 'SSD', resourceService: 'Storage', value: 100 },
+      create: { locationId: locations[0].id, resourceName: 'Space Quota', resourceService: 'HDFS', value: 100000 },
     }),
     prisma.capacity.upsert({
-      where: { locationId_resourceName_resourceService: { locationId: locations[2].id, resourceName: 'CPU', resourceService: 'Compute' } },
+      where: { locationId_resourceName_resourceService: { locationId: locations[2].id, resourceName: 'vCPU', resourceService: 'VM' } },
       update: {},
-      create: { locationId: locations[2].id, resourceName: 'CPU', resourceService: 'Compute', value: 2000 },
-    }),
-    prisma.capacity.upsert({
-      where: { locationId_resourceName_resourceService: { locationId: locations[2].id, resourceName: 'RAM', resourceService: 'Compute' } },
-      update: {},
-      create: { locationId: locations[2].id, resourceName: 'RAM', resourceService: 'Compute', value: 8192 },
+      create: { locationId: locations[2].id, resourceName: 'vCPU', resourceService: 'VM', value: 500 },
     }),
   ]);
   console.log(`Created ${capacities.length} capacities`);
@@ -449,11 +476,11 @@ async function main() {
   });
 
   const resourceOptions = [
-    { serviceName: 'Compute', resourceName: 'CPU', resourceService: 'Compute', unit: 'vCPU', maxVal: 500 },
-    { serviceName: 'Compute', resourceName: 'RAM', resourceService: 'Compute', unit: 'GB', maxVal: 1024 },
-    { serviceName: 'Storage', resourceName: 'SSD', resourceService: 'Storage', unit: 'TB', maxVal: 100 },
-    { serviceName: 'Network', resourceName: 'Bandwidth', resourceService: 'Network', unit: 'Gbps', maxVal: 10 },
-    { serviceName: 'Container', resourceName: 'Pods', resourceService: 'Container', unit: 'units', maxVal: 50 },
+    { serviceName: 'VM', resourceName: 'vCPU', resourceService: 'VM', unit: 'count', maxVal: 500 },
+    { serviceName: 'VM', resourceName: 'Memory', resourceService: 'VM', unit: 'GB', maxVal: 1024 },
+    { serviceName: 'HDFS', resourceName: 'Space Quota', resourceService: 'HDFS', unit: 'GB', maxVal: 100000 },
+    { serviceName: 'KAFKA', resourceName: 'Throughput in', resourceService: 'KAFKA', unit: 'MB/s', maxVal: 10000 },
+    { serviceName: 'Openshift', resourceName: 'Pods', resourceService: 'Openshift', unit: 'count', maxVal: 200 },
   ];
 
   // Need at least 50 demands
@@ -641,9 +668,9 @@ async function main() {
   await prisma.demand.create({
     data: {
       projectName: 'E2E Test Project',
-      serviceName: 'Compute',
-      resourceName: 'CPU',
-      resourceService: 'Compute',
+      serviceName: 'VM',
+      resourceName: 'vCPU',
+      resourceService: 'VM',
       value: 16,
       locationId: locations[0].id,
       type: DemandType.New,
@@ -660,9 +687,9 @@ async function main() {
   await prisma.demand.create({
     data: {
       projectName: 'E2E Test Project',
-      serviceName: 'Compute',
-      resourceName: 'RAM',
-      resourceService: 'Compute',
+      serviceName: 'VM',
+      resourceName: 'Memory',
+      resourceService: 'VM',
       value: 32,
       locationId: locations[0].id,
       type: DemandType.New,
