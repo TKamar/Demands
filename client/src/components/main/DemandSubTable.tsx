@@ -11,6 +11,11 @@ import type { ApproveDemandPayload } from '../../api/types';
 export const ACTIVE_STATUSES = new Set(['PendingCenterManager', 'Pending', 'WaitingOnPrerequisite']);
 export const TERMINAL_STATUSES = new Set(['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled']);
 
+type QuickApproveDemandPayload = {
+  status: 'Approved';
+  approvedValue: number;
+};
+
 function statusColor(status: string): string {
   if (['Approved', 'PartiallyApproved', 'ApprovedWithCondition'].includes(status)) return 'text-green-700';
   if (['Rejected', 'CenterManagerRejected'].includes(status)) return 'text-red-600';
@@ -35,7 +40,7 @@ export default function DemandSubTable({
   const { t } = useTranslation();
   const { showToast } = useToast();
 
-  const { demands: allDemands, isLoading, deleteDemand, approveDemand, rejectDemand } = useDemands(
+  const { demands: allDemands, isLoading, deleteDemand, approveDemand } = useDemands(
     { projectName, createdBy },
     { page: 1, limit: 100 }
   );
@@ -93,9 +98,10 @@ export default function DemandSubTable({
     const pending = group.filter(d => ACTIVE_STATUSES.has(d.status));
     setQuickApproveTarget(null);
     const results = await Promise.allSettled(
-      pending.map(d =>
-        approveDemand(d.id, { status: 'Approved', approvedValue: d.value } as ApproveDemandPayload)
-      )
+      pending.map(d => {
+        const payload: QuickApproveDemandPayload = { status: 'Approved', approvedValue: d.value };
+        return approveDemand(d.id, payload as ApproveDemandPayload);
+      })
     );
     const failed = results.filter(r => r.status === 'rejected').length;
     if (failed > 0) {
