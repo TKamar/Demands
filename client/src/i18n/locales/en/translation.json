@@ -45,7 +45,8 @@
     "error": {
       "approveFailed": "Failed to approve demand",
       "rejectFailed": "Failed to reject demand",
-      "transferFailed": "Transfer failed"
+      "transferFailed": "Transfer failed",
+      "partialTransferFailed": "{{succeeded}} transferred, {{failed}} failed"
     },
     "bulk": {
       "noneSelected": "Select demands to take bulk action",

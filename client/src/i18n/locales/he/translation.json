@@ -45,7 +45,8 @@
     "error": {
       "approveFailed": "אישור הדרישה נכשל",
       "rejectFailed": "דחיית הדרישה נכשלה",
-      "transferFailed": "ההעברה נכשלה"
+      "transferFailed": "ההעברה נכשלה",
+      "partialTransferFailed": "{{succeeded}} הועברו, {{failed}} נכשלו"
     },
     "bulk": {
       "noneSelected": "בחר דרישות לביצוע פעולה קבוצתית",

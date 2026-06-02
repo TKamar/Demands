@@ -107,7 +107,7 @@ export default function ServiceDecisionModal({
       const results = await Promise.allSettled(demands.map(d => transferDemand(d.id, targetService)));
       const failed = results.filter(r => r.status === 'rejected').length;
       if (failed > 0) {
-        showToast(`${demands.length - failed} הועברו, ${failed} נכשלו`, 'error');
+        showToast(t('management.error.partialTransferFailed', '', { succeeded: demands.length - failed, failed }), 'error');
       } else {
         showToast(t('management.success.transferred', 'הדרישות הועברו בהצלחה'), 'success');
       }
