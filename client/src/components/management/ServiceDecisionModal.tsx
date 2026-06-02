@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../common/Modal';
 import { useToast } from '../common/Toast';
@@ -39,7 +39,7 @@ export default function ServiceDecisionModal({
 }: ServiceDecisionModalProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
-  const { services } = useReferenceData();
+  const { services, resources } = useReferenceData();
 
   const [path, setPath] = useState<DecisionPath>('select');
   const [decisions, setDecisions] = useState<Record<number, DemandDecision>>({});
@@ -118,8 +118,20 @@ export default function ServiceDecisionModal({
     }
   };
 
-  const availableServices = services.filter(
-    s => s.isActive !== false && s.name !== serviceName
+  const groupResourceNames = useMemo(
+    () => [...new Set(demands.map(d => d.resourceName))],
+    [demands]
+  );
+
+  const availableServices = useMemo(() =>
+    services.filter(s =>
+      s.isActive !== false &&
+      s.name !== serviceName &&
+      groupResourceNames.every(rName =>
+        resources.some(r => r.serviceName === s.name && r.name === rName)
+      )
+    ),
+    [services, resources, serviceName, groupResourceNames]
   );
 
   const serviceInfo = (
@@ -273,18 +285,21 @@ export default function ServiceDecisionModal({
             <label className="block text-sm font-medium text-text-primary mb-1.5">
               {t('management.decisionModal.targetService', 'שירות יעד')} <span className="text-danger">*</span>
             </label>
-            <select
-              value={targetService}
-              onChange={e => setTargetService(e.target.value)}
-              required
-              className="w-full px-3 py-2 text-sm border border-divider rounded-lg bg-bg-default"
-              dir="rtl"
-            >
-              <option value="">{t('management.decisionModal.selectService', 'בחר שירות')}</option>
-              {availableServices.map(s => (
-                <option key={s.name} value={s.name}>{s.displayName ?? s.name}</option>
-              ))}
-            </select>
+            {availableServices.length === 0
+              ? <p className="text-sm text-muted">{t('service.noCompatibleTransfer', 'No compatible services available')}</p>
+              : <select
+                  value={targetService}
+                  onChange={e => setTargetService(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 text-sm border border-divider rounded-lg bg-bg-default"
+                  dir="rtl"
+                >
+                  <option value="">{t('management.decisionModal.selectService', 'בחר שירות')}</option>
+                  {availableServices.map(s => (
+                    <option key={s.name} value={s.name}>{s.displayName ?? s.name}</option>
+                  ))}
+                </select>
+            }
           </div>
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1.5">
