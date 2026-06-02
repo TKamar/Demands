@@ -466,3 +466,73 @@ Completed: 2026-06-02
 - Consider API-level testing approach for CI/CD automation (to bypass Keycloak headless limitation)
 
 ---
+
+## Infrastructure Mapping Refactor
+
+Branch: `feature/infrastructure-mapping-refactor`
+Started: 2026-06-02
+
+| Task | Area | Status |
+|------|------|--------|
+| 1 | Create feature branch | ✅ Done |
+| 2 | Update seed.ts services/resources | ✅ Done |
+| 3 | Update seed-sub-project-c.ts | ✅ Done |
+| 4 | Update WORK_LOG | ✅ Done |
+
+### 2026-06-02
+
+**feature/infrastructure-mapping-refactor**
+
+- **Taxonomy replacement:** Old generic taxonomy (Compute, Storage, Network, Database, Container) replaced with real production infrastructure from Excel specification
+- **New services (18 total):**
+  - Storage: HDFS, NAS, S3
+  - Databases: MongoK, MongoVM, Postgres (PG), ECK, Redis, Oracle, MSSQL
+  - Processing: Openshift, Spark, VM, RUNAI, LLM
+  - Data Transport: NIFI, CAAS, KAFKA
+
+- **New resources (40 total):** Domain-specific resources with precise units per service (e.g., VM has vCPU/count, CPU/GHz, Memory/GB, GPU type; KAFKA has Storage/GB, Throughput in/out, Partitions; HDFS has Files Amount/count, Space Quota/GB)
+
+- **Moderator assignments:** mod1 assigned to processing services (VM, Openshift, RUNAI, LLM); mod2-7 distributed across storage/database/data-transport services
+
+### Files Modified
+- `server/prisma/seed.ts`
+  - Removed stale services (Compute, Storage, Network, Database, Container)
+  - Added 18 new services with moderator assignments
+  - Added ~40 new resources with correct units
+  - Updated capacities to reference VM/HDFS resources
+  - Updated resourceOptions array for 50-demand seed generation
+  - Updated E2E test demands (Compute/CPU/RAM → VM/vCPU/Memory)
+
+- `server/scripts/seed-sub-project-c.ts`
+  - Replaced Compute → VM with vCPU, Memory, CPU, GPU type resources
+  - Replaced Storage → HDFS with Files Amount, Space Quota resources
+  - Replaced Network → KAFKA with Storage (no backup), Throughput in/out, Partitions
+  - Updated all 15 test demands across 3 projects with new service/resource mappings
+
+### Key Achievements
+- ✅ Complete taxonomy replacement (5 old services → 18 real services)
+- ✅ 40 domain-specific resources with correct units from Excel spec
+- ✅ No TypeScript type changes needed (all string-based, DB-driven)
+- ✅ Client filtering logic unchanged (dynamic `resources.filter(r => r.serviceName === form.service)`)
+- ✅ Seed scripts updated; ready to run with new infrastructure data
+- ✅ E2E test data updated to use VM/vCPU & VM/Memory (key moderator: mod1)
+
+### Verification Steps
+```bash
+# Run full seed with new taxonomy
+npm run dev:server
+
+# In another terminal, verify database
+npx prisma studio
+
+# Check services table: should list 18 services (HDFS, KAFKA, VM, etc.)
+# Check resources table: 40+ resources across 18 services
+# Create Demand → Service dropdown shows all 18 services
+# Select VM → Resource dropdown shows vCPU, CPU, Memory, GPU type
+```
+
+### Commits
+- `feat: replace seed services and resources with real infrastructure taxonomy`
+- `feat: align sub-project-c seed with real infrastructure taxonomy`
+
+---
