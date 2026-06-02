@@ -1,0 +1,48 @@
+{
+  "Admin-HappyPath-01": {
+    "status": "FAIL",
+    "notes": [
+      "❌ Error: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"http://localhost:5173/**\" until \"networkidle\"\n  navigated to \"http://localhost:8080/realms/demands/login-actions/authenticate?execution=1bd4f693-eca7-4e10-bd3e-caf81b8e90ee&client_id=demands-web&tab_id=iQCe2frgn1E&client_data=eyJydSI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTE3My9jYWxsYmFjayIsInJ0IjoiY29kZSIsInN0IjoiZTQxNWU2OTkyYWM2NDIwY2E1ZDA1OTU4MzVmYmVmMmIifQ\"\n============================================================"
+    ]
+  },
+  "Admin-SadPath-01": {
+    "status": "PASS",
+    "notes": [
+      "⚠️ No Approved demands visible in this view"
+    ]
+  },
+  "CenterManager-HappyPath-01": {
+    "status": "FAIL",
+    "notes": [
+      "❌ Error: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"http://localhost:5173/**\" until \"networkidle\"\n  navigated to \"http://localhost:8080/realms/demands/login-actions/authenticate?execution=1bd4f693-eca7-4e10-bd3e-caf81b8e90ee&client_id=demands-web&tab_id=39LKcdMAAJE&client_data=eyJydSI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTE3My9jYWxsYmFjayIsInJ0IjoiY29kZSIsInN0IjoiMjFmNDgyN2Y4MTk4NGI4OGJkNzNlZjYxY2EwYmIxM2QifQ\"\n============================================================"
+    ]
+  },
+  "CenterManager-SadPath-01": {
+    "status": "PASS",
+    "notes": [
+      "✅ Project Gamma (Center B) is correctly hidden"
+    ]
+  },
+  "Moderator-HappyPath-01": {
+    "status": "FAIL",
+    "notes": [
+      "❌ Error: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"http://localhost:5173/**\" until \"networkidle\"\n  navigated to \"http://localhost:8080/realms/demands/login-actions/authenticate?execution=1bd4f693-eca7-4e10-bd3e-caf81b8e90ee&client_id=demands-web&tab_id=VaSy_asfz2s&client_data=eyJydSI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTE3My9jYWxsYmFjayIsInJ0IjoiY29kZSIsInN0IjoiMjExMWMxYjc2YTlhNDkxZWJlMjRjZWY0MDU1NzM0YTQifQ\"\n============================================================"
+    ]
+  },
+  "Moderator-SadPath-01": {
+    "status": null,
+    "notes": []
+  },
+  "User-HappyPath-01": {
+    "status": "FAIL",
+    "notes": [
+      "❌ Error: page.waitForURL: Timeout 10000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation to \"http://localhost:5173/**\" until \"networkidle\"\n  navigated to \"http://localhost:8080/realms/demands/login-actions/authenticate?execution=1bd4f693-eca7-4e10-bd3e-caf81b8e90ee&client_id=demands-web&tab_id=i5MtY8HNjhM&client_data=eyJydSI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTE3My9jYWxsYmFjayIsInJ0IjoiY29kZSIsInN0IjoiYmE5NGMxYmVjMzM3NDRlMThjMzQ3MDE4OGVmMjhhOWMifQ\"\n============================================================"
+    ]
+  },
+  "User-SadPath-01": {
+    "status": "PASS",
+    "notes": [
+      "⚠️ No Approved demands found to test"
+    ]
+  }
+}
