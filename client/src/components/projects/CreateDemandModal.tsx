@@ -22,6 +22,8 @@ interface CreateDemandModalProps {
   onSubmit: (payload: CreateDemandPayload | UpdateDemandPayload, demandId?: number) => Promise<void>;
   editingDemand?: Demand | null;
   onCreated?: () => void;
+  defaultProjectName?: string;
+  defaultServiceName?: string;
 }
 
 const initialForm = {
@@ -52,6 +54,8 @@ export default function CreateDemandModal({
   onSubmit,
   editingDemand,
   onCreated,
+  defaultProjectName,
+  defaultServiceName,
 }: CreateDemandModalProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -105,9 +109,14 @@ export default function CreateDemandModal({
         section: editingDemand.sectionName || '',
       });
     } else if (!editingDemand && isOpen) {
-      setForm(initialForm);
+      setForm({
+        ...initialForm,
+        project: defaultProjectName ?? '',
+        service: defaultServiceName ?? '',
+      });
+      setResourceRows([{ id: newRowId(), resourceName: '', value: '', unit: '' }]);
     }
-  }, [editingDemand, isOpen, allProjects]);
+  }, [editingDemand, isOpen, allProjects, defaultProjectName, defaultServiceName]);
 
   // --- Derived: selected project for location display ---
   const selectedProject = useMemo(
