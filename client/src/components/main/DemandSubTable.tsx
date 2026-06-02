@@ -4,10 +4,11 @@ import { MdExpandMore, MdChevronLeft, MdEdit, MdDelete, MdGavel } from 'react-ic
 import ConfirmDialog from '../common/ConfirmDialog';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import ManageServiceDemandsModal from '../projects/ManageServiceDemandsModal';
+import ServiceDecisionModal from '../management/ServiceDecisionModal';
 import { useDemands } from '../../hooks/useDemands';
 import { useToast } from '../common/Toast';
 import type { Demand } from '../../types/domain';
-import type { ApproveDemandPayload } from '../../api/types';
+import type { ApproveDemandPayload, RejectDemandPayload } from '../../api/types';
 
 export const ACTIVE_STATUSES = new Set(['PendingCenterManager', 'Pending', 'WaitingOnPrerequisite']);
 export const TERMINAL_STATUSES = new Set(['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled']);
@@ -41,7 +42,7 @@ export default function DemandSubTable({
   const { t } = useTranslation();
   const { showToast } = useToast();
 
-  const { demands: allDemands, isLoading, deleteDemand, approveDemand } = useDemands(
+  const { demands: allDemands, isLoading, deleteDemand, approveDemand, rejectDemand } = useDemands(
     { projectName, createdBy },
     { page: 1, limit: 100 }
   );
@@ -259,10 +260,21 @@ export default function DemandSubTable({
         />
       )}
 
-      {/* ServiceDecisionModal placeholder — wired in Task 5 */}
-      {decidingServiceName !== null && (
-        <div style={{ display: 'none' }} />
-      )}
+      {decidingServiceName !== null && (() => {
+        const svcDemands = serviceGroups.get(decidingServiceName) ?? [];
+        return (
+          <ServiceDecisionModal
+            open={true}
+            onClose={() => setDecidingServiceName(null)}
+            demands={svcDemands}
+            serviceName={decidingServiceName}
+            projectName={projectName}
+            onApprove={(id, payload) => approveDemand(id, payload)}
+            onReject={(id, payload) => rejectDemand(id, payload)}
+            onSuccess={() => setDecidingServiceName(null)}
+          />
+        );
+      })()}
     </div>
   );
 }
