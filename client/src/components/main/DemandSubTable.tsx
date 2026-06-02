@@ -1,24 +1,23 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from 'react-oidc-context';
-import { MdEdit, MdDelete, MdCancel, MdGavel } from 'react-icons/md';
-import MoreActionsMenu from '../common/MoreActionsMenu';
-import type { MoreAction } from '../common/MoreActionsMenu';
-import { useDemands } from '../../hooks/useDemands';
+import { MdExpandMore, MdChevronLeft, MdEdit, MdDelete, MdGavel } from 'react-icons/md';
+import ConfirmDialog from '../common/ConfirmDialog';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
-import DecisionModal from '../management/DecisionModal';
-import CreateDemandModal from '../projects/CreateDemandModal';
+import { useDemands } from '../../hooks/useDemands';
 import { useToast } from '../common/Toast';
 import type { Demand } from '../../types/domain';
-import type {
-  CreateDemandPayload,
-  UpdateDemandPayload,
-  ApproveDemandPayload,
-  RejectDemandPayload,
-} from '../../api/types';
+import type { ApproveDemandPayload } from '../../api/types';
 
 export const ACTIVE_STATUSES = new Set(['PendingCenterManager', 'Pending', 'WaitingOnPrerequisite']);
 export const TERMINAL_STATUSES = new Set(['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled']);
+
+function statusColor(status: string): string {
+  if (['Approved', 'PartiallyApproved', 'ApprovedWithCondition'].includes(status)) return 'text-green-700';
+  if (['Rejected', 'CenterManagerRejected'].includes(status)) return 'text-red-600';
+  if (['Pending', 'PendingCenterManager', 'WaitingOnPrerequisite'].includes(status)) return 'text-amber-600';
+  if (status === 'Cancelled') return 'text-gray-400';
+  return 'text-text-secondary';
+}
 
 export interface DemandSubTableProps {
   projectName: string;
@@ -34,101 +33,83 @@ export default function DemandSubTable({
   createdBy,
 }: DemandSubTableProps) {
   const { t } = useTranslation();
-  const auth = useAuth();
   const { showToast } = useToast();
-  const currentUsername = auth.user?.profile.preferred_username ?? '';
 
-  const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
-  const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
-  const [decidingDemand, setDecidingDemand] = useState<Demand | null>(null);
-  const [isDecisionLoading, setIsDecisionLoading] = useState(false);
-
-  const { demands: allDemands, isLoading, updateDemand, deleteDemand, cancelDemand, approveDemand, rejectDemand } = useDemands(
+  const { demands: allDemands, isLoading, deleteDemand, approveDemand, rejectDemand } = useDemands(
     { projectName, createdBy },
     { page: 1, limit: 100 }
   );
 
   const demands = useMemo(
-    () => allDemands.filter(d => mode === 'history' ? TERMINAL_STATUSES.has(d.status) : ACTIVE_STATUSES.has(d.status)),
+    () => allDemands.filter(d =>
+      mode === 'history' ? TERMINAL_STATUSES.has(d.status) : ACTIVE_STATUSES.has(d.status)
+    ),
     [allDemands, mode]
   );
 
-  async function handleSubmitDemand(payload: CreateDemandPayload | UpdateDemandPayload, demandId?: number) {
-    if (demandId) {
-      try {
-        await updateDemand(demandId, payload as UpdateDemandPayload);
-        showToast(t('demand.updated', 'Requirement updated'), 'success');
-        setEditingDemand(null);
-      } catch {
-        showToast(t('demand.updateError', 'Failed to update requirement'), 'error');
-      }
+  // Group demands by serviceName
+  const serviceGroups = useMemo(() => {
+    const groups = new Map<string, Demand[]>();
+    for (const demand of demands) {
+      const list = groups.get(demand.serviceName) ?? [];
+      groups.set(demand.serviceName, [...list, demand]);
     }
-  }
+    return groups;
+  }, [demands]);
 
-  async function handleDeleteDemand(demand: Demand) {
-    if (!window.confirm(t('demand.deleteConfirm', 'Delete this requirement?'))) return;
-    try {
-      await deleteDemand(demand.id);
-      showToast(t('demand.deleted', 'Requirement deleted'), 'success');
-    } catch {
-      showToast(t('demand.deleteError', 'Failed to delete requirement'), 'error');
-    }
-  }
+  // Service row expand state
+  const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set());
+  const toggleService = useCallback((name: string) => {
+    setExpandedServices(prev => {
+      const next = new Set(prev);
+      next.has(name) ? next.delete(name) : next.add(name);
+      return next;
+    });
+  }, []);
 
-  async function handleCancelDemand(demand: Demand) {
-    if (!window.confirm(t('demand.cancelConfirm', 'Cancel this requirement?'))) return;
-    try {
-      await cancelDemand(demand.id);
-      showToast(t('demand.cancelled', 'Requirement cancelled'), 'success');
-    } catch {
-      showToast(t('demand.cancelError', 'Failed to cancel requirement'), 'error');
-    }
-  }
+  // Resource row sidebar
+  const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
 
-  async function handleApprove(payload: ApproveDemandPayload) {
-    if (!decidingDemand) return;
-    setIsDecisionLoading(true);
-    try {
-      await approveDemand(decidingDemand.id, payload);
-      showToast(t('management.success.approved'), 'success');
-      setDecidingDemand(null);
-    } catch (err: any) {
-      showToast(err?.response?.data?.error || t('management.error.approveFailed'), 'error');
-    } finally {
-      setIsDecisionLoading(false);
+  // Delete group confirm
+  const [deleteServiceTarget, setDeleteServiceTarget] = useState<string | null>(null);
+  const handleConfirmDeleteGroup = useCallback(async () => {
+    if (!deleteServiceTarget) return;
+    const group = serviceGroups.get(deleteServiceTarget) ?? [];
+    setDeleteServiceTarget(null);
+    const results = await Promise.allSettled(group.map(d => deleteDemand(d.id)));
+    const failed = results.filter(r => r.status === 'rejected').length;
+    if (failed > 0) {
+      showToast(`${results.length - failed} נמחקו, ${failed} נכשלו`, 'error');
+    } else {
+      showToast(t('service.deleteGroupSuccess', 'כל הדרישות נמחקו'), 'success');
     }
-  }
+  }, [deleteServiceTarget, serviceGroups, deleteDemand, showToast, t]);
 
-  async function handleReject(payload: RejectDemandPayload) {
-    if (!decidingDemand) return;
-    setIsDecisionLoading(true);
-    try {
-      await rejectDemand(decidingDemand.id, payload);
-      showToast(t('management.success.rejected'), 'success');
-      setDecidingDemand(null);
-    } catch (err: any) {
-      showToast(err?.response?.data?.error || t('management.error.rejectFailed'), 'error');
-    } finally {
-      setIsDecisionLoading(false);
+  // Quick approve confirm
+  const [quickApproveTarget, setQuickApproveTarget] = useState<string | null>(null);
+  const handleConfirmQuickApprove = useCallback(async () => {
+    if (!quickApproveTarget) return;
+    const group = serviceGroups.get(quickApproveTarget) ?? [];
+    const pending = group.filter(d => ACTIVE_STATUSES.has(d.status));
+    setQuickApproveTarget(null);
+    const results = await Promise.allSettled(
+      pending.map(d =>
+        approveDemand(d.id, { status: 'Approved', approvedValue: d.value } as ApproveDemandPayload)
+      )
+    );
+    const failed = results.filter(r => r.status === 'rejected').length;
+    if (failed > 0) {
+      showToast(`${pending.length - failed} אושרו, ${failed} נכשלו`, 'error');
+    } else {
+      showToast(t('service.quickApproveSuccess', 'כל הדרישות אושרו'), 'success');
     }
-  }
+  }, [quickApproveTarget, serviceGroups, approveDemand, showToast, t]);
 
-  function buildActions(demand: Demand): MoreAction[] {
-    const isPending = demand.status === 'Pending';
-    const isOwner = demand.createdBy === currentUsername;
-    if (canDecide) {
-      if (!isPending) return [];
-      return [
-        { label: t('management.decide', 'Decide'), icon: <MdGavel size={12} />, onClick: () => setDecidingDemand(demand) },
-        { label: t('common.delete', 'Delete'), icon: <MdDelete size={12} />, danger: true, onClick: () => handleDeleteDemand(demand) },
-      ];
-    }
-    if (!isPending || !isOwner) return [];
-    return [
-      { label: t('common.edit', 'Edit'), icon: <MdEdit size={12} />, onClick: () => setEditingDemand(demand) },
-      { label: t('common.cancel', 'Cancel'), icon: <MdCancel size={12} />, danger: true, onClick: () => handleCancelDemand(demand) },
-    ];
-  }
+  // Edit (Manage) modal target — wired in Task 4
+  const [managingServiceName, setManagingServiceName] = useState<string | null>(null);
+
+  // Deep Decision modal target — wired in Task 5
+  const [decidingServiceName, setDecidingServiceName] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -138,7 +119,7 @@ export default function DemandSubTable({
     );
   }
 
-  if (demands.length === 0) {
+  if (serviceGroups.size === 0) {
     return (
       <div className="px-12 py-4 text-xs text-text-secondary italic border-t border-dashed border-primary/30">
         {t('demands.empty', 'No requirements')}
@@ -148,75 +129,129 @@ export default function DemandSubTable({
 
   return (
     <div className="border-t border-dashed border-primary/30 bg-primary/[0.02]">
-      <table className="w-full text-xs">
-        <thead>
-          <tr className="bg-primary/5 text-text-secondary">
-            <th className="ps-12 pe-3 py-2 text-start font-semibold">{t('demand.service', 'Service')}</th>
-            <th className="px-3 py-2 text-start font-semibold">{t('demand.resource', 'Resource')}</th>
-            <th className="px-3 py-2 text-start font-semibold">{t('demand.value', 'Value')}</th>
-            <th className="px-3 py-2 text-start font-semibold">{t('demand.status', 'Status')}</th>
-            <th className="px-3 py-2 text-start font-semibold">{t('common.actions', 'Actions')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {demands.map((demand) => {
-            const rowActions = buildActions(demand);
-            return (
-              <tr
-                key={demand.id}
-                className="border-t border-divider/50 hover:bg-primary/5 cursor-pointer transition-colors"
-                onClick={() => setSelectedDemand(demand)}
+      {Array.from(serviceGroups.entries()).map(([svcName, svcDemands]) => {
+        const isExpanded = expandedServices.has(svcName);
+        return (
+          <div key={svcName} className="border-b border-divider/30 last:border-0">
+            {/* ── Service row (Level 2) ── */}
+            <div className="flex items-center gap-2 px-4 py-2 ps-8 bg-primary/[0.04] hover:bg-primary/[0.07] transition-colors">
+              <button
+                onClick={() => toggleService(svcName)}
+                className="w-5 shrink-0 flex items-center justify-center text-primary bg-transparent border-none cursor-pointer p-0"
               >
-                <td className="ps-12 pe-3 py-2 text-text-primary">{demand.serviceName}</td>
-                <td className="px-3 py-2 text-text-secondary">{demand.resourceName}</td>
-                <td className="px-3 py-2 font-medium">{demand.value.toLocaleString()}</td>
-                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
-                  <span className={`text-[10px] font-medium ${
-                    demand.status === 'Approved' ? 'text-green-700'
-                    : demand.status === 'Pending' ? 'text-amber-600'
-                    : demand.status === 'Rejected' ? 'text-red-600'
-                    : demand.status === 'PartiallyApproved' ? 'text-blue-600'
-                    : 'text-gray-500'
-                  }`}>
-                    {demand.status}
+                {isExpanded ? <MdExpandMore size={16} /> : <MdChevronLeft size={16} />}
+              </button>
+              <span className="flex-1 text-sm font-semibold text-text-primary">{svcName}</span>
+              <span className="text-xs text-text-secondary me-2">
+                ({svcDemands.length} {t('service.resources', 'resources')})
+              </span>
+              {/* Actions */}
+              <div className="flex items-center gap-1">
+                <span className="relative group">
+                  <button
+                    onClick={() => setManagingServiceName(svcName)}
+                    className="p-1 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer rounded"
+                  >
+                    <MdEdit size={14} />
+                  </button>
+                  <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                    {t('common.edit', 'Edit')}
                   </span>
-                </td>
-                <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
-                  <MoreActionsMenu actions={rowActions} size="sm" />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                </span>
+                <span className="relative group">
+                  <button
+                    onClick={() => setDeleteServiceTarget(svcName)}
+                    className="p-1 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer rounded"
+                  >
+                    <MdDelete size={14} />
+                  </button>
+                  <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                    {t('common.delete', 'Delete')}
+                  </span>
+                </span>
+                {canDecide && (
+                  <>
+                    <span className="relative group">
+                      <button
+                        onClick={() => setQuickApproveTarget(svcName)}
+                        className="px-2 py-0.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 rounded border-none cursor-pointer transition-colors"
+                      >
+                        ⚡
+                      </button>
+                      <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                        {t('service.quickApprove', 'Quick Approve')}
+                      </span>
+                    </span>
+                    <span className="relative group">
+                      <button
+                        onClick={() => setDecidingServiceName(svcName)}
+                        className="px-2 py-0.5 text-xs font-semibold text-white bg-indigo-900 hover:bg-indigo-950 rounded border-none cursor-pointer transition-colors flex items-center"
+                      >
+                        <MdGavel size={12} />
+                      </button>
+                      <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
+                        {t('service.deepDecision', 'Deep Decision')}
+                      </span>
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* ── Resource rows (Level 3) ── */}
+            {isExpanded && svcDemands.map(demand => (
+              <div
+                key={demand.id}
+                onClick={() => setSelectedDemand(demand)}
+                className="flex items-center gap-3 px-4 py-1.5 ps-16 border-t border-divider/20 hover:bg-primary/5 cursor-pointer transition-colors"
+              >
+                <span className="flex-1 text-xs text-text-primary">{demand.resourceName}</span>
+                <span className="w-24 text-xs text-text-secondary">
+                  {demand.value.toLocaleString()} {demand.unit}
+                </span>
+                <span className={`text-[10px] font-medium w-28 ${statusColor(demand.status)}`}>
+                  {demand.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+      })}
 
       <DemandDetailSidebar
         demand={selectedDemand}
         project={null}
         isOpen={selectedDemand !== null}
         onClose={() => setSelectedDemand(null)}
-        onEdit={(d) => { setEditingDemand(d); setSelectedDemand(null); }}
         isModerator={canDecide}
-        onMakeDecision={canDecide ? (d) => { setDecidingDemand(d); setSelectedDemand(null); } : undefined}
       />
 
-      {editingDemand && (
-        <CreateDemandModal
-          isOpen
-          onClose={() => setEditingDemand(null)}
-          onSubmit={handleSubmitDemand}
-          editingDemand={editingDemand}
-        />
+      <ConfirmDialog
+        isOpen={deleteServiceTarget !== null}
+        title={t('service.deleteGroupTitle', 'מחיקת שירות')}
+        message={t('service.deleteGroupMessage', 'מחיקת כל הדרישות בשירות זה היא בלתי הפיכה. להמשיך?')}
+        onConfirm={handleConfirmDeleteGroup}
+        onCancel={() => setDeleteServiceTarget(null)}
+        danger
+      />
+
+      <ConfirmDialog
+        isOpen={quickApproveTarget !== null}
+        title={t('service.quickApproveTitle', 'אישור מהיר')}
+        message={t('service.quickApproveMessage', 'לאשר את כל הדרישות הממתינות בשירות זה בכמות המבוקשת?')}
+        onConfirm={handleConfirmQuickApprove}
+        onCancel={() => setQuickApproveTarget(null)}
+      />
+
+      {/* ManageServiceDemandsModal placeholder — wired in Task 4 */}
+      {managingServiceName !== null && (
+        <div style={{ display: 'none' }} />
       )}
 
-      <DecisionModal
-        open={decidingDemand !== null}
-        onClose={() => setDecidingDemand(null)}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        demand={decidingDemand}
-        isLoading={isDecisionLoading}
-      />
+      {/* ServiceDecisionModal placeholder — wired in Task 5 */}
+      {decidingServiceName !== null && (
+        <div style={{ display: 'none' }} />
+      )}
     </div>
   );
 }
