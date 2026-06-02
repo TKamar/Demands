@@ -1,0 +1,248 @@
+﻿[
+    {
+        "resources":  [
+                          {
+                              "unit":  "MB/s",
+                              "name":  "Throughput"
+                          },
+                          {
+                              "unit":  "Schematic Binary\\",
+                              "name":  "files type"
+                          },
+                          {
+                              "unit":  "small / big",
+                              "name":  "files Size"
+                          }
+                      ],
+        "service":  "CAAS"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "Logs, Text, geo, Vector",
+                              "name":  "Elastic Type"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "License"
+                          }
+                      ],
+        "service":  "ECK"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "0",
+                              "name":  "Files Amount"
+                          },
+                          {
+                              "unit":  "GB",
+                              "name":  "Space Quota"
+                          }
+                      ],
+        "service":  "HDFS"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage (no backup)"
+                          },
+                          {
+                              "unit":  "MB/s",
+                              "name":  "Throughput in"
+                          },
+                          {
+                              "unit":  "MB/s",
+                              "name":  "Throughput out"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "Partitions"
+                          }
+                      ],
+        "service":  "KAFKA"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "0",
+                              "name":  "מודל גדול/קטן"
+                          }
+                      ],
+        "service":  "LLM"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          }
+                      ],
+        "service":  "MongoK"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          }
+                      ],
+        "service":  "MongoVM"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          }
+                      ],
+        "service":  "MSSQL"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          },
+                          {
+                              "unit":  "HDD / SSD",
+                              "name":  "Hardware Type"
+                          }
+                      ],
+        "service":  "NAS"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "0",
+                              "name":  "CPU"
+                          },
+                          {
+                              "unit":  "GB",
+                              "name":  "Memory"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "Messages per Second"
+                          }
+                      ],
+        "service":  "NIFI"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Memory"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "Pods"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "Cores"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "CPU"
+                          }
+                      ],
+        "service":  "Openshift"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          }
+                      ],
+        "service":  "Oracle"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          }
+                      ],
+        "service":  "Postgres (PG)"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Memory (Shards X7)"
+                          }
+                      ],
+        "service":  "Redis"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          },
+                          {
+                              "unit":  "GB",
+                              "name":  "Memory"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "GPU"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "CPU"
+                          }
+                      ],
+        "service":  "RUNAI"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          },
+                          {
+                              "unit":  "0",
+                              "name":  "Files Amount"
+                          }
+                      ],
+        "service":  "S3"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "GB",
+                              "name":  "Memory"
+                          },
+                          {
+                              "unit":  "GB",
+                              "name":  "Storage"
+                          }
+                      ],
+        "service":  "Spark"
+    },
+    {
+        "resources":  [
+                          {
+                              "unit":  "0",
+                              "name":  "vCPU"
+                          },
+                          {
+                              "unit":  "GHz",
+                              "name":  "CPU"
+                          },
+                          {
+                              "unit":  "GB",
+                              "name":  "Memory"
+                          },
+                          {
+                              "unit":  "A100, T4, H100",
+                              "name":  "GPU type"
+                          }
+                      ],
+        "service":  "VM"
+    }
+]

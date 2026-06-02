@@ -794,7 +794,7 @@ export default function CreateProjectModal({
                       >
                         <option value="">{t('demand.service', 'שירות')}</option>
                         {referenceData.services.map(s => (
-                          <option key={s.name} value={s.name}>{s.name}</option>
+                          <option key={s.name} value={s.name}>{s.displayName || s.name}</option>
                         ))}
                       </select>
 

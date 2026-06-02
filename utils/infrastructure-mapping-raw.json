@@ -1,0 +1,380 @@
+﻿[
+    {
+        "cells":  [
+                      "A - קטגוריה",
+                      "B - שירות/מערכת",
+                      "C - פרמטר",
+                      "D - יחידה"
+                  ],
+        "raw":  "A - קטגוריה|B - שירות/מערכת|C - פרמטר|D - יחידה"
+    },
+    {
+        "cells":  [
+                      "אחסון",
+                      "HDFS",
+                      "Files Amount",
+                      "0"
+                  ],
+        "raw":  "אחסון|HDFS|Files Amount|0"
+    },
+    {
+        "cells":  [
+                      "אחסון",
+                      "HDFS",
+                      "Space Quota",
+                      "GB"
+                  ],
+        "raw":  "אחסון|HDFS|Space Quota|GB"
+    },
+    {
+        "cells":  [
+                      "אחסון",
+                      "NAS",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "אחסון|NAS|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "אחסון",
+                      "NAS",
+                      "Hardware Type",
+                      "HDD / SSD"
+                  ],
+        "raw":  "אחסון|NAS|Hardware Type|HDD / SSD"
+    },
+    {
+        "cells":  [
+                      "אחסון",
+                      "S3",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "אחסון|S3|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "אחסון",
+                      "S3",
+                      "Files Amount",
+                      "0"
+                  ],
+        "raw":  "אחסון|S3|Files Amount|0"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "MongoK",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "מאגרים|MongoK|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "MongoVM",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "מאגרים|MongoVM|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "Postgres (PG)",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "מאגרים|Postgres (PG)|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "מאגרים||Storage|GB"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "ECK",
+                      "Elastic Type",
+                      "Logs, Text, geo, Vector"
+                  ],
+        "raw":  "מאגרים|ECK|Elastic Type|Logs, Text, geo, Vector"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "ECK",
+                      "License",
+                      "0"
+                  ],
+        "raw":  "מאגרים|ECK|License|0"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "Redis",
+                      "Memory (Shards X7)",
+                      "GB"
+                  ],
+        "raw":  "מאגרים|Redis|Memory (Shards X7)|GB"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "Oracle",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "מאגרים|Oracle|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "MSSQL",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "מאגרים|MSSQL|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "מאגרים",
+                      "",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "מאגרים||Storage|GB"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "Openshift",
+                      "Memory",
+                      "GB"
+                  ],
+        "raw":  "עיבוד|Openshift|Memory|GB"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "Openshift",
+                      "Pods",
+                      "0"
+                  ],
+        "raw":  "עיבוד|Openshift|Pods|0"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "Openshift",
+                      "Cores",
+                      "0"
+                  ],
+        "raw":  "עיבוד|Openshift|Cores|0"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "Openshift",
+                      "CPU",
+                      "0"
+                  ],
+        "raw":  "עיבוד|Openshift|CPU|0"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "Spark",
+                      "Memory",
+                      "GB"
+                  ],
+        "raw":  "עיבוד|Spark|Memory|GB"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "Spark",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "עיבוד|Spark|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "VM",
+                      "vCPU",
+                      "0"
+                  ],
+        "raw":  "עיבוד|VM|vCPU|0"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "VM",
+                      "CPU",
+                      "GHz"
+                  ],
+        "raw":  "עיבוד|VM|CPU|GHz"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "VM",
+                      "Memory",
+                      "GB"
+                  ],
+        "raw":  "עיבוד|VM|Memory|GB"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "VM",
+                      "GPU type",
+                      "A100, T4, H100"
+                  ],
+        "raw":  "עיבוד|VM|GPU type|A100, T4, H100"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "RUNAI",
+                      "Storage",
+                      "GB"
+                  ],
+        "raw":  "עיבוד|RUNAI|Storage|GB"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "RUNAI",
+                      "Memory",
+                      "GB"
+                  ],
+        "raw":  "עיבוד|RUNAI|Memory|GB"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "RUNAI",
+                      "GPU",
+                      "0"
+                  ],
+        "raw":  "עיבוד|RUNAI|GPU|0"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "RUNAI",
+                      "CPU",
+                      "0"
+                  ],
+        "raw":  "עיבוד|RUNAI|CPU|0"
+    },
+    {
+        "cells":  [
+                      "עיבוד",
+                      "LLM",
+                      "מודל גדול/קטן",
+                      "0"
+                  ],
+        "raw":  "עיבוד|LLM|מודל גדול/קטן|0"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "NIFI",
+                      "CPU",
+                      "0"
+                  ],
+        "raw":  "שינוע מידע|NIFI|CPU|0"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "NIFI",
+                      "Memory",
+                      "GB"
+                  ],
+        "raw":  "שינוע מידע|NIFI|Memory|GB"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "NIFI",
+                      "Messages per Second",
+                      "0"
+                  ],
+        "raw":  "שינוע מידע|NIFI|Messages per Second|0"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "CAAS",
+                      "Throughput",
+                      "MB/s"
+                  ],
+        "raw":  "שינוע מידע|CAAS|Throughput|MB/s"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "CAAS",
+                      "files type",
+                      "Schematic Binary\\"
+                  ],
+        "raw":  "שינוע מידע|CAAS|files type|Schematic Binary\\"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "CAAS",
+                      "files Size",
+                      "small / big"
+                  ],
+        "raw":  "שינוע מידע|CAAS|files Size|small / big"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "KAFKA",
+                      "Storage (no backup)",
+                      "GB"
+                  ],
+        "raw":  "שינוע מידע|KAFKA|Storage (no backup)|GB"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "KAFKA",
+                      "Throughput in",
+                      "MB/s"
+                  ],
+        "raw":  "שינוע מידע|KAFKA|Throughput in|MB/s"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "KAFKA",
+                      "Throughput out",
+                      "MB/s"
+                  ],
+        "raw":  "שינוע מידע|KAFKA|Throughput out|MB/s"
+    },
+    {
+        "cells":  [
+                      "שינוע מידע",
+                      "KAFKA",
+                      "Partitions",
+                      "0"
+                  ],
+        "raw":  "שינוע מידע|KAFKA|Partitions|0"
+    }
+]
