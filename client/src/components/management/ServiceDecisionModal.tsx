@@ -104,12 +104,15 @@ export default function ServiceDecisionModal({
     if (!targetService) return;
     setIsSubmitting(true);
     try {
-      await Promise.allSettled(demands.map(d => transferDemand(d.id, targetService)));
-      showToast(t('management.success.transferred', 'הדרישות הועברו בהצלחה'), 'success');
+      const results = await Promise.allSettled(demands.map(d => transferDemand(d.id, targetService)));
+      const failed = results.filter(r => r.status === 'rejected').length;
+      if (failed > 0) {
+        showToast(`${demands.length - failed} הועברו, ${failed} נכשלו`, 'error');
+      } else {
+        showToast(t('management.success.transferred', 'הדרישות הועברו בהצלחה'), 'success');
+      }
       onSuccess?.();
       onClose();
-    } catch (err: any) {
-      showToast(err?.response?.data?.error || t('management.error.transferFailed', 'העברה נכשלה'), 'error');
     } finally {
       setIsSubmitting(false);
     }
