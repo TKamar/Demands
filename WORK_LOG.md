@@ -536,3 +536,64 @@ npx prisma studio
 - `feat: align sub-project-c seed with real infrastructure taxonomy`
 
 ---
+
+## Phase 2: Infrastructure Logic Alignment (2026-06-02)
+
+Branch: `feature/infrastructure-mapping-refactor`
+
+**Status:** Complete
+
+**Objective:** Close 5 logic and UX gaps discovered during comprehensive codebase audit.
+
+**Changes:**
+
+1. **Server-side resource validation** (`demand.service.ts` + `demand.controller.ts`)
+   - Added Prisma resource lookup using composite key (name, serviceName)
+   - Prevents orphaned demand records when transferring to incompatible services
+   - Returns 400 with descriptive error message for client feedback
+
+2. **Client-side transfer dropdown filtering** (`DecisionModal.tsx`)
+   - Added resource-compatibility filter to transfer dropdown
+   - Only shows services that have the demand's resource
+   - Shows empty-state message when no compatible services exist
+
+3. **Group transfer dropdown filtering** (`ServiceDecisionModal.tsx`)
+   - Added multi-resource compatibility filter for service groups
+   - Ensures all demands in a group can be transferred together
+   - Uses `.every()` check for resource compatibility across all group demands
+
+4. **Missing i18n keys** (`en/translation.json` + `he/translation.json`)
+   - Added 11 keys to new `service` section (resources, deleteGroupTitle, deleteGroupMessage, etc.)
+   - Added 2 keys to `management.success` (transferred, decided)
+   - Added 1 key to `management.error` (transferFailed)
+   - Replaced hardcoded Hebrew fallback strings with proper translation keys
+
+5. **Display consistency** (`CreateProjectModal.tsx`)
+   - Changed service option label from `s.name` to `s.displayName || s.name`
+   - Aligns with pattern used in all other service dropdowns
+
+**Commits:**
+- `d21c582` - fix: validate resource compatibility in transferDemand
+- `85ecfbb` - fix: filter transfer dropdown to resource-compatible services
+- `febe042` - fix: filter group transfer dropdown to resource-compatible services
+- `b35647f` - fix: add missing i18n keys for service group actions and transfer feedback
+- `ac510d9` - fix: use displayName fallback for service options in CreateProjectModal
+
+**Architecture Notes:**
+- All changes follow existing database-driven patterns
+- No hardcoded service names or values
+- Resource compatibility uses composite key (name, serviceName) pattern from Prisma schema
+- Client filtering uses already-loaded ReferenceDataContext to prevent extra API calls
+- i18n keys follow project conventions and include proper fallbacks
+
+**Testing:**
+- Server: Resource validation tested with incompatible service transfers (returns 400)
+- Client: Transfer dropdowns verified to show only compatible services and empty-state messages
+- i18n: All keys properly defined, no missing key warnings in console
+- Consistency: All service dropdowns now use same displayName || name pattern
+
+**Next Steps:**
+- Monitor for any edge cases with unusual service/resource combinations
+- Consider adding per-resource input type enhancements in future sprint (enum values for GPU type, etc.)
+
+---
