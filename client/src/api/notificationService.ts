@@ -19,14 +19,14 @@ export interface NotificationsResponse {
 }
 
 export async function fetchNotifications(page = 1, limit = 20): Promise<NotificationsResponse> {
-  const { data } = await api.get('/notifications', { params: { page, limit } });
+  const { data } = await api.get('/api/notifications', { params: { page, limit } });
   return data;
 }
 
 export async function markNotificationRead(id: number): Promise<void> {
-  await api.patch(`/notifications/${id}/read`);
+  await api.patch(`/api/notifications/${id}/read`);
 }
 
 export async function markAllNotificationsRead(): Promise<void> {
-  await api.patch('/notifications/read-all');
+  await api.patch('/api/notifications/read-all');
 }
