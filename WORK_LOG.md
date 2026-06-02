@@ -286,3 +286,30 @@ Started: 2026-06-01
 - `RequestsIOpened`: added `selectedCenters` filter; added create/edit/cancel demand actions mirroring RequirementsView
 - `RequestHistory`: added `selectedCenters` filter via `useHistoryDemands`
 - `CreateProjectModal`: added edit-mode demands section — fetches project demands with AbortController, lists them with Edit/Cancel per row, stacks `CreateDemandModal` and `ConfirmDialog` for actions
+
+---
+
+## Sub-Project B: 3-Level Table Accordion
+
+Branch: `feature/sub-project-b-accordion`
+Started: 2026-06-01
+
+| Task | Area | Status |
+|------|------|--------|
+| 1 | Extract DemandSubTable to own file | ✅ Done |
+| 2 | CreateDemandModal default props | ⏳ Pending |
+| 3 | DemandSubTable 3-level refactor | ⏳ Pending |
+| 4 | ManageServiceDemandsModal | ⏳ Pending |
+| 5 | ServiceDecisionModal (Deep Decision) | ⏳ Pending |
+| 6 | Manual Verification | ⏳ Pending |
+| 7 | WORK_LOG Update | ⏳ Pending |
+
+### 2026-06-01
+
+**feature/sub-project-b-accordion**
+- `DemandSubTable.tsx`: extracted from `ProjectsAccordion.tsx`; 217 new lines; exports ACTIVE_STATUSES, TERMINAL_STATUSES constants
+- `ProjectsAccordion.tsx`: updated to import DemandSubTable from new file; removed 238 lines of old definition
+- **Code Quality Fixes:**
+  - `DemandSubTable.tsx` `handleSubmitDemand`: added try/catch wrapper with success toast (`demand.updated`) and error toast (`demand.updateError`)
+  - `WORK_LOG.md`: documented Sub-Project B task breakdown and Task 1 completion
+- **Next:** Task 2 - add defaultProjectName and defaultServiceName props to CreateDemandModal
