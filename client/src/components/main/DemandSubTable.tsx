@@ -55,8 +55,13 @@ export default function DemandSubTable({
 
   async function handleSubmitDemand(payload: CreateDemandPayload | UpdateDemandPayload, demandId?: number) {
     if (demandId) {
-      await updateDemand(demandId, payload as UpdateDemandPayload);
-      setEditingDemand(null);
+      try {
+        await updateDemand(demandId, payload as UpdateDemandPayload);
+        showToast(t('demand.updated', 'Requirement updated'), 'success');
+        setEditingDemand(null);
+      } catch {
+        showToast(t('demand.updateError', 'Failed to update requirement'), 'error');
+      }
     }
   }
 
