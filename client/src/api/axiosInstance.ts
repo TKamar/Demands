@@ -4,12 +4,17 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
+let _token: string | null = null;
+
 export function setAuthToken(token: string | null) {
-  if (token) {
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    delete api.defaults.headers.common['Authorization'];
-  }
+  _token = token;
 }
+
+api.interceptors.request.use((config) => {
+  if (_token) {
+    config.headers.Authorization = `Bearer ${_token}`;
+  }
+  return config;
+});
 
 export default api;

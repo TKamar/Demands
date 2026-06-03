@@ -9,7 +9,7 @@ export function useCurrentUser(): AppUser | null {
 
   useEffect(() => {
     if (!auth.isAuthenticated) return;
-    api.get<AppUser>('/me')
+    api.get<AppUser>('/api/me')
       .then(res => setUser(res.data))
       .catch(() => setUser(null));
   }, [auth.isAuthenticated]);
