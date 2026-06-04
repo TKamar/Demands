@@ -406,3 +406,21 @@ export async function updateUser(username: string, payload: UpdateUserPayload): 
   const res = await api.patch<AppUser>(`/api/users/${username}`, payload);
   return res.data;
 }
+
+// --- Service Admin ---
+
+export async function updateService(name: string, data: { moderators: string[] }): Promise<any> {
+  const response = await api.put(`/api/services/${name}`, data);
+  return response.data;
+}
+
+export async function getAllServices(): Promise<any[]> {
+  const response = await api.get('/api/services');
+  return response.data;
+}
+
+export const apiService = {
+  updateService,
+  getAllServices,
+  getUsers: fetchUsers,
+};

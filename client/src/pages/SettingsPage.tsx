@@ -8,6 +8,7 @@ import WalletManagement from '../components/management/WalletManagement';
 import EntityManager from '../components/common/EntityManager';
 import { useReferenceData } from '../hooks/useReferenceData';
 import { UserManagement } from '../components/settings/UserManagement';
+import { ServiceAdmin } from '../components/settings/ServiceAdmin';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import type { UserRole } from '../types/domain';
 
@@ -347,6 +348,7 @@ function ServicesSettings({ serviceOptions, onSuccess }: { serviceOptions: { val
     const tabs = [
         { id: 'service', label: t('settings.tabs.service', 'Services') },
         { id: 'resource', label: t('settings.tabs.resource', 'Resources') },
+        { id: 'admin', label: t('settings.tabs.admin', 'Service Admin') },
     ];
 
     return (
@@ -407,6 +409,9 @@ function ServicesSettings({ serviceOptions, onSuccess }: { serviceOptions: { val
                         { key: 'unit', label: t('settings.resource.unit', 'Unit'), type: 'text', required: true },
                     ]}
                 />
+            )}
+            {subTab === 'admin' && (
+                <ServiceAdmin />
             )}
         </div>
     );
