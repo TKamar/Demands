@@ -241,6 +241,7 @@ Started: 2026-05-25
 
 ---
 
+<<<<<<< HEAD
 ## Requirements Location & Create Button Fix
 
 Branch: `feature/requirements-location-create-button`
@@ -597,3 +598,36 @@ Branch: `feature/infrastructure-mapping-refactor`
 - Consider adding per-resource input type enhancements in future sprint (enum values for GPU type, etc.)
 
 ---
+
+## Sprint: Mock Data Architecture Overhaul
+**Branch:** `feature/mock-data-overhaul`
+**Started:** 2026-06-04
+
+### Goal
+Replace stale user profiles and stub E2E data with 3 structured lifecycle scenarios.
+Promote `user2` to CENTER_MANAGER. Remove `cm1` (not in Keycloak — cannot log in).
+
+### Completed: 2026-06-04
+
+**Changes made:**
+- `server/prisma/seed.ts`:
+  - Promoted `user2` from REGULAR_USER to CENTER_MANAGER (IT Center). Added `role` to `update` clause for idempotency.
+  - Removed `cm1` user record (absent from Keycloak; cannot log in).
+  - Replaced 2-demand stub "E2E Test Project" with 3 structured scenarios:
+    - Scenario A: "E2E - Awaiting CM Approval" — 3 VM demands, PendingCenterManager
+    - Scenario B: "E2E - Pending Moderator Review" — 3 Openshift demands, Pending
+    - Scenario C: "E2E - Resolved History" — Approved + Rejected + PartiallyApproved
+
+- `docs/KEYCLOAK_USER_FLOW.md`: Created comprehensive documentation explaining how user identity flows through Keycloak → Backend → Database, including role assignment examples and test verification scenarios.
+
+**RBAC Visibility Matrix (verified in Docker):**
+
+| Scenario | user1 (My Requests) | user2 (CM Approval Queue) | mod1 (Mod Approval Queue) | Any History tab |
+|---|---|---|---|---|
+| A — PendingCenterManager | Yes | Yes | No | No |
+| B — Pending | Yes | No | Yes | No |
+| C — Terminal | No | No | No | user1 History only |
+
+**No Keycloak changes needed:** `user2` exists in Keycloak as `user` group; `requireAuth` middleware promotes to CENTER_MANAGER from DB.
+
+### Status: Complete — Ready for Plan B
