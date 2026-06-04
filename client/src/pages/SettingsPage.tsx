@@ -238,22 +238,27 @@ function OrganizationSettings({
                             label: t('settings.section.center', 'Center'),
                             type: 'select',
                             options: centerOptions,
-                            onChange: () => ({ branchName: '' }) // Reset branch when center changes
+                            required: true,
                         },
                         {
                             key: 'branchName',
                             label: t('settings.section.branch', 'Branch'),
                             type: 'select',
                             required: true,
-                            disabled: (formData) => !formData.branchCenter,
-                            dynamicOptions: (formData) => {
-                                if (!formData.branchCenter) return [];
-                                return branches
-                                    .filter(b => b.centerName === formData.branchCenter)
-                                    .map(b => ({
-                                        value: b.name,
-                                        label: b.displayName || b.name
-                                    }));
+                            dependsOn: 'branchCenter',
+                            optionsLoader: async (centerName) => {
+                                try {
+                                    // Use static data from branches array (already loaded via useReferenceData)
+                                    return branches
+                                        .filter(b => b.centerName === centerName)
+                                        .map(b => ({
+                                            value: b.name,
+                                            label: b.displayName || b.name
+                                        }));
+                                } catch (err) {
+                                    console.error('Failed to load branches:', err);
+                                    return [];
+                                }
                             }
                         },
                         { key: 'name', label: t('common.name', 'Name'), type: 'text', required: true },

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MdAdd, MdEdit, MdDelete, MdSearch } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { useToast } from './Toast';
@@ -25,6 +25,9 @@ export interface EntityField {
     disabled?: boolean | ((formData: Record<string, any>) => boolean); // Can be used to disable fields during update if needed or based on other fields
     description?: string;
     onChange?: (value: any, formData: Record<string, any>) => Record<string, any>; // Return partial form data to update
+    // NEW: dependency support for async option loading
+    dependsOn?: string; // key of parent field (e.g., 'centerName')
+    optionsLoader?: (parentValue: string) => Promise<{ value: any; label: string }[]>;
 }
 
 interface EntityManagerProps {
@@ -62,6 +65,10 @@ export default function EntityManager({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
+
+    // Async options state for dependent fields
+    const [asyncOptions, setAsyncOptions] = useState<Record<string, { value: any; label: string }[]>>({});
+    const [loadingFields, setLoadingFields] = useState<Set<string>>(new Set());
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -201,7 +208,31 @@ export default function EntityManager({
         });
     });
 
+    const getFieldOptions = (field: EntityField): { value: any; label: string }[] => {
+        // Check for async options first (loaded via optionsLoader)
+        if (field.dependsOn && asyncOptions[field.key]) {
+            return asyncOptions[field.key];
+        }
+        // Fall back to dynamicOptions if available
+        if (field.dynamicOptions) {
+            return field.dynamicOptions(formData);
+        }
+        // Fall back to static options
+        return field.options || [];
+    };
+
     const isFieldDisabled = (field: EntityField) => {
+        // If field is loading async options, disable it
+        if (loadingFields.has(field.key)) {
+            return true;
+        }
+        // If field depends on another field and parent is not selected, disable it
+        if (field.dependsOn) {
+            const parentValue = formData[field.dependsOn];
+            if (!parentValue) {
+                return true;
+            }
+        }
         if (typeof field.disabled === 'function') {
             return field.disabled(formData);
         }
@@ -214,14 +245,43 @@ export default function EntityManager({
         return false;
     };
 
-    const handleFieldChange = (field: EntityField, value: any) => {
+    const handleFieldChange = useCallback(async (field: EntityField, value: any) => {
+        // Update current field value
         if (field.onChange) {
             const updates = field.onChange(value, formData);
-            setFormData({ ...formData, ...updates, [field.key]: value });
+            setFormData(prev => ({ ...prev, ...updates, [field.key]: value }));
         } else {
-            setFormData({ ...formData, [field.key]: value });
+            setFormData(prev => ({ ...prev, [field.key]: value }));
         }
-    };
+
+        // Find dependent fields and reload their options
+        const dependentFields = fields.filter(f => f.dependsOn === field.key);
+
+        for (const depField of dependentFields) {
+            if (depField.optionsLoader && value) {
+                setLoadingFields(prev => new Set([...prev, depField.key]));
+                try {
+                    const opts = await depField.optionsLoader(value);
+                    setAsyncOptions(prev => ({ ...prev, [depField.key]: opts }));
+                    // Clear dependent field value if it's no longer valid
+                    setFormData(prev => ({ ...prev, [depField.key]: '' }));
+                } catch (err) {
+                    console.error(`Failed to load options for ${depField.key}:`, err);
+                    setAsyncOptions(prev => ({ ...prev, [depField.key]: [] }));
+                } finally {
+                    setLoadingFields(prev => {
+                        const updated = new Set(prev);
+                        updated.delete(depField.key);
+                        return updated;
+                    });
+                }
+            } else if (depField.optionsLoader && !value) {
+                // Clear dependent field when parent is cleared
+                setAsyncOptions(prev => ({ ...prev, [depField.key]: [] }));
+                setFormData(prev => ({ ...prev, [depField.key]: '' }));
+            }
+        }
+    }, [fields]);
 
     const handleToggle = async (item: any, key: string, currentValue: boolean) => {
         const rowId = getRowId(item);
@@ -385,13 +445,15 @@ export default function EntityManager({
             >
                 <div className="flex flex-col gap-4">
                     {fields.map(field => {
-                        const fieldOptions = field.dynamicOptions ? field.dynamicOptions(formData) : field.options;
+                        const fieldOptions = getFieldOptions(field);
                         const isDisabled = isFieldDisabled(field);
+                        const isLoadingAsync = loadingFields.has(field.key);
 
                         return (
                             <div key={field.key} className="flex flex-col gap-1.5">
                                 <label className="text-sm font-medium text-text-secondary">
                                     {field.label} {field.required && <span className="text-red-500">*</span>}
+                                    {isLoadingAsync && <span className="text-xs text-primary ml-2">(Loading...)</span>}
                                 </label>
 
                                 {field.type === 'select' && fieldOptions ? (
