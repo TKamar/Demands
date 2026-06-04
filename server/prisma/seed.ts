@@ -325,31 +325,28 @@ async function main() {
   /*
    * Test User Accounts — Keycloak Realm Prerequisites
    *
-   * The following accounts must exist in the local Keycloak realm to log in during development.
-   * DB User records are seeded below so roles persist through OIDC login without being reset.
+   * Username    | Role            | Center              | Notes
+   * ------------|-----------------|---------------------|-------------------------------------
+   * admin1      | ADMIN           | -                   | Global scope; all data visible
+   * admin2      | ADMIN           | -                   | Secondary admin
+   * mod1        | MODERATOR       | -                   | Manages: Openshift, VM, RUNAI, LLM
+   * mod2        | MODERATOR       | -                   | Manages: NIFI, CAAS, KAFKA
+   * mod3        | MODERATOR       | -                   | Manages: HDFS, NAS, S3
+   * mod4        | MODERATOR       | -                   | Manages: MongoK, MongoVM, Postgres (PG)
+   * mod5        | MODERATOR       | -                   | Manages: Oracle, MSSQL
+   * mod6        | MODERATOR       | -                   | Manages: ECK, Redis, Spark
+   * mod7        | MODERATOR       | -                   | Manages: Spark, RUNAI, LLM, KAFKA
+   * user1       | REGULAR_USER    | IT Center           | E2E request creator
+   * user2       | CENTER_MANAGER  | IT Center           | E2E center manager for user1's center
+   * user3       | REGULAR_USER    | Operations Center   | Background user
    *
-   * Username    | Role            | Center       | Managed Services
-   * ------------|-----------------|--------------|-------------------
-   * admin1      | ADMIN           | -            | -
-   * admin2      | ADMIN           | -            | -
-   * cm1         | CENTER_MANAGER  | IT Center    | -
-   * mod1        | MODERATOR       | -            | Compute, Database
-   * mod2        | MODERATOR       | -            | Compute, Container
-   * mod3        | MODERATOR       | -            | Storage
-   * mod4        | MODERATOR       | -            | Storage
-   * mod5        | MODERATOR       | -            | Network
-   * mod6        | MODERATOR       | -            | Database
-   * mod7        | MODERATOR       | -            | Container
-   * user1       | REGULAR_USER    | IT Center    | -
-   * user2       | REGULAR_USER    | IT Center    | -
-   * user3       | REGULAR_USER    | Operations Center | -
+   * DB role overrides Keycloak group at login (requireAuth middleware upserts from DB).
+   * user2 exists in Keycloak as 'user' group — no realm change needed for CM flow.
    */
 
-  // Keycloak users (username = username, since UUIDs are generated at realm import)
   const USERS = {
     admin1: { username: 'admin1', name: 'Admin One' },
     admin2: { username: 'admin2', name: 'Admin Two' },
-    cm1: { username: 'cm1', name: 'Center Manager One' },
     mod1: { username: 'mod1', name: 'Moderator One' },
     mod2: { username: 'mod2', name: 'Moderator Two' },
     mod3: { username: 'mod3', name: 'Moderator Three' },
@@ -581,11 +578,6 @@ async function main() {
       update: { fullName: 'Admin Two' },
     }),
     prisma.user.upsert({
-      where: { username: 'cm1' },
-      create: { username: 'cm1', fullName: 'Center Manager One', role: UserRole.CENTER_MANAGER, centerName: 'IT Center' },
-      update: { fullName: 'Center Manager One' },
-    }),
-    prisma.user.upsert({
       where: { username: 'mod1' },
       create: { username: 'mod1', fullName: 'Moderator One', role: UserRole.MODERATOR, centerName: null },
       update: { fullName: 'Moderator One' },
@@ -627,8 +619,8 @@ async function main() {
     }),
     prisma.user.upsert({
       where: { username: 'user2' },
-      create: { username: 'user2', fullName: 'User Two', role: UserRole.REGULAR_USER, centerName: 'IT Center' },
-      update: { fullName: 'User Two' },
+      create: { username: 'user2', fullName: 'User Two', role: UserRole.CENTER_MANAGER, centerName: 'IT Center' },
+      update: { role: UserRole.CENTER_MANAGER, fullName: 'User Two' },
     }),
     prisma.user.upsert({
       where: { username: 'user3' },
@@ -636,7 +628,7 @@ async function main() {
       update: { fullName: 'User Three' },
     }),
   ]);
-  console.log('Seeded 13 user records (admin1, admin2, cm1, mod1-mod7, user1-user3)');
+  console.log('Seeded 12 user records (admin1, admin2, mod1-mod7, user1-user3)');
 
   // ============================================
   // E2E Test Scenario
