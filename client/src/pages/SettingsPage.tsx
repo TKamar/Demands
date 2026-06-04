@@ -9,6 +9,24 @@ import EntityManager from '../components/common/EntityManager';
 import { useReferenceData } from '../hooks/useReferenceData';
 import { UserManagement } from '../components/settings/UserManagement';
 import { useCurrentUser } from '../hooks/useCurrentUser';
+import type { UserRole } from '../types/domain';
+
+// Role-based tab visibility
+const getVisibleTabs = (role: UserRole): string[] => {
+  switch (role) {
+    case 'ADMIN':
+      return ['infrastructure', 'organization', 'options', 'services', 'capacity', 'wallets', 'users'];
+    case 'MODERATOR':
+      return ['services'];
+    default:
+      // REGULAR_USER, CENTER_MANAGER: no settings access
+      return [];
+  }
+};
+
+const showTab = (tabName: string, role: UserRole): boolean => {
+  return getVisibleTabs(role).includes(tabName);
+};
 
 // Sub-components for each tab section
 function InfrastructureSettings({
@@ -398,8 +416,12 @@ export default function SettingsPage() {
     // DB-backed role takes precedence; fall back to OIDC groups for initial render
     const dbRole = currentUser?.role;
     const oidcRole = (auth.user?.profile.groups as string[])?.[0]?.toLowerCase() || 'user';
-    const isAdmin = dbRole === 'ADMIN' || (!dbRole && oidcRole === 'admin');
-    const isModerator = dbRole === 'MODERATOR' || (!dbRole && oidcRole === 'moderator');
+    const userRole = (dbRole || (!dbRole && oidcRole === 'admin' ? 'ADMIN' : oidcRole === 'moderator' ? 'MODERATOR' : 'REGULAR_USER')) as UserRole;
+    const isAdmin = userRole === 'ADMIN';
+    const isModerator = userRole === 'MODERATOR';
+
+    // Check access permissions
+    const hasAccess = showTab('infrastructure', userRole) || showTab('services', userRole);
 
     const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services' | 'capacity' | 'wallets' | 'users'>(
         isAdmin ? 'infrastructure' : 'services'
@@ -437,6 +459,29 @@ export default function SettingsPage() {
         ] : []),
     ];
 
+    // Empty state for users without access
+    if (!hasAccess) {
+        return (
+            <div className="max-w-[1600px] mx-auto p-6 md:p-8">
+                <div className="mb-8">
+                    <button
+                        onClick={() => navigate('/projects')}
+                        className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer p-0 mb-4 text-sm"
+                    >
+                        <MdArrowBack size={16} />
+                        {t('common.back', 'Back')}
+                    </button>
+                    <h1 className="text-2xl font-bold text-text-primary mb-2">{t('nav.settings', 'Settings')}</h1>
+                </div>
+                <div className="bg-amber-50 border-l-4 border-amber-500 p-4">
+                    <p className="text-amber-800">
+                        {t('settings.accessDenied', 'Settings are available for Admins and Moderators only.')}
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-[1600px] mx-auto p-6 md:p-8">
             <div className="mb-8">
@@ -472,7 +517,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="animate-slide-in">
-                {mainTab === 'infrastructure' && (
+                {mainTab === 'infrastructure' && showTab('infrastructure', userRole) && (
                     <InfrastructureSettings
                         baseOptions={baseOptions}
                         envOptions={envOptions}
@@ -481,18 +526,18 @@ export default function SettingsPage() {
                         onSuccess={refreshData}
                     />
                 )}
-                {mainTab === 'organization' && (
+                {mainTab === 'organization' && showTab('organization', userRole) && (
                     <OrganizationSettings
                         centerOptions={centerOptions}
                         branches={branches}
                         onSuccess={refreshData}
                     />
                 )}
-                {mainTab === 'options' && <OptionsSettings onSuccess={refreshData} />}
-                {mainTab === 'services' && <ServicesSettings serviceOptions={serviceOptions} onSuccess={refreshData} />}
-                {mainTab === 'capacity' && <CapacityManagement />}
-                {mainTab === 'wallets' && <WalletManagement />}
-                {mainTab === 'users' && isAdmin && <UserManagement />}
+                {mainTab === 'options' && showTab('options', userRole) && <OptionsSettings onSuccess={refreshData} />}
+                {mainTab === 'services' && showTab('services', userRole) && <ServicesSettings serviceOptions={serviceOptions} onSuccess={refreshData} />}
+                {mainTab === 'capacity' && showTab('capacity', userRole) && <CapacityManagement />}
+                {mainTab === 'wallets' && showTab('wallets', userRole) && <WalletManagement />}
+                {mainTab === 'users' && showTab('users', userRole) && <UserManagement />}
             </div>
         </div>
     );
