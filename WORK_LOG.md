@@ -597,3 +597,89 @@ Branch: `feature/infrastructure-mapping-refactor`
 - Consider adding per-resource input type enhancements in future sprint (enum values for GPU type, etc.)
 
 ---
+
+## Sprint: Admin Settings Panel Enhancement & Feature Completeness
+
+**Branch:** `feature/admin-settings-enhancement`
+**Started:** 2026-06-04 (after Plan A completion)
+
+### Goal
+Enhance admin settings UI for production-grade multi-center management, add bulk operations, and document admin workflows.
+
+### Completed Tasks: 2026-06-04
+
+#### Task 1: Role-Based Settings Tab Visibility
+- Added `getVisibleTabs()` helper function to enforce role-based access
+- ADMIN: All 7 tabs (infrastructure, organization, options, services, capacity, wallets, users)
+- MODERATOR: Only 'services' tab visible
+- REGULAR_USER, CENTER_MANAGER: No access (empty state message)
+- Commit: `a49029d`
+
+#### Task 2: Dependent Dropdown for Organization Hierarchy
+- Extended `EntityField` interface with `dependsOn` and `optionsLoader` properties
+- Added `asyncOptions` and `loadingFields` state management
+- Implemented `handleFieldChange` to reload dependent field options on parent change
+- Configured Branch and Section tabs with dependent selects
+- Selecting a center auto-filters available branches
+- Selecting a branch auto-filters available sections
+- Commit: `821bdba`
+
+#### Task 3: Specialized ServiceAdmin Component
+- Created new `client/src/components/settings/ServiceAdmin.tsx` (181 lines)
+- Table-based interface for managing service moderators
+- Inline edit mode with checkbox multi-select for moderators
+- Bulk assignment operations with save/cancel controls
+- Loading states and error handling
+- Added 3 API methods: `updateService`, `getAllServices`, `getUsers`
+- Integrated into SettingsPage Services tab
+- Commit: `eddb148`
+
+#### Task 4: Bulk User Role Assignment
+- Added checkbox column to UserManagement table (select-all + individual)
+- Implemented `handleSelectAllUsers()` and `handleSelectUser()` handlers
+- Created `handleBulkRoleChange()` for bulk role updates with confirmation
+- Bulk action toolbar displays when users selected (5 buttons: 4 roles + clear)
+- Updates local state after successful bulk operations
+- Toast notifications for feedback
+- Commit: `460d9c9`
+
+#### Task 5: Admin User Guide Documentation
+- Created `docs/ADMIN_GUIDE.md` (222 lines, 9.2 KB)
+- 5 major sections: Organization Hierarchy, Services & Resources, User Management, Capacity & Wallets, Options & Project Configuration
+- 3 detailed common workflows: onboarding moderators, splitting services, expanding to new centers
+- Troubleshooting Q&A section
+- Best practices for administrators
+- Commit: `8ab2a8d`
+
+### Summary of Changes
+
+**Files Created:**
+- `client/src/components/settings/ServiceAdmin.tsx` (181 lines)
+- `docs/ADMIN_GUIDE.md` (222 lines)
+
+**Files Modified:**
+- `client/src/pages/SettingsPage.tsx` (role-based tab visibility + ServiceAdmin integration)
+- `client/src/components/common/EntityManager.tsx` (async option loading + dependent selects)
+- `client/src/components/settings/UserManagement.tsx` (bulk checkboxes + bulk actions)
+- `client/src/api/apiService.ts` (3 new API methods)
+
+**New Features:**
+- **Dependent selects**: Selecting a center auto-filters branch options
+- **Async option loading**: Dynamic dropdown population based on parent field
+- **Bulk operations**: Select multiple users → change all roles at once
+- **Service moderator UI**: Checkbox interface for assigning moderators to services
+- **Role-based visibility**: Moderators don't see Wallets or User Management tabs
+- **Admin documentation**: Complete workflows, troubleshooting, best practices
+
+**API Changes:**
+- `PUT /services/:name` — Update service with moderators array
+- No database schema changes required
+
+### Status: Complete — Production-Ready Admin Panel
+
+All 5 tasks completed and committed:
+- Task 1: `a49029d` ✅
+- Task 2: `821bdba` ✅
+- Task 3: `eddb148` ✅
+- Task 4: `460d9c9` ✅
+- Task 5: `8ab2a8d` ✅
