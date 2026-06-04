@@ -634,12 +634,29 @@ async function main() {
   // E2E Test Scenario
   // ============================================
 
-  const e2eProject = await prisma.project.upsert({
-    where: { name: 'E2E Test Project' },
+  // ============================================
+  // E2E Validation Scenarios
+  // ============================================
+
+  // Remove old stub E2E project on re-runs
+  await prisma.demand.deleteMany({ where: { projectName: 'E2E Test Project' } });
+  await prisma.project.deleteMany({ where: { name: 'E2E Test Project' } });
+
+  // ── Scenario A: Pending Center Manager Approval ──────────────────────────
+  //
+  // Visible to:
+  //   user1 → "Requests I Opened" (server: createdBy='user1')
+  //   user2 → "My Approval Requests" (GET /demands/center/pending:
+  //            centerName='IT Center' + status=PendingCenterManager)
+  // NOT visible to mod1 (status is PendingCenterManager, not Pending)
+  //
+  await prisma.demand.deleteMany({ where: { projectName: 'E2E - Awaiting CM Approval' } });
+  await prisma.project.upsert({
+    where: { name: 'E2E - Awaiting CM Approval' },
     update: {},
     create: {
-      name: 'E2E Test Project',
-      purpose: 'End-to-end testing of the RBAC approval flow',
+      name: 'E2E - Awaiting CM Approval',
+      purpose: 'VM resource request pending center manager approval',
       type: ProjectType.Semiannual,
       kindName: 'App',
       locationId: locations[0].id,
@@ -653,20 +670,82 @@ async function main() {
       createdByName: 'User One',
     },
   });
+  await Promise.all([
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Awaiting CM Approval',
+        serviceName: 'VM',
+        resourceName: 'vCPU',
+        resourceService: 'VM',
+        value: 8,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.PendingCenterManager,
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Awaiting CM Approval',
+        serviceName: 'VM',
+        resourceName: 'Memory',
+        resourceService: 'VM',
+        value: 32,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.PendingCenterManager,
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Awaiting CM Approval',
+        serviceName: 'VM',
+        resourceName: 'GPU type',
+        resourceService: 'VM',
+        value: 2,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.PendingCenterManager,
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+  ]);
+  console.log('E2E Scenario A: 3 VM demands (PendingCenterManager) — user1 → user2 flow');
 
-  await prisma.demand.deleteMany({ where: { projectName: 'E2E Test Project' } });
-
-  // Demand A: awaiting center manager approval (user1 → cm1 flow)
-  await prisma.demand.create({
-    data: {
-      projectName: 'E2E Test Project',
-      serviceName: 'VM',
-      resourceName: 'vCPU',
-      resourceService: 'VM',
-      value: 16,
+  // ── Scenario B: Pending Moderator Approval ────────────────────────────────
+  //
+  // Visible to:
+  //   user1 → "Requests I Opened" (server: createdBy='user1')
+  //   mod1  → "My Approval Requests" (managed=true: serviceName IN
+  //            [Openshift,VM,RUNAI,LLM] + status=Pending — Openshift matches)
+  // NOT visible to user2's CM queue (status=Pending, not PendingCenterManager)
+  //
+  await prisma.demand.deleteMany({ where: { projectName: 'E2E - Pending Moderator Review' } });
+  await prisma.project.upsert({
+    where: { name: 'E2E - Pending Moderator Review' },
+    update: {},
+    create: {
+      name: 'E2E - Pending Moderator Review',
+      purpose: 'Openshift resources awaiting moderator decision after CM approval',
+      type: ProjectType.Semiannual,
+      kindName: 'Track',
       locationId: locations[0].id,
-      type: DemandType.New,
-      status: DemandStatus.PendingCenterManager,
+      year: 2026,
+      median: Median.H2,
+      priority: Priority.P2,
       centerName: 'IT Center',
       branchName: 'Development',
       sectionName: 'Backend Team',
@@ -674,18 +753,81 @@ async function main() {
       createdByName: 'User One',
     },
   });
+  await Promise.all([
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Pending Moderator Review',
+        serviceName: 'Openshift',
+        resourceName: 'Memory',
+        resourceService: 'Openshift',
+        value: 64,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.Pending,
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Pending Moderator Review',
+        serviceName: 'Openshift',
+        resourceName: 'Pods',
+        resourceService: 'Openshift',
+        value: 20,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.Pending,
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Pending Moderator Review',
+        serviceName: 'Openshift',
+        resourceName: 'Cores',
+        resourceService: 'Openshift',
+        value: 16,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.Pending,
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+  ]);
+  console.log('E2E Scenario B: 3 Openshift demands (Pending) — user2-approved → mod1 flow');
 
-  // Demand B: awaiting moderator approval (after CM approval, user1 → mod1 flow)
-  await prisma.demand.create({
-    data: {
-      projectName: 'E2E Test Project',
-      serviceName: 'VM',
-      resourceName: 'Memory',
-      resourceService: 'VM',
-      value: 32,
+  // ── Scenario C: Resolved / Historic ──────────────────────────────────────
+  //
+  // Visible to:
+  //   user1 → "Request History" tab ONLY (terminal status + createdBy='user1'
+  //            + isInternalTicket=false — see demandService.getHistoryDemands)
+  // NOT in any approval queue (terminal statuses are never re-actionable)
+  //
+  await prisma.demand.deleteMany({ where: { projectName: 'E2E - Resolved History' } });
+  await prisma.project.upsert({
+    where: { name: 'E2E - Resolved History' },
+    update: {},
+    create: {
+      name: 'E2E - Resolved History',
+      purpose: 'Completed requests demonstrating all terminal decision states',
+      type: ProjectType.Semiannual,
+      kindName: 'App',
       locationId: locations[0].id,
-      type: DemandType.New,
-      status: DemandStatus.Pending,
+      year: 2026,
+      median: Median.H1,
+      priority: Priority.P2,
       centerName: 'IT Center',
       branchName: 'Development',
       sectionName: 'Backend Team',
@@ -693,8 +835,66 @@ async function main() {
       createdByName: 'User One',
     },
   });
-
-  console.log('Created E2E test scenario (project + 2 demands for user1)');
+  await Promise.all([
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Resolved History',
+        serviceName: 'VM',
+        resourceName: 'vCPU',
+        resourceService: 'VM',
+        value: 12,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.Approved,
+        approvedValue: 12,
+        approvedDate: new Date('2026-05-15T00:00:00.000Z'),
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Resolved History',
+        serviceName: 'LLM',
+        resourceName: 'Model Size',
+        resourceService: 'LLM',
+        value: 3,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.Rejected,
+        reason: 'Requested model count exceeds available capacity for this period',
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+    prisma.demand.create({
+      data: {
+        projectName: 'E2E - Resolved History',
+        serviceName: 'Openshift',
+        resourceName: 'Pods',
+        resourceService: 'Openshift',
+        value: 30,
+        locationId: locations[0].id,
+        type: DemandType.New,
+        status: DemandStatus.PartiallyApproved,
+        approvedValue: 20,
+        approvedDate: new Date('2026-05-20T00:00:00.000Z'),
+        reason: 'Partial allocation approved; full quota pending capacity review',
+        centerName: 'IT Center',
+        branchName: 'Development',
+        sectionName: 'Backend Team',
+        createdBy: 'user1',
+        createdByName: 'User One',
+      },
+    }),
+  ]);
+  console.log('E2E Scenario C: 3 demands (Approved/Rejected/PartiallyApproved) in user1 history');
 
   console.log('Seeding completed.');
 }
