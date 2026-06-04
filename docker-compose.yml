@@ -38,7 +38,7 @@ services:
       - ./client:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=${VITE_API_URL:-http://localhost:3000/api}
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3000}
       - VITE_OIDC_AUTHORITY=${VITE_OIDC_AUTHORITY:-http://localhost:8080/realms/demands}
       - VITE_OIDC_CLIENT_ID=${VITE_OIDC_CLIENT_ID:-demands-web}
       - VITE_OIDC_REDIRECT_URI=${VITE_OIDC_REDIRECT_URI:-http://localhost:5173/callback}
