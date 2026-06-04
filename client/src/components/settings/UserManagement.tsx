@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdEdit, MdSearch } from 'react-icons/md';
 import type { AppUser, UserRole } from '../../types/domain';
@@ -26,6 +26,7 @@ export const UserManagement: React.FC = () => {
   const [services, setServices] = useState<ReferenceItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
 
   // Modal state
   const [editingUser, setEditingUser] = useState<AppUser | null>(null);
@@ -63,6 +64,51 @@ export const UserManagement: React.FC = () => {
     const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
     setDraftServices(selected);
   };
+
+  const handleSelectAllUsers = useCallback((checked: boolean) => {
+    if (checked && users) {
+      setSelectedUsers(new Set(users.map(u => u.username)));
+    } else {
+      setSelectedUsers(new Set());
+    }
+  }, [users]);
+
+  const handleSelectUser = useCallback((username: string, checked: boolean) => {
+    const updated = new Set(selectedUsers);
+    if (checked) {
+      updated.add(username);
+    } else {
+      updated.delete(username);
+    }
+    setSelectedUsers(updated);
+  }, [selectedUsers]);
+
+  const handleBulkRoleChange = useCallback(async (newRole: UserRole) => {
+    const count = selectedUsers.size;
+    if (!window.confirm(`Change ${count} user(s) to ${newRole}?`)) {
+      return;
+    }
+
+    try {
+      await Promise.all(
+        Array.from(selectedUsers).map(username =>
+          updateUser(username, { role: newRole })
+        )
+      );
+
+      if (users) {
+        const updated = users.map(u =>
+          selectedUsers.has(u.username) ? { ...u, role: newRole, centerName: null } : u
+        );
+        setUsers(updated);
+      }
+
+      setSelectedUsers(new Set());
+      showToast(`${count} user(s) updated successfully`, 'success');
+    } catch (err: any) {
+      showToast(err.response?.data?.message || 'Failed to update users', 'error');
+    }
+  }, [selectedUsers, users, showToast]);
 
   const handleSave = async () => {
     if (!editingUser) return;
@@ -108,12 +154,60 @@ export const UserManagement: React.FC = () => {
         </div>
       </div>
 
+      {/* Bulk action toolbar */}
+      {selectedUsers.size > 0 && (
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded">
+          <p className="text-blue-900 font-medium mb-3">{selectedUsers.size} user(s) selected</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => handleBulkRoleChange('ADMIN')}
+              className="px-3 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition"
+            >
+              Set Role → Admin
+            </button>
+            <button
+              onClick={() => handleBulkRoleChange('MODERATOR')}
+              className="px-3 py-2 bg-purple-500 text-white text-sm rounded hover:bg-purple-600 transition"
+            >
+              Set Role → Moderator
+            </button>
+            <button
+              onClick={() => handleBulkRoleChange('CENTER_MANAGER')}
+              className="px-3 py-2 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition"
+            >
+              Set Role → Center Manager
+            </button>
+            <button
+              onClick={() => handleBulkRoleChange('REGULAR_USER')}
+              className="px-3 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition"
+            >
+              Set Role → Regular User
+            </button>
+            <button
+              onClick={() => setSelectedUsers(new Set())}
+              className="px-3 py-2 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400 transition"
+            >
+              Clear Selection
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table card */}
       <div className="bg-bg-paper rounded-xl shadow-sm border border-divider overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-start">
             <thead className="text-xs text-text-secondary uppercase bg-gray-50 border-b border-divider">
               <tr>
+                <th className="p-2 border text-center w-12">
+                  <input
+                    type="checkbox"
+                    checked={users && selectedUsers.size === users.length && users.length > 0}
+                    onChange={(e) => handleSelectAllUsers(e.target.checked)}
+                    aria-label="Select all users"
+                    className="w-4 h-4"
+                  />
+                </th>
                 <th className="px-6 py-3 font-semibold whitespace-nowrap text-start">
                   {t('users.username')}
                 </th>
@@ -134,7 +228,7 @@ export const UserManagement: React.FC = () => {
             <tbody className="divide-y divide-divider">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center">
+                  <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="flex justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                     </div>
@@ -142,13 +236,22 @@ export const UserManagement: React.FC = () => {
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-text-secondary">
+                  <td colSpan={6} className="px-6 py-12 text-center text-text-secondary">
                     {t('common.noResults', 'No results found')}
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map(user => (
                   <tr key={user.username} className="bg-white hover:bg-gray-50 transition-colors">
+                    <td className="p-2 border text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedUsers.has(user.username)}
+                        onChange={(e) => handleSelectUser(user.username, e.target.checked)}
+                        aria-label={`Select ${user.username}`}
+                        className="w-4 h-4"
+                      />
+                    </td>
                     <td className="px-6 py-4 text-text-primary whitespace-nowrap text-start">
                       <span className="font-bold text-text-primary">{user.username}</span>
                     </td>
