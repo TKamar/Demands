@@ -1,0 +1,117 @@
+services:
+  server:
+    build:
+      context: ./server
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      - DATABASE_URL=postgresql://user:password@postgres:5432/demands
+      # OIDC / Auth
+      - OIDC_DISCOVERY_URL=http://keycloak:8080/realms/demands/.well-known/openid-configuration
+      - AUTH_ISSUER=http://localhost:8080/realms/demands
+      - AUTH_AUDIENCE=${AUTH_AUDIENCE:-demands-api}
+      - AUTH_GROUP_CLAIM_PATH=${AUTH_GROUP_CLAIM_PATH:-groups}
+      - AUTH_ADMIN_GROUP=${AUTH_ADMIN_GROUP:-admin}
+      - AUTH_CLIENT_TYPE=${AUTH_CLIENT_TYPE:-keycloak}
+      # Keycloak Auth Client
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM:-demands}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID:-demands-api}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET:-demands-api-secret}
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: false
+      keycloak:
+        condition: service_started
+        required: false
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3000/api}
+      - VITE_OIDC_AUTHORITY=${VITE_OIDC_AUTHORITY:-http://localhost:8080/realms/demands}
+      - VITE_OIDC_CLIENT_ID=${VITE_OIDC_CLIENT_ID:-demands-web}
+      - VITE_OIDC_REDIRECT_URI=${VITE_OIDC_REDIRECT_URI:-http://localhost:5173/callback}
+    profiles: ["dev"]
+    depends_on:
+      - server
+
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["dev"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_MULTIPLE_DATABASES:-demands,keycloak}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user} -d demands"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    profiles: ["dev"]
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: ${POSTGRES_USER:-user}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+    volumes:
+      - ./docker/keycloak/demands-realm.json:/opt/keycloak/data/import/demands-realm.json:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: 
+      - /bin/bash
+      - -c
+      - |
+        # Start Keycloak in the background
+        /opt/keycloak/bin/kc.sh start-dev --import-realm & 
+        
+        echo "Waiting for Keycloak to wake up..."
+        # This is a native Bash way to check if a port is open
+        while ! exec 6<>/dev/tcp/localhost/8080; do
+          sleep 2
+        done 2>/dev/null
+        
+        exec 6>&- # Close the socket
+        
+        echo "Keycloak is alive! Applying SSL fix..."
+        
+        # We use a loop here just in case the port is open but the API isn't fully ready
+        until /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user $$KC_BOOTSTRAP_ADMIN_USERNAME --password $$KC_BOOTSTRAP_ADMIN_PASSWORD; do
+          echo "Admin CLI not ready yet... retrying in 2s"
+          sleep 2
+        done
+        
+        /opt/keycloak/bin/kcadm.sh update realms/master -s sslRequired=NONE
+        
+        echo "SSL requirement disabled. You're good to go!"
+        wait
+
+volumes:
+  postgres_data:

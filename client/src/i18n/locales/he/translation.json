@@ -1,0 +1,637 @@
+{
+  "nav": {
+    "dashboard": "דשבורד",
+    "projects": "פרוייקטים",
+    "demands": "דרישות",
+    "create": "צור חדש",
+    "project": "פרויקט",
+    "demand": "דרישה",
+    "moderator": "ניהול",
+    "settings": "הגדרות",
+    "back": "חזרה"
+  },
+  "management": {
+    "demandsTitle": "ניהול דרישות",
+    "makeDecision": "קבלת החלטה",
+    "decide": "החלט",
+    "decisionModal": {
+      "title": "קבלת החלטה",
+      "decisionType": "סוג החלטה",
+      "Approved": "אישור",
+      "PartiallyApproved": "אישור חלקי",
+      "ApprovedWithCondition": "אישור עם תנאי",
+      "Rejected": "דחייה",
+      "approvedValue": "כמות מאושרת",
+      "requestedValue": "כמות מבוקשת",
+      "reason": "סיבה",
+      "reasonPlaceholder": "הזן סיבה להחלטה זו...",
+      "submit": "שלח החלטה",
+      "manualDecision": "קבלת החלטה ידנית",
+      "manualDecisionDesc": "אשר, דחה, או אשר באופן מותנה",
+      "transfer": "העברה למנהל שירות אחר",
+      "transferDesc": "העבר את הדרישה לטיפול שירות אחר",
+      "targetService": "שירות יעד",
+      "selectService": "בחר שירות",
+      "transferNotes": "הערות",
+      "transferNotesPlaceholder": "הערות להעברה (אופציונלי)...",
+      "transferSubmit": "העבר"
+    },
+    "success": {
+      "approved": "הדרישה אושרה בהצלחה",
+      "rejected": "הדרישה נדחתה בהצלחה",
+      "transferred": "הדרישה הועברה בהצלחה",
+      "decided": "ההחלטה נשמרה"
+    },
+    "error": {
+      "approveFailed": "אישור הדרישה נכשל",
+      "rejectFailed": "דחיית הדרישה נכשלה",
+      "transferFailed": "ההעברה נכשלה",
+      "partialTransferFailed": "{{succeeded}} הועברו, {{failed}} נכשלו"
+    },
+    "bulk": {
+      "noneSelected": "בחר דרישות לביצוע פעולה קבוצתית",
+      "selected": "{{count}} דרישות נבחרו",
+      "allSelected": "כל {{count}} הדרישות נבחרו",
+      "pageSelected": "כל {{pageCount}} הדרישות בדף זה נבחרו.",
+      "selectAllAcrossPages": "בחר את כל {{count}} הדרישות",
+      "changeStatus": "שנה סטטוס",
+      "clearSelection": "נקה בחירה"
+    },
+    "bulkDecision": {
+      "title": "שינוי סטטוס מרובה",
+      "summary": "החל שינוי סטטוס על {{count}} דרישות (רק דרישות ממתינות יושפעו)",
+      "submit": "החל על הכל",
+      "successApproved": "{{count}} דרישות אושרו בהצלחה",
+      "successRejected": "{{count}} דרישות נדחו בהצלחה"
+    },
+    "tabs": {
+      "capacity": "ניהול קיבולת משאבים",
+      "wallet": "ניהול ארנקים"
+    },
+    "wallet": {
+      "add": "הוסף ארנק",
+      "columns": {
+        "service": "שירות",
+        "resource": "משאב",
+        "base": "בסיס",
+        "environment": "סביבה",
+        "network": "רשת",
+        "cluster": "קלאסטר",
+        "center": "מרכז",
+        "value": "ערך",
+        "actions": "פעולות"
+      },
+      "modal": {
+        "createTitle": "הוסף ארנק חדש",
+        "editTitle": "ערוך ארנק",
+        "capacity": "קיבולת (מיקום + משאב)",
+        "selectCapacity": "בחר קיבולת...",
+        "value": "ערך הארנק",
+        "save": "שמור",
+        "create": "צור"
+      },
+      "confirmDelete": "האם אתה בטוח שברצונך למחוק ארנק זה?",
+      "deleteSuccess": "הארנק נמחק בהצלחה",
+      "deleteFailed": "מחיקת הארנק נכשלה",
+      "updateSuccess": "הארנק עודכן בהצלחה",
+      "createSuccess": "הארנק נוצר בהצלחה",
+      "operationFailed": "הפעולה נכשלה"
+    },
+    "capacity": {
+      "add": "הוסף קיבולת",
+      "columns": {
+        "service": "שירות",
+        "resource": "סוג משאב",
+        "unit": "יחידה",
+        "base": "בסיס",
+        "network": "רשת",
+        "environment": "סביבה",
+        "cluster": "קלאסטר",
+        "total": "קיבולת כוללת",
+        "allocated": "מוקצה",
+        "available": "זמין",
+        "utilization": "ניצול %",
+        "actions": "פעולות"
+      },
+      "modal": {
+        "createTitle": "הוסף קיבולת חדשה",
+        "editTitle": "ערוך קיבולת",
+        "location": "מיקום",
+        "serviceResource": "שירות ומשאב",
+        "value": "קיבולת כוללת",
+        "cancel": "ביטול",
+        "save": "שמור",
+        "create": "צור"
+      }
+    }
+  },
+  "common": {
+    "search": "חיפוש...",
+    "noResults": "לא נמצאו תוצאות",
+    "showing": "מציג",
+    "to": "עד",
+    "of": "מתוך",
+    "results": "תוצאות",
+    "previous": "הקודם",
+    "next": "הבא",
+    "all": "הכל",
+    "clearFilters": "נקה סינונים",
+    "filters": "סינון",
+    "sortBy": "מיין לפי",
+    "none": "ללא",
+    "total": "סה\"כ",
+    "ascending": "עולה",
+    "descending": "יורד",
+    "submitting": "שולח...",
+    "errors": {
+      "unknown": "אירעה שגיאה בלתי צפויה. נסה שוב."
+    },
+    "toast": {
+      "projectCreated": "הפרויקט נוצר בהצלחה",
+      "projectCreateFailed": "יצירת הפרויקט נכשלה",
+      "demandCreated": "הדרישה נוצרה בהצלחה",
+      "demandCreateFailed": "יצירת הדרישה נכשלה"
+    },
+    "name": "שם",
+    "displayName": "שם תצוגה",
+    "add": "הוסף",
+    "edit": "ערוך",
+    "delete": "מחק",
+    "actions": "פעולות",
+    "save": "שמור",
+    "cancel": "ביטול",
+    "confirm": "אישור",
+    "saving": "שומר...",
+    "select": "בחר...",
+    "moderators": "כל המנהלים",
+    "typeAndEnter": "הקלד ולחץ ENTER...",
+    "active": "פעיל",
+    "updated": "עודכן בהצלחה",
+    "back": "חזרה",
+    "duplicate": "שכפל",
+    "loading": "טוען..."
+  },
+  "settings": {
+    "subtitle": "ניהול ישויות מערכת והגדרות",
+    "userManagement": "ניהול משתמשים",
+    "mainTabs": {
+      "infrastructure": "תשתיות",
+      "organization": "ארגון",
+      "options": "אפשרויות",
+      "services": "שירותים"
+    },
+    "tabs": {
+      "base": "בסיס",
+      "environment": "סביבה",
+      "network": "רשת",
+      "cluster": "קלאסטר",
+      "location": "מיקום",
+      "center": "מרכז",
+      "branch": "ענף",
+      "section": "מדור",
+      "emergency": "אפשרויות חירום",
+      "projectKind": "סוג פרויקט",
+      "demandReason": "סיבת החלטה",
+      "service": "שירות",
+      "resource": "משאב"
+    },
+    "base": {
+      "title": "בסיסים"
+    },
+    "environment": {
+      "title": "סביבות"
+    },
+    "network": {
+      "title": "רשתות"
+    },
+    "cluster": {
+      "title": "קלאסטרים"
+    },
+    "location": {
+      "title": "מיקומים",
+      "base": "בסיס",
+      "environment": "סביבה",
+      "network": "רשת",
+      "cluster": "קלאסטר"
+    },
+    "center": {
+      "title": "מרכזים"
+    },
+    "branch": {
+      "title": "ענפים",
+      "center": "מרכז"
+    },
+    "section": {
+      "title": "מדורים",
+      "branch": "ענף",
+      "center": "מרכז"
+    },
+    "emergency": {
+      "title": "אפשרויות חירום"
+    },
+    "projectKind": {
+      "title": "סוגי פרויקטים"
+    },
+    "demandReason": {
+      "title": "סיבות החלטה"
+    },
+    "service": {
+      "title": "שירותים",
+      "moderatorsDesc": "הקלד ולחץ ENTER להוספת מנהל"
+    },
+    "resource": {
+      "title": "משאבים",
+      "service": "שירות",
+      "unit": "יחידה"
+    }
+  },
+  "app": {
+    "title": "מערכת דרישות"
+  },
+  "user": {
+    "profile": "פרופיל",
+    "logout": "התנתק"
+  },
+  "dashboard": {
+    "title": "Dashboard - השוואות ומגמות",
+    "subtitle": "ניתוח נתונים והשוואות בין תקופות - פנימי בלבד",
+    "placeholder": "תוכן העמוד יופיע כאן"
+  },
+  "projects": {
+    "title": "הפרוייקטים שלי",
+    "subtitle": "צפייה וניהול דרישות הפרוייקטים שלך",
+    "demands": "דרישות",
+    "searchPlaceholder": "חיפוש...",
+    "showRemoved": "הצג דרישות שהוסרו",
+    "recordCount": "מציג {{shown}} מתוך {{total}} רשומות",
+    "noDemands": "אין דרישות להצגה",
+    "projectNotFound": "הפרוייקט לא נמצא",
+    "backToProjects": "חזרה לפרוייקטים",
+    "columns": {
+      "id": "מזהה",
+      "project": "פרוייקט",
+      "service": "שירות",
+      "resource": "משאב",
+      "value": "כמות",
+      "unit": "יחידה",
+      "type": "סוג בקשה",
+      "base": "בסיס",
+      "environment": "סביבה",
+      "network": "רשת",
+      "cluster": "קלאסטר",
+      "status": "סטטוס",
+      "approvedValue": "כמות מאושרת",
+      "approvedDate": "תאריך אישור",
+      "reason": "סיבה",
+      "createdAt": "תאריך יצירה",
+      "createdBy": "נוצר ע\"י",
+      "resourceService": "שירות משאב",
+      "year": "שנה",
+      "relatedTo": "מסלול / אפליקציה",
+      "median": "חציון",
+      "projectType": "סוג בקשה",
+      "emergencyOption": "אפשרות חירום",
+      "center": "מרכז",
+      "branch": "ענף",
+      "section": "מדור",
+      "kind": "סוג פרויקט"
+    },
+    "status": {
+      "Pending": "ממתין",
+      "Approved": "מאושר",
+      "Rejected": "נדחה",
+      "PartiallyApproved": "אושר חלקית",
+      "ApprovedWithCondition": "אושר עם תנאי",
+      "Cancelled": "בוטל",
+      "PendingCenterManager": "ממתין לאישור מנהל מרכז",
+      "CenterManagerRejected": "נדחה על ידי מנהל מרכז"
+    },
+    "editProject": {
+      "title": "עריכת פרויקט"
+    },
+    "duplicateProject": {
+      "title": "שכפול פרויקט",
+      "demandsTitle": "דרישות להעברה",
+      "approvedDemands": "דרישות מאושרות (נבחרו מראש)",
+      "optionalDemands": "דרישות אחרות (אופציונלי)",
+      "noDemands": "לפרויקט זה אין דרישות.",
+      "submit": "שכפל",
+      "failedToLoadDemands": "טעינת הדרישות נכשלה"
+    },
+    "duplicateSuccess": "הפרויקט שוכפל בהצלחה",
+    "actions": {
+      "cannotDeleteWithDemands": "לא ניתן למחוק פרויקט עם דרישות קיימות",
+      "duplicate": "שכפל פרויקט"
+    },
+    "confirmDelete": "האם אתה בטוח שברצונך למחוק פרויקט זה?",
+    "deleteSuccess": "הפרויקט נמחק בהצלחה",
+    "deleteFailed": "מחיקת הפרויקט נכשלה",
+    "updateSuccess": "הפרויקט עודכן בהצלחה",
+    "updateFailed": "עדכון הפרויקט נכשל",
+    "type": {
+      "New": "חדש",
+      "Extension": "הרחבה",
+      "Semiannual": "חצי שנתי",
+      "Emergency": "חירום",
+      "median": "חציון",
+      "relatedTo": "מסלול / אפליקציה",
+      "emergencyOption": "אפשרות חירום",
+      "center": "מרכז",
+      "branch": "ענף",
+      "section": "מדור"
+    },
+    "kind": {
+      "App": "אפליקציה",
+      "Track": "מסלול"
+    },
+    "priority": {
+      "P1": "P1 - דחוף",
+      "P2": "P2 - רגיל",
+      "P3": "P3 - נמוך"
+    },
+    "demandType": {
+      "New": "חדש",
+      "Extension": "הרחבה",
+      "median": "חציון",
+      "relatedTo": "מסלול / אפליקציה",
+      "emergencyOption": "אפשרות חירום",
+      "center": "מרכז",
+      "branch": "ענף",
+      "section": "מדור"
+    },
+    "empty": "לא נמצאו פרויקטים",
+    "median": {
+      "H1": "H1",
+      "H2": "H2"
+    },
+    "newProject": "פרויקט חדש",
+    "export": "ייצוא",
+    "createDemand": {
+      "title": "דרישה חדשה",
+      "newDemand": "דרישה חדשה",
+      "project": "פרויקט",
+      "service": "שירות",
+      "resource": "משאב",
+      "unit": "יחידה",
+      "value": "כמות",
+      "type": "סוג",
+      "clusterName": "שם קלאסטר",
+      "clusterNamePlaceholder": "הזן שם קלאסטר",
+      "overrideLocation": "דריסת מיקום",
+      "overrideOrganization": "דריסת ארגון",
+      "submit": "צור דרישה",
+      "selectOption": "בחר...",
+      "valuePlaceholder": "הזן כמות",
+      "center": "מרכז",
+      "branch": "ענף",
+      "section": "מדור"
+    },
+    "createProject": {
+      "title": "פרויקט חדש",
+      "name": "שם הפרויקט",
+      "trackOrApp": "מסלול / אפליקציה",
+      "year": "שנה",
+      "median": "חציון",
+      "section": "מדור",
+      "center": "מרכז",
+      "branch": "ענף",
+      "requestType": "סוג בקשה",
+      "priority": "תעדוף",
+      "projectType": "סוג פרויקט",
+      "environment": "סביבה",
+      "network": "רשת",
+      "cluster": "קלאסטר",
+      "base": "בסיס",
+      "purpose": "ייעוד הפרויקט",
+      "submit": "צור פרויקט",
+      "autoIdentified": "זוהה אוטומטית",
+      "change": "שינוי",
+      "namePlaceholder": "מטרת הפרויקט / התפוקה שהפרויקט מביא (לא שם טכני)",
+      "trackOrAppPlaceholder": "לאיזה מסלול/אפליקציה הפרויקט שייך? (אם רלוונטי)",
+      "purposePlaceholder": "פירוט קצר: למה הפרויקט קיים, למי הוא מיועד, ואיזה ערך הוא נותן",
+      "selectOption": "בחר...",
+      "priorityOptions": {
+        "P1": "דחוף - P1",
+        "P2": "רגיל - P2",
+        "P3": "נמוך - P3"
+      },
+      "emergencyOption": "אפשרות חירום"
+    }
+  },
+  "projectsTable": {
+    "columns": {
+      "name": "שם פרויקט",
+      "purpose": "ייעוד",
+      "demandCount": "דרישות",
+      "kind": "סוג פרויקט",
+      "relatedTo": "מסלול / אפליקציה",
+      "year": "שנה",
+      "median": "מחצית",
+      "emergencyOption": "אפשרות חירום",
+      "location": "מיקום",
+      "organization": "ארגון"
+    },
+    "noProjects": "אין פרוייקטים להצגה"
+  },
+  "projectSidebar": {
+    "details": "פרטים",
+    "location": "מיקום",
+    "organization": "ארגון",
+    "meta": "מידע",
+    "viewDemands": "צפייה בדרישות"
+  },
+  "demandSidebar": {
+    "demandDetails": "פרטי דרישה",
+    "approval": "אישור",
+    "location": "מיקום",
+    "organization": "ארגון",
+    "projectInfo": "פרטי פרויקט",
+    "meta": "מידע",
+    "clusterName": "שם קלאסטר",
+    "projectType": "סוג פרויקט"
+  },
+  "demands": {
+    "editDemand": {
+      "title": "עריכת דרישה"
+    },
+    "empty": "אין דרישות",
+    "actions": {
+      "cancel": "ביטול"
+    },
+    "confirmCancel": "האם אתה בטוח שברצונך לבטל דרישה זו?",
+    "cancelSuccess": "הדרישה בוטלה בהצלחה",
+    "cancelFailed": "ביטול הדרישה נכשל",
+    "updateSuccess": "הדרישה עודכנה בהצלחה",
+    "updateFailed": "עדכון הדרישה נכשל",
+    "project": "פרויקט",
+    "service": "שירות",
+    "resource": "משאב",
+    "value": "כמות",
+    "createdBy": "נוצר על ידי",
+    "createdAt": "תאריך יצירה",
+    "status": "סטטוס"
+  },
+  "demand": {
+    "deleteConfirm": "למחוק דרישה זו?",
+    "deleted": "הדרישה נמחקה",
+    "deleteError": "מחיקת הדרישה נכשלה",
+    "cancelConfirm": "לבטל דרישה זו?",
+    "cancelled": "הדרישה בוטלה",
+    "cancelError": "ביטול הדרישה נכשל",
+    "restoreTitle": "החזרת דרישה",
+    "restoreConfirm": "להחזיר דרישה זו לסטטוס ממתין?",
+    "restoreSuccess": "הדרישה הוחזרה בהצלחה",
+    "restoreError": "שגיאה בהחזרת הדרישה",
+    "service": "שירות",
+    "resource": "משאב",
+    "value": "כמות",
+    "status": "סטטוס"
+  },
+  "decision": {
+    "selectPlaceholder": "בחר החלטה",
+    "approve": "אישור",
+    "reject": "דחיה",
+    "conditionalApproval": "אישור מותנה",
+    "reason": "סיבה",
+    "reasonPlaceholder": "הזן סיבה...",
+    "approvedQuantity": "כמות מאושרת"
+  },
+  "notFound": {
+    "message": "העמוד המבוקש לא נמצא"
+  },
+  "table": {
+    "columns": "עמודות",
+    "resetColumns": "איפוס לברירת מחדל"
+  },
+  "users": {
+    "username": "שם משתמש",
+    "fullName": "שם מלא",
+    "role": "תפקיד",
+    "center": "מרכז",
+    "selectCenter": "-- בחר מרכז --"
+  },
+  "status": {
+    "PendingCenterManager": "ממתין לאישור מנהל מרכז",
+    "CenterManagerRejected": "נדחה על ידי מנהל מרכז"
+  },
+  "filters": {
+    "groups": {
+      "general": "כללי",
+      "project": "פרויקט",
+      "service": "שירות",
+      "organization": "ארגון",
+      "location": "מיקום",
+      "timeline": "לוח זמנים",
+      "other": "אחר"
+    }
+  },
+  "tabs": {
+    "myApprovalRequests": "בקשות לאישור שלי",
+    "requestsIOpened": "הבקשות שפתחתי",
+    "requestHistory": "היסטוריית דרישות"
+  },
+  "approvalRequests": { "empty": "אין בקשות ממתינות לאישור" },
+  "myRequests": { "empty": "לא פתחת בקשות עדיין" },
+  "resourceAssignment": {
+    "title": "הקצאת משאבים",
+    "comingSoon": "שיוך משאבים יהיה זמין לאחר אישור מנחה.",
+    "empty": "אין משאבים מאושרים להקצאה",
+    "demands": "דרישות",
+    "total": "סה\"כ",
+    "requested": "נדרש",
+    "approved": "מאושר",
+    "assignPlaceholder": "הכמות שתוקצה",
+    "save": "שמור",
+    "saved": "הוקצה בהצלחה",
+    "saveError": "שגיאה בשמירה"
+  },
+  "history": { "comingSoon": "היסטוריית דרישות תהיה זמינה בקרוב." },
+  "actions": {
+    "approve": "אשר",
+    "reject": "דחה"
+  },
+  "theme": {
+    "toggle": "החלף ערכת נושא",
+    "light": "בהיר",
+    "dark": "כהה",
+    "system": "מערכת"
+  },
+  "notifications": {
+    "title": "ההתראות שלי",
+    "markAllRead": "סמן הכל כנקרא",
+    "empty": "אין התראות",
+    "loading": "טוען...",
+    "types": {
+      "NewDemand": "דרישה חדשה",
+      "DemandDecision": "קבלת תשובה על הדרישה",
+      "DemandCancelled": "ביטול דרישה",
+      "DemandEdited": "עריכת דרישה",
+      "NewProject": "פרויקט חדש",
+      "ProjectDeleted": "מחיקת פרויקט",
+      "ProjectEdited": "עריכת פרויקט"
+    }
+  },
+  "bulk": {
+    "selected": "דרישות נבחרו",
+    "makeDecision": "קבלת החלטה",
+    "title": "קבלת החלטה עבור דרישות מרובות",
+    "centerInfo": "פיקוד: {{center}}",
+    "resourceInfo": "משאב: {{resource}}"
+  },
+  "main": {
+    "tabs": {
+      "projects": "פרויקטים ודרישות",
+      "requirements": "דרישות"
+    },
+    "search": {
+      "placeholder": "חיפוש… (בקרוב)"
+    },
+    "actions": {
+      "newProject": "פרויקט חדש",
+      "newRequirement": "דרישה חדשה"
+    }
+  },
+  "requirements": {
+    "addRequirement": "+ הוסף דרישה"
+  },
+  "centerFilter": {
+    "label": "מרכז",
+    "all": "כל המרכזים",
+    "selectAll": "כל המרכזים",
+    "count": "{{count}} מרכזים"
+  },
+  "resourceSummary": {
+    "label": "משאבים",
+    "collapse": "כווץ",
+    "expand": "הרחב משאבים",
+    "empty": "אין נתוני קיבולת"
+  },
+  "project": {
+    "name": "שם",
+    "type": "סוג",
+    "center": "מרכז",
+    "priority": "תעדוף",
+    "status": "סטטוס",
+    "deleteConfirm": "למחוק את הפרויקט?",
+    "deleted": "הפרויקט נמחק",
+    "deleteError": "מחיקת הפרויקט נכשלה",
+    "inlineRequirements": {
+      "title": "דרישות (אופציונלי)",
+      "addRow": "הוסף דרישה",
+      "partialError": "{{succeeded}} דרישות נוצרו, {{failed}} נכשלו"
+    }
+  },
+  "service": {
+    "resources": "משאבים",
+    "deleteGroupTitle": "מחיקת קבוצת שירות",
+    "deleteGroupMessage": "האם למחוק את כל הדרישות בקבוצת שירות זו?",
+    "deleteGroupSuccess": "קבוצת השירות נמחקה",
+    "quickApprove": "אישור מהיר",
+    "quickApproveTitle": "אישור מהיר",
+    "quickApproveMessage": "לאשר את כל המשאבים הממתינים בשירות זה?",
+    "quickApproveSuccess": "אושר בהצלחה",
+    "deepDecision": "החלטה מעמיקה",
+    "noDecisionNote": "ללא החלטה",
+    "noCompatibleTransfer": "אין שירותים תואמים להעברה"
+  }
+}

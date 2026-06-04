@@ -1,0 +1,1 @@
+ALTER TABLE "Demand" ADD COLUMN "assignedValue" DOUBLE PRECISION;

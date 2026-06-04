@@ -1,0 +1,80 @@
+@import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #1565C0;
+  --color-primary-light: #E3F2FD;
+  --color-primary-dark: #0D47A1;
+  --color-bg-default: #F8F9FA;
+  --color-bg-paper: #FFFFFF;
+  --color-text-primary: #1A1A2E;
+  --color-text-secondary: #6B7280;
+  --color-divider: #E5E7EB;
+  --color-danger: #d32f2f;
+  --color-topbar: #3D5C3E;
+  --font-sans: "Segoe UI", Tahoma, Arial, sans-serif;
+  --animate-slide-in: slide-in 0.3s ease-out;
+}
+
+/* Dark Mode Token Overrides */
+html.dark {
+  --color-bg-default:      #0D1117;
+  --color-bg-paper:        #161B22;
+  --color-text-primary:    #E6EDF3;
+  --color-text-secondary:  #8B949E;
+  --color-divider:         #30363D;
+  --color-primary:         #58A6FF;
+  --color-primary-light:   #1F3450;
+  --color-primary-dark:    #388BFD;
+  --color-topbar:          #1E3320;
+  --color-danger:          #F85149;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@layer base {
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-default);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}

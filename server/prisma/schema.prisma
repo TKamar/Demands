@@ -1,0 +1,354 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Organization Models
+// ============================================
+
+model Center {
+  name        String    @id
+  displayName String?
+  isActive    Boolean   @default(true)
+  branches    Branch[]
+  wallets     Wallet[]
+  projects    Project[]
+  demands     Demand[]
+  users       User[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Branch {
+  name        String
+  displayName String?
+  isActive    Boolean   @default(true)
+  centerName  String
+  center      Center    @relation(fields: [centerName], references: [name], onDelete: Cascade)
+  sections    Section[]
+  projects    Project[]
+  demands     Demand[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@id([name, centerName])
+}
+
+model Section {
+  name           String
+  displayName    String?
+  isActive       Boolean   @default(true)
+  branchName     String
+  branchCenter   String
+  branch         Branch    @relation(fields: [branchName, branchCenter], references: [name, centerName], onDelete: Cascade)
+  projects       Project[]
+  demands        Demand[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@id([name, branchName, branchCenter])
+}
+
+// ============================================
+// Location Models
+// ============================================
+
+model Base {
+  name        String     @id
+  displayName String?
+  isActive    Boolean    @default(true)
+  locations   Location[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Environment {
+  name        String     @id
+  displayName String?
+  isActive    Boolean    @default(true)
+  locations   Location[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Network {
+  name        String     @id
+  displayName String?
+  isActive    Boolean    @default(true)
+  locations   Location[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Cluster {
+  name        String     @id
+  displayName String?
+  isActive    Boolean    @default(true)
+  locations   Location[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Location {
+  id              Int         @id @default(autoincrement())
+  baseName        String
+  environmentName String
+  networkName     String
+  clusterName     String
+  isActive        Boolean     @default(true)
+  base            Base        @relation(fields: [baseName], references: [name], onDelete: Cascade)
+  environment     Environment @relation(fields: [environmentName], references: [name], onDelete: Cascade)
+  network         Network     @relation(fields: [networkName], references: [name], onDelete: Cascade)
+  cluster         Cluster     @relation(fields: [clusterName], references: [name], onDelete: Cascade)
+  capacities      Capacity[]
+  projects        Project[]
+  demands         Demand[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([baseName, environmentName, networkName, clusterName])
+}
+
+// ============================================
+// Service Models
+// ============================================
+
+model Service {
+  name       String     @id
+  moderators String[]   @default([])
+  isActive   Boolean    @default(true)
+  resources  Resource[]
+  demands    Demand[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Resource {
+  name        String
+  unit        String
+  isActive    Boolean    @default(true)
+  serviceName String
+  service     Service    @relation(fields: [serviceName], references: [name], onDelete: Cascade)
+  capacities  Capacity[]
+  demands     Demand[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@id([name, serviceName])
+}
+
+model Capacity {
+  id              Int      @id @default(autoincrement())
+  locationId      Int
+  resourceName    String
+  resourceService String
+  value           Float
+  allocated       Float    @default(0)
+  available       Float    @default(0)
+  location        Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  resource        Resource @relation(fields: [resourceName, resourceService], references: [name, serviceName], onDelete: Cascade)
+  wallets         Wallet[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([locationId, resourceName, resourceService])
+}
+
+// ============================================
+// Wallet Model
+// ============================================
+
+model Wallet {
+  id         Int      @id @default(autoincrement())
+  centerName String
+  center     Center   @relation(fields: [centerName], references: [name], onDelete: Cascade)
+  capacityId Int
+  capacity   Capacity @relation(fields: [capacityId], references: [id], onDelete: Cascade)
+  value      Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([centerName, capacityId])
+}
+
+// ============================================
+// Request Models
+// ============================================
+
+enum ProjectType {
+  Emergency
+  Semiannual
+}
+
+model ProjectKind {
+  name        String    @id
+  displayName String?
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum Median {
+  H1
+  H2
+}
+
+enum DemandType {
+  New
+  Extension
+}
+
+enum DemandStatus {
+  PendingCenterManager
+  Pending
+  Approved
+  Rejected
+  PartiallyApproved
+  ApprovedWithCondition
+  Cancelled
+  CenterManagerRejected
+  CenterManagerApproved
+  WaitingOnPrerequisite
+}
+
+enum Priority {
+  P1
+  P2
+  P3
+}
+
+model Project {
+  name                String           @id
+  purpose             String
+  relatedTo           String?
+  type                ProjectType
+  kindName            String
+  kind                ProjectKind      @relation(fields: [kindName], references: [name], onDelete: Restrict)
+  locationId          Int
+  location            Location         @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  year                Int?
+  median              Median?
+  priority            Priority?
+  centerName          String
+  branchName          String
+  sectionName         String
+  center              Center           @relation(fields: [centerName], references: [name])
+  branch              Branch           @relation(fields: [branchName, centerName], references: [name, centerName])
+  section             Section          @relation(fields: [sectionName, branchName, centerName], references: [name, branchName, branchCenter])
+  demands             Demand[]
+  emergencyOptionName String?
+  emergencyOption     EmergencyOption? @relation(fields: [emergencyOptionName], references: [name])
+  createdBy           String?
+  createdByName       String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  notifications       Notification[]
+
+  @@index([createdBy])
+}
+
+model Demand {
+  id                 Int              @id @default(autoincrement())
+  projectName        String
+  project            Project          @relation(fields: [projectName], references: [name], onDelete: Cascade)
+  serviceName        String
+  service            Service          @relation(fields: [serviceName], references: [name], onDelete: Cascade)
+  resourceName       String
+  resourceService    String
+  resource           Resource         @relation(fields: [resourceName, resourceService], references: [name, serviceName], onDelete: Cascade)
+  value              Float
+  locationId         Int
+  location           Location         @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  type               DemandType
+  status             DemandStatus     @default(Pending)
+  clusterName        String?
+  approvedValue        Float?
+  assignedValue        Float?
+  requirementGroupId   Int?
+  prerequisiteDemandId Int?
+  isInternalTicket     Boolean  @default(false)
+
+  prerequisiteDemand   Demand?  @relation("PrerequisiteChain", fields: [prerequisiteDemandId], references: [id], onDelete: SetNull)
+  dependentDemands     Demand[] @relation("PrerequisiteChain")
+  approvedDate         DateTime?
+  reason             String?
+  centerName         String
+  branchName         String
+  sectionName        String
+  center             Center           @relation(fields: [centerName], references: [name])
+  branch             Branch           @relation(fields: [branchName, centerName], references: [name, centerName])
+  section            Section          @relation(fields: [sectionName, branchName, centerName], references: [name, branchName, branchCenter])
+  createdBy          String?
+  createdByName      String?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  notifications      Notification[]
+
+  @@index([createdBy])
+}
+
+model EmergencyOption {
+  name      String    @id
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// ============================================
+// User Models
+// ============================================
+
+enum UserRole {
+  ADMIN
+  MODERATOR
+  CENTER_MANAGER
+  REGULAR_USER
+}
+
+model User {
+  username   String    @id
+  fullName   String?
+  role       UserRole  @default(REGULAR_USER)
+  centerName String?
+  center     Center?   @relation(fields: [centerName], references: [name])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+// ============================================
+// Notification Models
+// ============================================
+
+enum NotificationType {
+  NewDemand
+  DemandDecision
+  DemandCancelled
+  DemandEdited
+  NewProject
+  ProjectDeleted
+  ProjectEdited
+}
+
+model Notification {
+  id                Int              @id @default(autoincrement())
+  type              NotificationType
+  recipientUsername String?
+  isAdminBroadcast  Boolean          @default(false)
+  readByUsernames   String[]         @default([])
+  isRead            Boolean          @default(false)
+  title             String
+  message           String
+  demandId          Int?
+  demand            Demand?          @relation(fields: [demandId], references: [id], onDelete: SetNull)
+  projectName       String?
+  project           Project?         @relation(fields: [projectName], references: [name], onDelete: SetNull)
+  createdAt         DateTime         @default(now())
+
+  @@index([recipientUsername, createdAt(sort: Desc)])
+  @@index([isAdminBroadcast, createdAt(sort: Desc)])
+}

@@ -1,0 +1,637 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "demands": "Demands",
+    "moderator": "Management",
+    "settings": "Settings",
+    "create": "Create New",
+    "project": "Project",
+    "demand": "Demand",
+    "back": "Back"
+  },
+  "management": {
+    "demandsTitle": "Demands Management",
+    "makeDecision": "Make Decision",
+    "decide": "Decide",
+    "decisionModal": {
+      "title": "Make Decision",
+      "decisionType": "Decision Type",
+      "Approved": "Approve",
+      "PartiallyApproved": "Partially Approve",
+      "ApprovedWithCondition": "Approve With Condition",
+      "Rejected": "Reject",
+      "approvedValue": "Approved Value",
+      "requestedValue": "Requested",
+      "reason": "Reason",
+      "reasonPlaceholder": "Enter reason for this decision...",
+      "submit": "Submit Decision",
+      "manualDecision": "Make Decision",
+      "manualDecisionDesc": "Approve, reject, or approve with conditions",
+      "transfer": "Transfer to Another Service Manager",
+      "transferDesc": "Transfer the demand to another service for handling",
+      "targetService": "Target Service",
+      "selectService": "Select a service",
+      "transferNotes": "Notes",
+      "transferNotesPlaceholder": "Notes for transfer (optional)...",
+      "transferSubmit": "Transfer"
+    },
+    "success": {
+      "approved": "Demand approved successfully",
+      "rejected": "Demand rejected successfully",
+      "transferred": "Demand transferred successfully",
+      "decided": "Decision saved"
+    },
+    "error": {
+      "approveFailed": "Failed to approve demand",
+      "rejectFailed": "Failed to reject demand",
+      "transferFailed": "Transfer failed",
+      "partialTransferFailed": "{{succeeded}} transferred, {{failed}} failed"
+    },
+    "bulk": {
+      "noneSelected": "Select demands to take bulk action",
+      "selected": "{{count}} demands selected",
+      "allSelected": "All {{count}} demands selected",
+      "pageSelected": "All {{pageCount}} demands on this page are selected.",
+      "selectAllAcrossPages": "Select all {{count}} demands",
+      "changeStatus": "Change Status",
+      "clearSelection": "Clear selection"
+    },
+    "bulkDecision": {
+      "title": "Bulk Status Change",
+      "summary": "Apply status change to {{count}} demands (only Pending demands will be affected)",
+      "submit": "Apply to All",
+      "successApproved": "{{count}} demands approved successfully",
+      "successRejected": "{{count}} demands rejected successfully"
+    },
+    "tabs": {
+      "capacity": "Capacity Management",
+      "wallet": "Wallet Management"
+    },
+    "wallet": {
+      "add": "Add Wallet",
+      "columns": {
+        "service": "Service",
+        "resource": "Resource",
+        "base": "Base",
+        "environment": "Environment",
+        "network": "Network",
+        "cluster": "Cluster",
+        "center": "Center",
+        "value": "Value",
+        "actions": "Actions"
+      },
+      "modal": {
+        "createTitle": "Add New Wallet",
+        "editTitle": "Edit Wallet",
+        "capacity": "Capacity (Location + Resource)",
+        "selectCapacity": "Select a capacity...",
+        "value": "Wallet Value",
+        "save": "Save",
+        "create": "Create"
+      },
+      "confirmDelete": "Are you sure you want to delete this wallet?",
+      "deleteSuccess": "Wallet deleted successfully",
+      "deleteFailed": "Failed to delete wallet",
+      "updateSuccess": "Wallet updated successfully",
+      "createSuccess": "Wallet created successfully",
+      "operationFailed": "Operation failed"
+    },
+    "capacity": {
+      "add": "Add Capacity",
+      "columns": {
+        "service": "Service",
+        "resource": "Resource Type",
+        "unit": "Unit",
+        "base": "Base",
+        "network": "Network",
+        "environment": "Environment",
+        "cluster": "Cluster",
+        "total": "Total Capacity",
+        "allocated": "Allocated",
+        "available": "Available",
+        "utilization": "Utilization %",
+        "actions": "Actions"
+      },
+      "modal": {
+        "createTitle": "Add New Capacity",
+        "editTitle": "Edit Capacity",
+        "location": "Location",
+        "serviceResource": "Service & Resource",
+        "value": "Total Capacity",
+        "cancel": "Cancel",
+        "save": "Save",
+        "create": "Create"
+      }
+    }
+  },
+  "common": {
+    "search": "Search...",
+    "noResults": "No results found",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
+    "previous": "Previous",
+    "next": "Next",
+    "all": "All",
+    "clearFilters": "Clear all filters",
+    "filters": "Filters",
+    "sortBy": "Sort by",
+    "none": "None",
+    "total": "Total",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "submitting": "Submitting...",
+    "errors": {
+      "unknown": "An unexpected error occurred. Please try again."
+    },
+    "toast": {
+      "projectCreated": "Project created successfully",
+      "projectCreateFailed": "Failed to create project",
+      "demandCreated": "Demand created successfully",
+      "demandCreateFailed": "Failed to create demand"
+    },
+    "name": "Name",
+    "displayName": "Display Name",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "actions": "Actions",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "saving": "Saving...",
+    "select": "Select...",
+    "moderators": "Moderators",
+    "typeAndEnter": "Type and press Enter...",
+    "active": "Active",
+    "updated": "Updated successfully",
+    "back": "Back",
+    "duplicate": "Duplicate",
+    "loading": "Loading..."
+  },
+  "settings": {
+    "subtitle": "Manage system entities and configurations",
+    "userManagement": "User Management",
+    "mainTabs": {
+      "infrastructure": "Infrastructure",
+      "organization": "Organization",
+      "options": "Options",
+      "services": "Services"
+    },
+    "tabs": {
+      "base": "Base",
+      "environment": "Environment",
+      "network": "Network",
+      "cluster": "Cluster",
+      "location": "Location",
+      "center": "Center",
+      "branch": "Branch",
+      "section": "Section",
+      "emergency": "Emergency Options",
+      "projectKind": "Project Kind",
+      "demandReason": "Demand Reason",
+      "service": "Service",
+      "resource": "Resource"
+    },
+    "base": {
+      "title": "Bases"
+    },
+    "environment": {
+      "title": "Environments"
+    },
+    "network": {
+      "title": "Networks"
+    },
+    "cluster": {
+      "title": "Clusters"
+    },
+    "location": {
+      "title": "Locations",
+      "base": "Base",
+      "environment": "Environment",
+      "network": "Network",
+      "cluster": "Cluster"
+    },
+    "center": {
+      "title": "Centers"
+    },
+    "branch": {
+      "title": "Branches",
+      "center": "Center"
+    },
+    "section": {
+      "title": "Sections",
+      "branch": "Branch",
+      "center": "Center"
+    },
+    "emergency": {
+      "title": "Emergency Options"
+    },
+    "projectKind": {
+      "title": "Project Kinds"
+    },
+    "demandReason": {
+      "title": "Demand Reasons"
+    },
+    "service": {
+      "title": "Services",
+      "moderatorsDesc": "Type and press Enter to add moderator"
+    },
+    "resource": {
+      "title": "Resources",
+      "service": "Service",
+      "unit": "Unit"
+    }
+  },
+  "app": {
+    "title": "Demand System"
+  },
+  "user": {
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard - Comparisons & Trends",
+    "subtitle": "Data analysis and comparisons between periods - internal only",
+    "placeholder": "Page content will appear here"
+  },
+  "projects": {
+    "title": "My Projects",
+    "subtitle": "View and manage your project demands",
+    "demands": "demands",
+    "searchPlaceholder": "Search...",
+    "showRemoved": "Show removed demands",
+    "recordCount": "Showing {{shown}} of {{total}} records",
+    "noDemands": "No demands to display",
+    "projectNotFound": "Project not found",
+    "backToProjects": "Back to Projects",
+    "columns": {
+      "id": "ID",
+      "project": "Project",
+      "service": "Service",
+      "resource": "Resource",
+      "value": "Value",
+      "unit": "Unit",
+      "type": "Type",
+      "base": "Base",
+      "environment": "Environment",
+      "network": "Network",
+      "cluster": "Cluster",
+      "status": "Status",
+      "approvedValue": "Approved Value",
+      "approvedDate": "Approved Date",
+      "reason": "Reason",
+      "createdAt": "Created At",
+      "createdBy": "Created By",
+      "resourceService": "Resource Service",
+      "year": "Year",
+      "relatedTo": "Related To",
+      "median": "Median",
+      "projectType": "Project Type",
+      "emergencyOption": "Emergency Option",
+      "center": "Center",
+      "branch": "Branch",
+      "section": "Section",
+      "kind": "Kind"
+    },
+    "status": {
+      "Pending": "Pending",
+      "Approved": "Approved",
+      "Rejected": "Rejected",
+      "PartiallyApproved": "Partially Approved",
+      "ApprovedWithCondition": "Approved With Condition",
+      "Cancelled": "Cancelled",
+      "PendingCenterManager": "Pending CM Approval",
+      "CenterManagerRejected": "Rejected by CM"
+    },
+    "editProject": {
+      "title": "Edit Project"
+    },
+    "duplicateProject": {
+      "title": "Duplicate Project",
+      "demandsTitle": "Demands to carry forward",
+      "approvedDemands": "Approved demands (pre-selected)",
+      "optionalDemands": "Other demands (optional)",
+      "noDemands": "This project has no demands.",
+      "submit": "Duplicate",
+      "failedToLoadDemands": "Failed to load demands"
+    },
+    "duplicateSuccess": "Project duplicated successfully",
+    "actions": {
+      "cannotDeleteWithDemands": "Cannot delete project with existing demands",
+      "duplicate": "Duplicate project"
+    },
+    "confirmDelete": "Are you sure you want to delete this project?",
+    "deleteSuccess": "Project deleted successfully",
+    "deleteFailed": "Failed to delete project",
+    "updateSuccess": "Project updated successfully",
+    "updateFailed": "Failed to update project",
+    "type": {
+      "New": "New",
+      "Extension": "Extension",
+      "Semiannual": "Semiannual",
+      "Emergency": "Emergency",
+      "median": "Median",
+      "relatedTo": "Related To",
+      "emergencyOption": "Emergency Option",
+      "center": "Center",
+      "branch": "Branch",
+      "section": "Section"
+    },
+    "kind": {
+      "App": "Application",
+      "Track": "Track"
+    },
+    "priority": {
+      "P1": "P1 - Urgent",
+      "P2": "P2 - Normal",
+      "P3": "P3 - Low"
+    },
+    "demandType": {
+      "New": "New",
+      "Extension": "Extension",
+      "median": "Median",
+      "relatedTo": "Related To",
+      "emergencyOption": "Emergency Option",
+      "center": "Center",
+      "branch": "Branch",
+      "section": "Section"
+    },
+    "empty": "No projects found",
+    "median": {
+      "H1": "H1",
+      "H2": "H2"
+    },
+    "newProject": "New Project",
+    "export": "Export",
+    "createDemand": {
+      "title": "New Demand",
+      "newDemand": "New Demand",
+      "project": "Project",
+      "service": "Service",
+      "resource": "Resource",
+      "unit": "Unit",
+      "value": "Value",
+      "type": "Type",
+      "clusterName": "Cluster Name",
+      "clusterNamePlaceholder": "Enter cluster name",
+      "overrideLocation": "Override Location",
+      "overrideOrganization": "Override Organization",
+      "submit": "Create Demand",
+      "selectOption": "Select...",
+      "valuePlaceholder": "Enter value",
+      "center": "Center",
+      "branch": "Branch",
+      "section": "Section"
+    },
+    "createProject": {
+      "title": "New Project",
+      "name": "Project Name",
+      "trackOrApp": "Track / Application",
+      "center": "Center",
+      "branch": "Branch",
+      "requestType": "Request Type",
+      "priority": "Priority",
+      "projectType": "Project Type",
+      "environment": "Environment",
+      "network": "Network",
+      "base": "Base",
+      "cluster": "Cluster",
+      "purpose": "Project Purpose",
+      "submit": "Create Project",
+      "autoIdentified": "Auto-identified",
+      "change": "Change",
+      "namePlaceholder": "Project name / the output the project delivers (not a technical name)",
+      "trackOrAppPlaceholder": "Which track/application does this project belong to? (if relevant)",
+      "purposePlaceholder": "Brief description: why the project exists, who it's for, and what value it provides",
+      "selectOption": "Select...",
+      "priorityOptions": {
+        "P1": "Urgent - P1",
+        "P2": "Normal - P2",
+        "P3": "Low - P3"
+      },
+      "emergencyOption": "Emergency Option",
+      "year": "Year",
+      "median": "Median",
+      "section": "Section"
+    }
+  },
+  "projectsTable": {
+    "columns": {
+      "name": "Project Name",
+      "purpose": "Purpose",
+      "demandCount": "Demands",
+      "kind": "Kind",
+      "relatedTo": "Related To",
+      "year": "Year",
+      "median": "Median",
+      "emergencyOption": "Emergency Option",
+      "location": "Location",
+      "organization": "Organization"
+    },
+    "noProjects": "No projects to display"
+  },
+  "projectSidebar": {
+    "details": "Details",
+    "location": "Location",
+    "organization": "Organization",
+    "meta": "Information",
+    "viewDemands": "View Demands"
+  },
+  "demandSidebar": {
+    "demandDetails": "Demand Details",
+    "approval": "Approval",
+    "location": "Location",
+    "organization": "Organization",
+    "projectInfo": "Project Information",
+    "meta": "Information",
+    "clusterName": "Cluster Name",
+    "projectType": "Project Type"
+  },
+  "demands": {
+    "editDemand": {
+      "title": "Edit Demand"
+    },
+    "empty": "No requirements",
+    "actions": {
+      "cancel": "Cancel"
+    },
+    "confirmCancel": "Are you sure you want to cancel this demand?",
+    "cancelSuccess": "Demand cancelled successfully",
+    "cancelFailed": "Failed to cancel demand",
+    "updateSuccess": "Demand updated successfully",
+    "updateFailed": "Failed to update demand",
+    "project": "Project",
+    "service": "Service",
+    "resource": "Resource",
+    "value": "Value",
+    "createdBy": "Created By",
+    "createdAt": "Created At",
+    "status": "Status"
+  },
+  "demand": {
+    "deleteConfirm": "Delete this requirement?",
+    "deleted": "Requirement deleted",
+    "deleteError": "Failed to delete requirement",
+    "cancelConfirm": "Cancel this requirement?",
+    "cancelled": "Requirement cancelled",
+    "cancelError": "Failed to cancel requirement",
+    "restoreTitle": "Restore Requirement",
+    "restoreConfirm": "Restore this requirement to pending status?",
+    "restoreSuccess": "Requirement restored successfully",
+    "restoreError": "Failed to restore requirement",
+    "service": "Service",
+    "resource": "Resource",
+    "value": "Value",
+    "status": "Status"
+  },
+  "decision": {
+    "selectPlaceholder": "Select Decision",
+    "approve": "Approve",
+    "reject": "Reject",
+    "conditionalApproval": "Conditional Approval",
+    "reason": "Reason",
+    "reasonPlaceholder": "Enter reason...",
+    "approvedQuantity": "Approved Quantity"
+  },
+  "notFound": {
+    "message": "The requested page was not found"
+  },
+  "table": {
+    "columns": "Columns",
+    "resetColumns": "Reset to defaults"
+  },
+  "users": {
+    "username": "Username",
+    "fullName": "Full Name",
+    "role": "Role",
+    "center": "Center",
+    "selectCenter": "-- Select Center --"
+  },
+  "status": {
+    "PendingCenterManager": "Pending CM Approval",
+    "CenterManagerRejected": "Rejected by CM"
+  },
+  "filters": {
+    "groups": {
+      "general": "General",
+      "project": "Project",
+      "service": "Service",
+      "organization": "Organization",
+      "location": "Location",
+      "timeline": "Timeline",
+      "other": "Other"
+    }
+  },
+  "tabs": {
+    "myApprovalRequests": "My Approval Requests",
+    "requestsIOpened": "Requests I Opened",
+    "requestHistory": "Request History"
+  },
+  "approvalRequests": { "empty": "No pending approval requests" },
+  "myRequests": { "empty": "You have not opened any requests yet" },
+  "resourceAssignment": {
+    "title": "Resource Assignment",
+    "comingSoon": "Resource assignment will be available after moderator approval.",
+    "empty": "No approved resources to assign",
+    "demands": "demands",
+    "total": "Total",
+    "requested": "Requested",
+    "approved": "Approved",
+    "assignPlaceholder": "Quantity to assign",
+    "save": "Save",
+    "saved": "Assigned successfully",
+    "saveError": "Error saving"
+  },
+  "history": { "comingSoon": "Request history will be available soon." },
+  "actions": {
+    "approve": "Approve",
+    "reject": "Reject"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "notifications": {
+    "title": "My Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications",
+    "loading": "Loading...",
+    "types": {
+      "NewDemand": "New Demand",
+      "DemandDecision": "Decision Received",
+      "DemandCancelled": "Demand Cancelled",
+      "DemandEdited": "Demand Edited",
+      "NewProject": "New Project",
+      "ProjectDeleted": "Project Deleted",
+      "ProjectEdited": "Project Edited"
+    }
+  },
+  "bulk": {
+    "selected": "requirements selected",
+    "makeDecision": "Make Decision",
+    "title": "Bulk Decision",
+    "centerInfo": "Center: {{center}}",
+    "resourceInfo": "Resource: {{resource}}"
+  },
+  "main": {
+    "tabs": {
+      "projects": "Projects & Requirements",
+      "requirements": "Requirements"
+    },
+    "search": {
+      "placeholder": "Search… (coming soon)"
+    },
+    "actions": {
+      "newProject": "New Project",
+      "newRequirement": "New Requirement"
+    }
+  },
+  "requirements": {
+    "addRequirement": "+ Add Requirement"
+  },
+  "centerFilter": {
+    "label": "Center",
+    "all": "All Centers",
+    "selectAll": "All Centers",
+    "count": "{{count}} centers"
+  },
+  "resourceSummary": {
+    "label": "Resources",
+    "collapse": "Collapse",
+    "expand": "Expand resources",
+    "empty": "No capacity data"
+  },
+  "project": {
+    "name": "Name",
+    "type": "Type",
+    "center": "Center",
+    "priority": "Priority",
+    "status": "Status",
+    "deleteConfirm": "Delete this project?",
+    "deleted": "Project deleted",
+    "deleteError": "Failed to delete project",
+    "inlineRequirements": {
+      "title": "Requirements (Optional)",
+      "addRow": "Add Requirement",
+      "partialError": "{{succeeded}} requirements created, {{failed}} failed"
+    }
+  },
+  "service": {
+    "resources": "Resources",
+    "deleteGroupTitle": "Delete Service Group",
+    "deleteGroupMessage": "Delete all demands in this service group?",
+    "deleteGroupSuccess": "Service group deleted",
+    "quickApprove": "Quick Approve",
+    "quickApproveTitle": "Quick Approve",
+    "quickApproveMessage": "Approve all pending resources in this service?",
+    "quickApproveSuccess": "Approved successfully",
+    "deepDecision": "Deep Decision",
+    "noDecisionNote": "No decision",
+    "noCompatibleTransfer": "No compatible services available"
+  }
+}
