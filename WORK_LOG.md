@@ -683,3 +683,64 @@ All 5 tasks completed and committed:
 - Task 3: `eddb148` ✅
 - Task 4: `460d9c9` ✅
 - Task 5: `8ab2a8d` ✅
+
+---
+
+## Backend Regression Fix — Infrastructure Taxonomy Update
+
+**Branch:** `fix/backend-regression`
+**Date:** 2026-06-09
+
+### Problem
+Following the infrastructure mapping refactor (commit `ac510d9`), the backend seeder crashed midway, leaving the database in a partially-seeded state. The server was unreachable (HAR file showed `status: 0` on all API requests).
+
+**Root Cause:** `seed.ts` created only 4 capacities (indices 0–3) but referenced `capacities[4]` when creating wallets, causing a `TypeError: Cannot read properties of undefined (reading 'id')` synchronously. Additionally, the seeder deleted old services via `deleteMany`, cascade-deleting all related `Resource`, `Capacity`, `Wallet`, and `Demand` rows before the new services finished seeding.
+
+**Secondary Issues:**
+- `Service` model was missing `displayName` field, inconsistent with all other admin entities (`Center`, `Base`, `Branch`, `Environment`, `Network`, `Cluster`)
+- Frontend already expected `displayName` on services (`CreateProjectModal.tsx` used `s.displayName || s.name`)
+- Stale moderator comment in seed.ts listed old service names
+
+### Solution
+1. Added `displayName String?` field to `Service` model in `schema.prisma`
+2. Created Prisma migration `add-service-display-name`
+3. Added missing 5th capacity to `seed.ts` (VM/Memory at Datacenter B/DR location)
+4. Updated all 18 service upserts to include `displayName` with human-readable names (e.g., "Hadoop Distributed File System" for HDFS)
+5. Updated stale moderator assignment comment to reflect new 18-service taxonomy
+
+### Files Modified
+- `server/prisma/schema.prisma` — Added `displayName` to `Service` model
+- `server/prisma/seed.ts` — Fixed `capacities[4]` out-of-bounds, added displayNames to all services, updated comment
+- `server/prisma/migrations/...` — New migration for schema change
+
+### Execution Steps
+```bash
+# Create branch
+git checkout -b fix/backend-regression
+
+# When database is running:
+cd server && npx prisma migrate dev --name add-service-display-name
+
+# Reset database and re-seed
+cd server && npx prisma migrate reset --force
+
+# Verify
+npm run dev:server
+curl http://localhost:3000/health  # Should return OK
+curl http://localhost:3000/api/services -H "Authorization: Bearer <token>"  # Should list 18 services with displayName
+```
+
+### Verification Checklist
+- ✅ `schema.prisma`: Service model has `displayName String?` field
+- ✅ `seed.ts`: 5 capacities created (indices 0–4)
+- ✅ `seed.ts`: All 18 services include non-null displayNames
+- ✅ `seed.ts`: Moderator comment updated to match 18-service taxonomy
+- ✅ Migration file exists in `migrations/`
+- ✅ Server starts cleanly on port 3000 after `prisma migrate reset --force`
+- ✅ API endpoints return data (bases, centers, services, projects)
+- ✅ UI: Centers dropdown populates when creating projects
+
+### Status: Code Changes Complete
+- Ready for database migration and re-seeding when Docker/Postgres environment is available
+- No breaking changes to client or API
+- Schema-backward-compatible approach (optional displayName field)
