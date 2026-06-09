@@ -180,27 +180,27 @@ async function main() {
 
   const services = await Promise.all([
     // Storage
-    prisma.service.upsert({ where: { name: 'HDFS' }, update: { moderators: ['mod3'] }, create: { name: 'HDFS', moderators: ['mod3'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'NAS' }, update: { moderators: ['mod3'] }, create: { name: 'NAS', moderators: ['mod3'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'S3' }, update: { moderators: ['mod3'] }, create: { name: 'S3', moderators: ['mod3'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'HDFS' }, update: { moderators: ['mod3'], displayName: 'HDFS' }, create: { name: 'HDFS', displayName: 'Hadoop Distributed File System', moderators: ['mod3'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'NAS' }, update: { moderators: ['mod3'], displayName: 'NAS' }, create: { name: 'NAS', displayName: 'Network Attached Storage', moderators: ['mod3'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'S3' }, update: { moderators: ['mod3'], displayName: 'S3' }, create: { name: 'S3', displayName: 'S3 Object Storage', moderators: ['mod3'], isActive: true } }),
     // Databases
-    prisma.service.upsert({ where: { name: 'MongoK' }, update: { moderators: ['mod4'] }, create: { name: 'MongoK', moderators: ['mod4'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'MongoVM' }, update: { moderators: ['mod4'] }, create: { name: 'MongoVM', moderators: ['mod4'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'Postgres (PG)' }, update: { moderators: ['mod4'] }, create: { name: 'Postgres (PG)', moderators: ['mod4'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'ECK' }, update: { moderators: ['mod6'] }, create: { name: 'ECK', moderators: ['mod6'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'Redis' }, update: { moderators: ['mod6'] }, create: { name: 'Redis', moderators: ['mod6'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'Oracle' }, update: { moderators: ['mod5'] }, create: { name: 'Oracle', moderators: ['mod5'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'MSSQL' }, update: { moderators: ['mod5'] }, create: { name: 'MSSQL', moderators: ['mod5'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'MongoK' }, update: { moderators: ['mod4'], displayName: 'MongoK' }, create: { name: 'MongoK', displayName: 'MongoDB on Kubernetes', moderators: ['mod4'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'MongoVM' }, update: { moderators: ['mod4'], displayName: 'MongoVM' }, create: { name: 'MongoVM', displayName: 'MongoDB on VM', moderators: ['mod4'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Postgres (PG)' }, update: { moderators: ['mod4'], displayName: 'Postgres (PG)' }, create: { name: 'Postgres (PG)', displayName: 'PostgreSQL', moderators: ['mod4'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'ECK' }, update: { moderators: ['mod6'], displayName: 'ECK' }, create: { name: 'ECK', displayName: 'Elastic Cloud on Kubernetes', moderators: ['mod6'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Redis' }, update: { moderators: ['mod6'], displayName: 'Redis' }, create: { name: 'Redis', displayName: 'Redis In-Memory Store', moderators: ['mod6'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Oracle' }, update: { moderators: ['mod5'], displayName: 'Oracle' }, create: { name: 'Oracle', displayName: 'Oracle Database', moderators: ['mod5'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'MSSQL' }, update: { moderators: ['mod5'], displayName: 'MSSQL' }, create: { name: 'MSSQL', displayName: 'Microsoft SQL Server', moderators: ['mod5'], isActive: true } }),
     // Processing
-    prisma.service.upsert({ where: { name: 'Openshift' }, update: { moderators: ['mod1'] }, create: { name: 'Openshift', moderators: ['mod1'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'Spark' }, update: { moderators: ['mod6', 'mod7'] }, create: { name: 'Spark', moderators: ['mod6', 'mod7'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'VM' }, update: { moderators: ['mod1'] }, create: { name: 'VM', moderators: ['mod1'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'RUNAI' }, update: { moderators: ['mod1', 'mod7'] }, create: { name: 'RUNAI', moderators: ['mod1', 'mod7'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'LLM' }, update: { moderators: ['mod1', 'mod7'] }, create: { name: 'LLM', moderators: ['mod1', 'mod7'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Openshift' }, update: { moderators: ['mod1'], displayName: 'Openshift' }, create: { name: 'Openshift', displayName: 'Red Hat OpenShift', moderators: ['mod1'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'Spark' }, update: { moderators: ['mod6', 'mod7'], displayName: 'Spark' }, create: { name: 'Spark', displayName: 'Apache Spark', moderators: ['mod6', 'mod7'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'VM' }, update: { moderators: ['mod1'], displayName: 'VM' }, create: { name: 'VM', displayName: 'Virtual Machine', moderators: ['mod1'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'RUNAI' }, update: { moderators: ['mod1', 'mod7'], displayName: 'RUNAI' }, create: { name: 'RUNAI', displayName: 'Run:AI GPU Orchestration', moderators: ['mod1', 'mod7'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'LLM' }, update: { moderators: ['mod1', 'mod7'], displayName: 'LLM' }, create: { name: 'LLM', displayName: 'Large Language Model', moderators: ['mod1', 'mod7'], isActive: true } }),
     // Data Transport
-    prisma.service.upsert({ where: { name: 'NIFI' }, update: { moderators: ['mod2'] }, create: { name: 'NIFI', moderators: ['mod2'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'CAAS' }, update: { moderators: ['mod2'] }, create: { name: 'CAAS', moderators: ['mod2'], isActive: true } }),
-    prisma.service.upsert({ where: { name: 'KAFKA' }, update: { moderators: ['mod2', 'mod7'] }, create: { name: 'KAFKA', moderators: ['mod2', 'mod7'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'NIFI' }, update: { moderators: ['mod2'], displayName: 'NIFI' }, create: { name: 'NIFI', displayName: 'Apache NiFi', moderators: ['mod2'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'CAAS' }, update: { moderators: ['mod2'], displayName: 'CAAS' }, create: { name: 'CAAS', displayName: 'Connectivity as a Service', moderators: ['mod2'], isActive: true } }),
+    prisma.service.upsert({ where: { name: 'KAFKA' }, update: { moderators: ['mod2', 'mod7'], displayName: 'KAFKA' }, create: { name: 'KAFKA', displayName: 'Apache Kafka', moderators: ['mod2', 'mod7'], isActive: true } }),
   ]);
   console.log(`Created ${services.length} services`);
 
@@ -282,6 +282,11 @@ async function main() {
       update: {},
       create: { locationId: locations[2].id, resourceName: 'vCPU', resourceService: 'VM', value: 500 },
     }),
+    prisma.capacity.upsert({
+      where: { locationId_resourceName_resourceService: { locationId: locations[4].id, resourceName: 'Memory', resourceService: 'VM' } },
+      update: {},
+      create: { locationId: locations[4].id, resourceName: 'Memory', resourceService: 'VM', value: 2048 },
+    }),
   ]);
   console.log(`Created ${capacities.length} capacities`);
 
@@ -328,20 +333,20 @@ async function main() {
    * The following accounts must exist in the local Keycloak realm to log in during development.
    * DB User records are seeded below so roles persist through OIDC login without being reset.
    *
-   * Username    | Role            | Center       | Managed Services
-   * ------------|-----------------|--------------|-------------------
-   * admin1      | ADMIN           | -            | -
-   * admin2      | ADMIN           | -            | -
-   * cm1         | CENTER_MANAGER  | IT Center    | -
-   * mod1        | MODERATOR       | -            | Compute, Database
-   * mod2        | MODERATOR       | -            | Compute, Container
-   * mod3        | MODERATOR       | -            | Storage
-   * mod4        | MODERATOR       | -            | Storage
-   * mod5        | MODERATOR       | -            | Network
-   * mod6        | MODERATOR       | -            | Database
-   * mod7        | MODERATOR       | -            | Container
-   * user1       | REGULAR_USER    | IT Center    | -
-   * user2       | REGULAR_USER    | IT Center    | -
+   * Username    | Role            | Center            | Managed Services
+   * ------------|-----------------|-------------------|------------------------------------------
+   * admin1      | ADMIN           | -                 | -
+   * admin2      | ADMIN           | -                 | -
+   * cm1         | CENTER_MANAGER  | IT Center         | -
+   * mod1        | MODERATOR       | -                 | VM, Openshift, RUNAI, LLM
+   * mod2        | MODERATOR       | -                 | NIFI, CAAS, KAFKA
+   * mod3        | MODERATOR       | -                 | HDFS, NAS, S3
+   * mod4        | MODERATOR       | -                 | MongoK, MongoVM, Postgres (PG)
+   * mod5        | MODERATOR       | -                 | Oracle, MSSQL
+   * mod6        | MODERATOR       | -                 | ECK, Redis, Spark
+   * mod7        | MODERATOR       | -                 | Spark, RUNAI, LLM, KAFKA
+   * user1       | REGULAR_USER    | IT Center         | -
+   * user2       | REGULAR_USER    | IT Center         | -
    * user3       | REGULAR_USER    | Operations Center | -
    */
 
