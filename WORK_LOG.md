@@ -701,4 +701,17 @@ Date: 2026-06-10
 **Why:** Prior seed only used 5 of 9 statuses; admin1/mod1 saw empty panels because no projects
 were seeded with their username as createdBy; no CM workflow data existed for cm1 to act on.
 
-**Next:** docker-compose down -v then rebuild to apply fresh seed.
+**Bug Fix:** TypeScript compilation error — capacities array had only 4 entries (indices 0-3) but wallet
+creation code tried to access capacities[4]. Fixed by adding 5th capacity for locations[4] with Memory/VM resource.
+
+**Commits:**
+- `15447ae` — feat(seed): add full-coverage mock data for all roles and demand statuses
+- `edd3c1c` — fix(seed): add 5th capacity for locations[4] to resolve TypeScript array bounds error
+
+**Status:** ✅ Complete — Code implemented and committed
+- All 5 privileged user projects created
+- All 8 demands for privileged projects added
+- All 20 workflow scenario demands covering 9 statuses implemented
+- Capacity array fix applied
+
+**Next:** docker-compose up to verify seed execution and test all role scenarios in the UI.
