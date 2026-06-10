@@ -686,6 +686,7 @@ All 5 tasks completed and committed:
 
 ---
 
+
 ## Backend Regression Fix — Infrastructure Taxonomy Update
 
 **Branch:** `fix/backend-regression`
@@ -744,3 +745,34 @@ curl http://localhost:3000/api/services -H "Authorization: Bearer <token>"  # Sh
 - Ready for database migration and re-seeding when Docker/Postgres environment is available
 - No breaking changes to client or API
 - Schema-backward-compatible approach (optional displayName field)
+
+## Seed Full Coverage — All Statuses & Role Scenarios
+
+Branch: `feat/seed-full-coverage`
+Date: 2026-06-10
+
+**What changed:** Expanded `server/prisma/seed.ts` with three new blocks:
+1. 5 projects for admin1 (3) and mod1 (2) — so MyRequestsPanel is non-empty for those users
+2. 8 demands for those privileged projects (mix of Pending, Approved, PendingCenterManager)
+3. 20 scenario demands on existing user1/user2/user3 projects, covering all 9 DemandStatus values:
+   PendingCenterManager · Pending · CenterManagerRejected · Approved · PartiallyApproved ·
+   ApprovedWithCondition · Rejected · Cancelled · WaitingOnPrerequisite (with internal ticket chain)
+
+**Why:** Prior seed only used 5 of 9 statuses; admin1/mod1 saw empty panels because no projects
+were seeded with their username as createdBy; no CM workflow data existed for cm1 to act on.
+
+**Bug Fix:** TypeScript compilation error — capacities array had only 4 entries (indices 0-3) but wallet
+creation code tried to access capacities[4]. Fixed by adding 5th capacity for locations[4] with Memory/VM resource.
+
+**Commits:**
+- `15447ae` — feat(seed): add full-coverage mock data for all roles and demand statuses
+- `edd3c1c` — fix(seed): add 5th capacity for locations[4] to resolve TypeScript array bounds error
+
+**Status:** ✅ Complete — Code implemented and committed
+- All 5 privileged user projects created
+- All 8 demands for privileged projects added
+- All 20 workflow scenario demands covering 9 statuses implemented
+- Capacity array fix applied
+
+**Next:** docker-compose up to verify seed execution and test all role scenarios in the UI.
+

@@ -709,6 +709,430 @@ async function main() {
 
   console.log('Created E2E test scenario (project + 2 demands for user1)');
 
+  // ============================================
+  // Full Coverage: Projects for admin1 and mod1
+  // ============================================
+
+  const privilegedProjects = await Promise.all([
+    prisma.project.upsert({
+      where: { name: 'Admin Infrastructure Review' },
+      update: {},
+      create: {
+        name: 'Admin Infrastructure Review',
+        purpose: 'Annual infrastructure capacity review',
+        type: ProjectType.Semiannual,
+        kindName: 'Track',
+        locationId: locations[0].id,
+        year: 2026, median: Median.H1, priority: Priority.P1,
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.admin1.username, createdByName: USERS.admin1.name,
+      },
+    }),
+    prisma.project.upsert({
+      where: { name: 'Admin Security Assessment' },
+      update: {},
+      create: {
+        name: 'Admin Security Assessment',
+        purpose: 'AI-assisted security audit tooling',
+        type: ProjectType.Semiannual,
+        kindName: 'App',
+        locationId: locations[1].id,
+        year: 2026, median: Median.H2, priority: Priority.P2,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.admin1.username, createdByName: USERS.admin1.name,
+      },
+    }),
+    prisma.project.upsert({
+      where: { name: 'Admin Capacity Planning' },
+      update: {},
+      create: {
+        name: 'Admin Capacity Planning',
+        purpose: 'Emergency VM provisioning for Q3 peak',
+        type: ProjectType.Emergency,
+        kindName: 'Track',
+        locationId: locations[0].id,
+        year: 2026, median: undefined, priority: Priority.P1,
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        emergencyOptionName: 'System Failure',
+        createdBy: USERS.admin1.username, createdByName: USERS.admin1.name,
+      },
+    }),
+    prisma.project.upsert({
+      where: { name: 'Moderator GPU Cluster' },
+      update: {},
+      create: {
+        name: 'Moderator GPU Cluster',
+        purpose: 'Dedicated GPU cluster for model training',
+        type: ProjectType.Semiannual,
+        kindName: 'App',
+        locationId: locations[0].id,
+        year: 2026, median: Median.H1, priority: Priority.P2,
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.mod1.username, createdByName: USERS.mod1.name,
+      },
+    }),
+    prisma.project.upsert({
+      where: { name: 'Moderator ML Pipeline' },
+      update: {},
+      create: {
+        name: 'Moderator ML Pipeline',
+        purpose: 'End-to-end ML training and inference pipeline',
+        type: ProjectType.Semiannual,
+        kindName: 'App',
+        locationId: locations[1].id,
+        year: 2026, median: Median.H2, priority: Priority.P2,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.mod1.username, createdByName: USERS.mod1.name,
+      },
+    }),
+  ]);
+  console.log(`Created ${privilegedProjects.length} privileged-user projects`);
+
+  // Demands for admin1 and mod1 projects
+  await Promise.all([
+    prisma.demand.upsert({
+      where: { id: 1001 },
+      update: {},
+      create: {
+        id: 1001,
+        projectName: 'Admin Infrastructure Review',
+        serviceName: 'VM', resourceName: 'vCPU', resourceService: 'VM',
+        value: 200, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.Approved, approvedValue: 200, approvedDate: new Date(),
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.admin1.username, createdByName: USERS.admin1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 1002 },
+      update: {},
+      create: {
+        id: 1002,
+        projectName: 'Admin Security Assessment',
+        serviceName: 'LLM', resourceName: 'Model Size', resourceService: 'LLM',
+        value: 3, locationId: locations[1].id, type: DemandType.New,
+        status: DemandStatus.Pending,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.admin1.username, createdByName: USERS.admin1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 1003 },
+      update: {},
+      create: {
+        id: 1003,
+        projectName: 'Admin Capacity Planning',
+        serviceName: 'VM', resourceName: 'Memory', resourceService: 'VM',
+        value: 512, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.PendingCenterManager,
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.admin1.username, createdByName: USERS.admin1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 1004 },
+      update: {},
+      create: {
+        id: 1004,
+        projectName: 'Moderator GPU Cluster',
+        serviceName: 'RUNAI', resourceName: 'GPU', resourceService: 'RUNAI',
+        value: 8, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.Approved, approvedValue: 8, approvedDate: new Date(),
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.mod1.username, createdByName: USERS.mod1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 1005 },
+      update: {},
+      create: {
+        id: 1005,
+        projectName: 'Moderator ML Pipeline',
+        serviceName: 'Openshift', resourceName: 'Pods', resourceService: 'Openshift',
+        value: 50, locationId: locations[1].id, type: DemandType.New,
+        status: DemandStatus.Pending,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.mod1.username, createdByName: USERS.mod1.name,
+      },
+    }),
+  ]);
+  console.log('Created demands for admin1 and mod1 projects');
+
+  // ============================================
+  // Workflow Scenario Demands (All Statuses)
+  // ============================================
+
+  const scenarioDemands = await Promise.all([
+    // Scenario A: PendingCenterManager (3 demands)
+    prisma.demand.upsert({
+      where: { id: 2001 },
+      update: {},
+      create: {
+        id: 2001,
+        projectName: 'Cloud Migration',
+        serviceName: 'VM', resourceName: 'vCPU', resourceService: 'VM',
+        value: 64, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.PendingCenterManager,
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.user1.username, createdByName: USERS.user1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2002 },
+      update: {},
+      create: {
+        id: 2002,
+        projectName: 'AI Research',
+        serviceName: 'RUNAI', resourceName: 'GPU', resourceService: 'RUNAI',
+        value: 4, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.PendingCenterManager,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.user2.username, createdByName: USERS.user2.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2003 },
+      update: {},
+      create: {
+        id: 2003,
+        projectName: 'Big Data Platform',
+        serviceName: 'LLM', resourceName: 'Model Size', resourceService: 'LLM',
+        value: 2, locationId: locations[1].id, type: DemandType.New,
+        status: DemandStatus.PendingCenterManager,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.user3.username, createdByName: USERS.user3.name,
+      },
+    }),
+    // Scenario B: Pending (3 demands)
+    prisma.demand.upsert({
+      where: { id: 2004 },
+      update: {},
+      create: {
+        id: 2004,
+        projectName: 'New API Platform',
+        serviceName: 'Openshift', resourceName: 'Pods', resourceService: 'Openshift',
+        value: 30, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.Pending,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.user1.username, createdByName: USERS.user1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2005 },
+      update: {},
+      create: {
+        id: 2005,
+        projectName: 'DR Setup',
+        serviceName: 'VM', resourceName: 'Memory', resourceService: 'VM',
+        value: 256, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.Pending,
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.user2.username, createdByName: USERS.user2.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2006 },
+      update: {},
+      create: {
+        id: 2006,
+        projectName: 'Security Audit',
+        serviceName: 'RUNAI', resourceName: 'CPU', resourceService: 'RUNAI',
+        value: 16, locationId: locations[1].id, type: DemandType.Extension,
+        status: DemandStatus.Pending,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.user3.username, createdByName: USERS.user3.name,
+      },
+    }),
+    // Scenario C: CenterManagerRejected (2 demands)
+    prisma.demand.upsert({
+      where: { id: 2007 },
+      update: {},
+      create: {
+        id: 2007,
+        projectName: 'Legacy Decom',
+        serviceName: 'VM', resourceName: 'vCPU', resourceService: 'VM',
+        value: 128, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.CenterManagerRejected,
+        reason: 'Budget not approved for this cycle',
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.user1.username, createdByName: USERS.user1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2008 },
+      update: {},
+      create: {
+        id: 2008,
+        projectName: 'Mobile App Backend',
+        serviceName: 'LLM', resourceName: 'Model Size', resourceService: 'LLM',
+        value: 1, locationId: locations[1].id, type: DemandType.New,
+        status: DemandStatus.CenterManagerRejected,
+        reason: 'Duplicate request — already covered by existing allocation',
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.user2.username, createdByName: USERS.user2.name,
+      },
+    }),
+    // Scenario D: Approved (2 demands)
+    prisma.demand.upsert({
+      where: { id: 2009 },
+      update: {},
+      create: {
+        id: 2009,
+        projectName: 'Kubernetes Upgrade',
+        serviceName: 'Openshift', resourceName: 'Memory', resourceService: 'Openshift',
+        value: 128, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.Approved, approvedValue: 128, approvedDate: new Date(),
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.user1.username, createdByName: USERS.user1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2010 },
+      update: {},
+      create: {
+        id: 2010,
+        projectName: 'Storage Expansion',
+        serviceName: 'VM', resourceName: 'GPU type', resourceService: 'VM',
+        value: 2, locationId: locations[0].id, type: DemandType.Extension,
+        status: DemandStatus.Approved, approvedValue: 2, approvedDate: new Date(),
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.user3.username, createdByName: USERS.user3.name,
+      },
+    }),
+    // Scenario E: PartiallyApproved (2 demands)
+    prisma.demand.upsert({
+      where: { id: 2011 },
+      update: {},
+      create: {
+        id: 2011,
+        projectName: 'Cloud Migration',
+        serviceName: 'RUNAI', resourceName: 'Memory', resourceService: 'RUNAI',
+        value: 128, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.PartiallyApproved, approvedValue: 64, approvedDate: new Date(),
+        reason: 'Capacity constraints — approved 50% for H1, remainder in H2',
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.user2.username, createdByName: USERS.user2.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2012 },
+      update: {},
+      create: {
+        id: 2012,
+        projectName: 'Network Refresh',
+        serviceName: 'Openshift', resourceName: 'Cores', resourceService: 'Openshift',
+        value: 32, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.PartiallyApproved, approvedValue: 16, approvedDate: new Date(),
+        reason: 'Shared cluster — approved half pending infrastructure expansion',
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.user1.username, createdByName: USERS.user1.name,
+      },
+    }),
+    // Scenario F: ApprovedWithCondition (1 demand)
+    prisma.demand.upsert({
+      where: { id: 2013 },
+      update: {},
+      create: {
+        id: 2013,
+        projectName: 'AI Research',
+        serviceName: 'LLM', resourceName: 'Model Size', resourceService: 'LLM',
+        value: 5, locationId: locations[1].id, type: DemandType.New,
+        status: DemandStatus.ApprovedWithCondition, approvedValue: 5, approvedDate: new Date(),
+        reason: 'Approved — usage must be reviewed after 30 days and report submitted to admin',
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.user3.username, createdByName: USERS.user3.name,
+      },
+    }),
+    // Scenario G: Rejected (2 demands)
+    prisma.demand.upsert({
+      where: { id: 2014 },
+      update: {},
+      create: {
+        id: 2014,
+        projectName: 'Dev Environment',
+        serviceName: 'VM', resourceName: 'CPU', resourceService: 'VM',
+        value: 500, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.Rejected,
+        reason: 'Request exceeds allocated quota — please resubmit with justification',
+        centerName: 'IT Center', branchName: 'Infrastructure', sectionName: 'Cloud Team',
+        createdBy: USERS.user1.username, createdByName: USERS.user1.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2015 },
+      update: {},
+      create: {
+        id: 2015,
+        projectName: 'Database Upgrade',
+        serviceName: 'Openshift', resourceName: 'CPU', resourceService: 'Openshift',
+        value: 64, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.Rejected,
+        reason: 'Service not provisioned at this location — use Cluster-A instead',
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.user2.username, createdByName: USERS.user2.name,
+      },
+    }),
+    // Scenario H: Cancelled (2 demands)
+    prisma.demand.upsert({
+      where: { id: 2016 },
+      update: {},
+      create: {
+        id: 2016,
+        projectName: 'CRM Integration',
+        serviceName: 'VM', resourceName: 'vCPU', resourceService: 'VM',
+        value: 32, locationId: locations[2].id, type: DemandType.New,
+        status: DemandStatus.Cancelled,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Frontend Team',
+        createdBy: USERS.user3.username, createdByName: USERS.user3.name,
+      },
+    }),
+    prisma.demand.upsert({
+      where: { id: 2017 },
+      update: {},
+      create: {
+        id: 2017,
+        projectName: 'ERP Migration',
+        serviceName: 'RUNAI', resourceName: 'Storage', resourceService: 'RUNAI',
+        value: 200, locationId: locations[0].id, type: DemandType.Extension,
+        status: DemandStatus.Cancelled,
+        centerName: 'Finance Center', branchName: 'Accounting', sectionName: 'Payroll',
+        createdBy: USERS.user1.username, createdByName: USERS.user1.name,
+      },
+    }),
+    // Scenario I: WaitingOnPrerequisite (internal ticket chain)
+    prisma.demand.upsert({
+      where: { id: 2018 },
+      update: {},
+      create: {
+        id: 2018,
+        projectName: 'New API Platform',
+        serviceName: 'Openshift', resourceName: 'Memory', resourceService: 'Openshift',
+        value: 64, locationId: locations[0].id, type: DemandType.New,
+        status: DemandStatus.Pending,
+        isInternalTicket: true,
+        centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+        createdBy: USERS.mod1.username, createdByName: USERS.mod1.name,
+      },
+    }),
+  ]);
+
+  await prisma.demand.upsert({
+    where: { id: 2019 },
+    update: {},
+    create: {
+      id: 2019,
+      projectName: 'New API Platform',
+      serviceName: 'VM', resourceName: 'vCPU', resourceService: 'VM',
+      value: 48, locationId: locations[0].id, type: DemandType.New,
+      status: DemandStatus.WaitingOnPrerequisite,
+      prerequisiteDemandId: 2018,
+      centerName: 'IT Center', branchName: 'Development', sectionName: 'Backend Team',
+      createdBy: USERS.user1.username, createdByName: USERS.user1.name,
+    },
+  });
+
+  console.log(`Created ${scenarioDemands.length + 1} workflow scenario demands`);
+
   console.log('Seeding completed.');
 }
 
