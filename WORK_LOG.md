@@ -683,3 +683,22 @@ All 5 tasks completed and committed:
 - Task 3: `eddb148` ✅
 - Task 4: `460d9c9` ✅
 - Task 5: `8ab2a8d` ✅
+
+---
+
+## Seed Full Coverage — All Statuses & Role Scenarios
+
+Branch: `feat/seed-full-coverage`
+Date: 2026-06-10
+
+**What changed:** Expanded `server/prisma/seed.ts` with three new blocks:
+1. 5 projects for admin1 (3) and mod1 (2) — so MyRequestsPanel is non-empty for those users
+2. 8 demands for those privileged projects (mix of Pending, Approved, PendingCenterManager)
+3. 20 scenario demands on existing user1/user2/user3 projects, covering all 9 DemandStatus values:
+   PendingCenterManager · Pending · CenterManagerRejected · Approved · PartiallyApproved ·
+   ApprovedWithCondition · Rejected · Cancelled · WaitingOnPrerequisite (with internal ticket chain)
+
+**Why:** Prior seed only used 5 of 9 statuses; admin1/mod1 saw empty panels because no projects
+were seeded with their username as createdBy; no CM workflow data existed for cm1 to act on.
+
+**Next:** docker-compose down -v then rebuild to apply fresh seed.
