@@ -18,7 +18,7 @@ const getVisibleTabs = (role: UserRole): string[] => {
     case 'ADMIN':
       return ['infrastructure', 'organization', 'options', 'services', 'capacity', 'wallets', 'users'];
     case 'MODERATOR':
-      return ['services'];
+      return ['services', 'capacity', 'wallets'];
     default:
       // REGULAR_USER, CENTER_MANAGER: no settings access
       return [];
@@ -68,7 +68,7 @@ function InfrastructureSettings({
             {subTab === 'base' && (
                 <EntityManager
                     title={t('settings.base.title', 'Bases')}
-                    endpoint="/bases"
+                    endpoint="/api/bases"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -84,7 +84,7 @@ function InfrastructureSettings({
             {subTab === 'environment' && (
                 <EntityManager
                     title={t('settings.environment.title', 'Environments')}
-                    endpoint="/environments"
+                    endpoint="/api/environments"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -100,7 +100,7 @@ function InfrastructureSettings({
             {subTab === 'network' && (
                 <EntityManager
                     title={t('settings.network.title', 'Networks')}
-                    endpoint="/networks"
+                    endpoint="/api/networks"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -116,7 +116,7 @@ function InfrastructureSettings({
             {subTab === 'cluster' && (
                 <EntityManager
                     title={t('settings.cluster.title', 'Clusters')}
-                    endpoint="/clusters"
+                    endpoint="/api/clusters"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -132,7 +132,7 @@ function InfrastructureSettings({
             {subTab === 'location' && (
                 <EntityManager
                     title={t('settings.location.title', 'Locations')}
-                    endpoint="/locations"
+                    endpoint="/api/locations"
                     idField="id"
                     onSuccess={onSuccess}
                     columns={[
@@ -188,7 +188,7 @@ function OrganizationSettings({
             {subTab === 'center' && (
                 <EntityManager
                     title={t('settings.center.title', 'Centers')}
-                    endpoint="/centers"
+                    endpoint="/api/centers"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -204,7 +204,7 @@ function OrganizationSettings({
             {subTab === 'branch' && (
                 <EntityManager
                     title={t('settings.branch.title', 'Branches')}
-                    endpoint="/branches"
+                    endpoint="/api/branches"
                     idField={['centerName', 'name']} // Order matters for API url: /branches/centerName/name
                     onSuccess={onSuccess}
                     columns={[
@@ -223,7 +223,7 @@ function OrganizationSettings({
             {subTab === 'section' && (
                 <EntityManager
                     title={t('settings.section.title', 'Sections')}
-                    endpoint="/sections"
+                    endpoint="/api/sections"
                     idField={['branchCenter', 'branchName', 'name']} // API: /sections/branchCenter/branchName/name
                     onSuccess={onSuccess}
                     columns={[
@@ -298,7 +298,7 @@ function OptionsSettings({ onSuccess }: { onSuccess: () => void }) {
             {subTab === 'emergency' && (
                 <EntityManager
                     title={t('settings.emergency.title', 'Emergency Options')}
-                    endpoint="/emergency-options"
+                    endpoint="/api/emergency-options"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -311,7 +311,7 @@ function OptionsSettings({ onSuccess }: { onSuccess: () => void }) {
             {subTab === 'projectKind' && (
                 <EntityManager
                     title={t('settings.projectKind.title', 'Project Kinds')}
-                    endpoint="/project-kinds"
+                    endpoint="/api/project-kinds"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -326,7 +326,7 @@ function OptionsSettings({ onSuccess }: { onSuccess: () => void }) {
             {subTab === 'demandReason' && (
                 <EntityManager
                     title={t('settings.demandReason.title', 'Demand Reasons')}
-                    endpoint="/decision-reasons"
+                    endpoint="/api/decision-reasons"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -369,7 +369,7 @@ function ServicesSettings({ serviceOptions, onSuccess }: { serviceOptions: { val
             {subTab === 'service' && (
                 <EntityManager
                     title={t('settings.service.title', 'Services')}
-                    endpoint="/services"
+                    endpoint="/api/services"
                     onSuccess={onSuccess}
                     columns={[
                         { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
@@ -394,7 +394,7 @@ function ServicesSettings({ serviceOptions, onSuccess }: { serviceOptions: { val
             {subTab === 'resource' && (
                 <EntityManager
                     title={t('settings.resource.title', 'Resources')}
-                    endpoint="/resources"
+                    endpoint="/api/resources"
                     idField={['serviceName', 'name']} // API: /resources/serviceName/name
                     onSuccess={onSuccess}
                     columns={[
