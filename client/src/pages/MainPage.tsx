@@ -43,7 +43,7 @@ export default function MainPage() {
     <div className="flex flex-col h-full">
       <TopNavTabs activeTab={topNavTab} onTabChange={setTopNavTab} role={role} />
 
-      {isModeratorOrAdmin(role) && (
+      {currentUser !== null && isModeratorOrAdmin(role) && (
         <div className="bg-bg-paper border-b border-divider px-6 py-3">
           <CenterFilter selectedCenters={selectedCenters} onChange={setSelectedCenters} />
         </div>

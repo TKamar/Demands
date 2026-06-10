@@ -776,3 +776,56 @@ creation code tried to access capacities[4]. Fixed by adding 5th capacity for lo
 
 **Next:** docker-compose up to verify seed execution and test all role scenarios in the UI.
 
+---
+
+## Hotfix Sprint — 404 API Route, Moderator Settings & Center Filter
+
+Branch: `hotfix/sprint-regressions-2026-06-10`
+Started: 2026-06-10
+
+**Summary:** Three production regressions blocking core application usage fixed.
+
+### 2026-06-10
+
+**Fix 1 — 404 on Settings CRUD Operations**
+- **Root cause:** `EntityManager` component calls `api.get(endpoint)` directly. Every `endpoint` prop in `SettingsPage.tsx` was a bare path like `/bases`, `/environments`, etc., constructing requests to `http://localhost:3000/bases`. The Express backend mounts all routes under `/api`, so only `http://localhost:3000/api/bases` was valid.
+- **Solution:** Prefixed all 13 `endpoint` props with `/api`:
+  - Infrastructure: `/api/bases`, `/api/environments`, `/api/networks`, `/api/clusters`, `/api/locations`
+  - Organization: `/api/centers`, `/api/branches`, `/api/sections`
+  - Options: `/api/emergency-options`, `/api/project-kinds`, `/api/decision-reasons`
+  - Services: `/api/services`, `/api/resources`
+- **File:** `client/src/pages/SettingsPage.tsx` (lines 71, 87, 103, 119, 135, 191, 207, 226, 301, 314, 329, 372, 397)
+- **Commit:** `fix: api prefix on settings endpoints`
+
+**Fix 2 — Moderator Blank Settings Tabs**
+- **Root cause:** `getVisibleTabs('MODERATOR')` returned `['services']` only. The `mainTabs` array conditionally included `capacity` and `wallets` for `isModerator = true`, but tab content guards (`showTab('capacity', userRole)`) evaluated to `false` for MODERATOR, showing blank panels on click.
+- **Solution:** Expanded `getVisibleTabs('MODERATOR')` to return `['services', 'capacity', 'wallets']`, aligning tab availability with what `mainTabs` renders.
+- **File:** `client/src/pages/SettingsPage.tsx` (line 21)
+- **Commit:** `fix: moderator tab access for capacity and wallets`
+
+**Fix 3 — CenterFilter Disappearing During Load**
+- **Root cause:** `MainPage.tsx` defaults `role = currentUser?.role ?? 'REGULAR_USER'` while `useCurrentUser()` is resolving (returns `null`). `isModeratorOrAdmin('REGULAR_USER')` evaluates to `false`, hiding the CenterFilter. If the async `/api/me` call is slow or the component unmounts, the filter never appears.
+- **Solution:** Added `currentUser !== null &&` guard to the CenterFilter render gate, preventing the false-negative during initial load.
+- **File:** `client/src/pages/MainPage.tsx` (line 46)
+- **Commit:** `fix: center filter load guard`
+
+**Fix 4 — Database Bootstrap (User Roles)**
+- **Issue:** All users (admin1, admin2, mod1–mod7, cm1, user1–user3) were created with default role `'REGULAR_USER'` during OIDC login, blocking access to Settings and Moderator functions.
+- **Root cause:** Users auto-upsert on OIDC login with `role: 'REGULAR_USER'` default; first admin must be explicitly promoted via SQL or Settings UI.
+- **Solution:** Ran SQL UPDATE to bootstrap all seed users with correct roles:
+  ```sql
+  UPDATE "User" SET role = 'ADMIN' WHERE username IN ('admin1', 'admin2');
+  UPDATE "User" SET role = 'MODERATOR' WHERE username IN ('mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6', 'mod7');
+  UPDATE "User" SET role = 'CENTER_MANAGER' WHERE username = 'cm1';
+  UPDATE "User" SET role = 'REGULAR_USER' WHERE username IN ('user1', 'user2', 'user3');
+  ```
+- **Status:** ✅ Complete — All 13 users in database now have correct roles; `/api/me` returns matching role.
+
+**Status:** ✅ Complete — All three code regressions + database bootstrap fixed and verified.
+- Settings Infrastructure → Base subtab: loads and populates bases table (GET /api/bases → 200)
+- ADMIN users (admin1, admin2): full Settings access with all tabs
+- MODERATOR users (mod1–mod7): Services/Capacity/Wallets tabs render content (no blank panels)
+- ADMIN/MODERATOR on /projects: CenterFilter appears once currentUser resolves
+
+**Next:** Merge `hotfix/sprint-regressions-2026-06-10` to `dev` via PR.
+
