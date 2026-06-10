@@ -809,9 +809,22 @@ Started: 2026-06-10
 - **File:** `client/src/pages/MainPage.tsx` (line 46)
 - **Commit:** `fix: center filter load guard`
 
-**Status:** ✅ Complete — All three regressions fixed and verified in browser.
+**Fix 4 — Database Bootstrap (User Roles)**
+- **Issue:** All users (admin1, admin2, mod1–mod7, cm1, user1–user3) were created with default role `'REGULAR_USER'` during OIDC login, blocking access to Settings and Moderator functions.
+- **Root cause:** Users auto-upsert on OIDC login with `role: 'REGULAR_USER'` default; first admin must be explicitly promoted via SQL or Settings UI.
+- **Solution:** Ran SQL UPDATE to bootstrap all seed users with correct roles:
+  ```sql
+  UPDATE "User" SET role = 'ADMIN' WHERE username IN ('admin1', 'admin2');
+  UPDATE "User" SET role = 'MODERATOR' WHERE username IN ('mod1', 'mod2', 'mod3', 'mod4', 'mod5', 'mod6', 'mod7');
+  UPDATE "User" SET role = 'CENTER_MANAGER' WHERE username = 'cm1';
+  UPDATE "User" SET role = 'REGULAR_USER' WHERE username IN ('user1', 'user2', 'user3');
+  ```
+- **Status:** ✅ Complete — All 13 users in database now have correct roles; `/api/me` returns matching role.
+
+**Status:** ✅ Complete — All three code regressions + database bootstrap fixed and verified.
 - Settings Infrastructure → Base subtab: loads and populates bases table (GET /api/bases → 200)
-- Moderator user: Services, Capacity, Wallets tabs all render content (no blank panels)
+- ADMIN users (admin1, admin2): full Settings access with all tabs
+- MODERATOR users (mod1–mod7): Services/Capacity/Wallets tabs render content (no blank panels)
 - ADMIN/MODERATOR on /projects: CenterFilter appears once currentUser resolves
 
 **Next:** Merge `hotfix/sprint-regressions-2026-06-10` to `dev` via PR.
