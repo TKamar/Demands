@@ -282,6 +282,11 @@ async function main() {
       update: {},
       create: { locationId: locations[2].id, resourceName: 'vCPU', resourceService: 'VM', value: 500 },
     }),
+    prisma.capacity.upsert({
+      where: { locationId_resourceName_resourceService: { locationId: locations[4].id, resourceName: 'Memory', resourceService: 'VM' } },
+      update: {},
+      create: { locationId: locations[4].id, resourceName: 'Memory', resourceService: 'VM', value: 2048 },
+    }),
   ]);
   console.log(`Created ${capacities.length} capacities`);
 
