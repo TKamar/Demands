@@ -1,3 +1,22 @@
+# Docker Cross-Platform Stability Patch — Work Log
+
+Branch: `fix/docker-cross-platform-stability`
+Started: 2026-06-11
+
+## Summary
+
+Fixed four critical Docker environment regressions on macOS:
+1. ✅ **Client vite: not found** — Added `client/.dockerignore` to isolate node_modules, hardened `Dockerfile` CMD with runtime `npm install`
+2. ✅ **cm1 user lost on restart** — Added `cm1` user to `demands-realm.json` for automatic Keycloak provisioning
+3. ✅ **Prisma update warnings** — Replaced `npx prisma` with `node_modules/.bin/prisma` in `entrypoint.sh`; added `PRISMA_HIDE_UPDATE_MESSAGE=1` env var
+4. ✅ **Keycloak issuer inconsistency** — Added `KC_HOSTNAME=localhost` to lock issuer URL
+5. ✅ **CRLF line ending protection** — Added `.gitattributes` rule and Dockerfile `sed` guard
+
+Commit: `c81bb43`
+Status: **Complete — ready for test on macOS**
+
+---
+
 # UX/UI Refinement Sprint — Work Log
 
 Branch: `feature/ux-ui-refinement-sprint`
