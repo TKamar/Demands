@@ -225,6 +225,23 @@
       ]
     },
     {
+      "username": "cm1",
+      "enabled": true,
+      "email": "cm1@example.org",
+      "firstName": "Center",
+      "lastName": "Manager One",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "cm123",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "user"
+      ]
+    },
+    {
       "username": "service-account-demands-api",
       "enabled": true,
       "serviceAccountClientId": "demands-api",

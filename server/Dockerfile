@@ -16,6 +16,7 @@ RUN npm run build
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+RUN sed -i 's/\r//' /entrypoint.sh
 
 EXPOSE 3000
 
