@@ -9,7 +9,7 @@ node_modules/.bin/prisma migrate deploy
 
 if [ "$NODE_ENV" = "development" ]; then
   echo "Seeding database..."
-  node_modules/.bin/prisma db seed
+  node node_modules/.bin/ts-node prisma/seed.ts
 fi
 
 echo "Starting server..."
