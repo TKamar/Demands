@@ -10,7 +10,7 @@ services:
       - DATABASE_URL=postgresql://user:password@postgres:5432/demands
       # OIDC / Auth
       - OIDC_DISCOVERY_URL=http://keycloak:8080/realms/demands/.well-known/openid-configuration
-      - AUTH_ISSUER=http://localhost:8080/realms/demands
+      - AUTH_ISSUER=http://keycloak:8080/realms/demands
       - AUTH_AUDIENCE=${AUTH_AUDIENCE:-demands-api}
       - AUTH_GROUP_CLAIM_PATH=${AUTH_GROUP_CLAIM_PATH:-groups}
       - AUTH_ADMIN_GROUP=${AUTH_ADMIN_GROUP:-admin}
@@ -88,10 +88,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    entrypoint: 
+    entrypoint:
       - /bin/bash
       - -c
       - |
+        # Delete existing realm to force reimport with updated config
+        rm -f /opt/keycloak/data/import/demands-realm-imported
+
         # Start Keycloak in the background
         /opt/keycloak/bin/kc.sh start-dev --import-realm & 
         
@@ -112,8 +115,45 @@ services:
         done
         
         /opt/keycloak/bin/kcadm.sh update realms/master -s sslRequired=NONE
-        
-        echo "SSL requirement disabled. You're good to go!"
+
+        echo "SSL requirement disabled. Creating test users in Keycloak..."
+
+        # Create test users in demands realm
+        USERS=("admin:admin123:admin" "admin1:admin123:admin" "admin2:admin123:admin" "user1:test123:user" "mod1:test123:moderator")
+
+        for USER_DATA in "$${USERS[@]}"; do
+          IFS=':' read -r USERNAME PASSWORD GROUP <<< "$$USER_DATA"
+
+          # Check if user already exists
+          USER_EXISTS=$$(/opt/keycloak/bin/kcadm.sh get users -r demands --fields username --query="username:$$USERNAME" 2>/dev/null | grep -c "$$USERNAME" || echo 0)
+
+          if [ "$$USER_EXISTS" -eq 0 ]; then
+            echo "Creating user: $$USERNAME"
+            /opt/keycloak/bin/kcadm.sh create users -r demands \
+              -s username=$$USERNAME \
+              -s email=$$USERNAME@example.com \
+              -s firstName=$${USERNAME^} \
+              -s lastName=Test \
+              -s enabled=true 2>/dev/null || true
+
+            # Get user ID and set password
+            USER_ID=$$(/opt/keycloak/bin/kcadm.sh get users -r demands --fields id,username --query="username:$$USERNAME" 2>/dev/null | grep -o '"id":"[^"]*' | cut -d'"' -f4)
+
+            if [ ! -z "$$USER_ID" ]; then
+              /opt/keycloak/bin/kcadm.sh update users/$$USER_ID/reset-password -r demands \
+                -s type=password -s value=$$PASSWORD -s temporary=false 2>/dev/null || true
+
+              # Add user to group
+              /opt/keycloak/bin/kcadm.sh update users/$$USER_ID/groups/$$GROUP -r demands 2>/dev/null || true
+
+              echo "✓ Created $$USERNAME (password: $$PASSWORD)"
+            fi
+          else
+            echo "✓ User $$USERNAME already exists"
+          fi
+        done
+
+        echo "You're good to go!"
         wait
 
 volumes:

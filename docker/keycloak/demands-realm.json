@@ -21,6 +21,23 @@
   ],
   "users": [
     {
+      "username": "admin",
+      "enabled": true,
+      "email": "admin@example.org",
+      "firstName": "Admin",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "groups": [
+        "admin"
+      ]
+    },
+    {
       "username": "admin1",
       "enabled": true,
       "email": "admin1@example.org",

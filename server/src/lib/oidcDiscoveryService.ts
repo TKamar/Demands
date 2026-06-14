@@ -46,6 +46,15 @@ export class OIDCDiscoveryService {
         );
       }
 
+      // Rewrite localhost to keycloak for jwks_uri and token_endpoint (for Docker network access)
+      // Keep issuer as-is (it's what the token contains)
+      if (doc.jwks_uri?.includes('localhost:8080')) {
+        doc.jwks_uri = doc.jwks_uri.replace('localhost:8080', 'keycloak:8080');
+      }
+      if (doc.token_endpoint?.includes('localhost:8080')) {
+        doc.token_endpoint = doc.token_endpoint.replace('localhost:8080', 'keycloak:8080');
+      }
+
       return doc;
     } catch (err) {
       if (err instanceof OIDCDiscoveryError) {
