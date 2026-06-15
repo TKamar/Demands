@@ -4,6 +4,39 @@
 **Started:** 2026-06-15
 **Status:** **✅ ALL TASKS COMPLETE & MERGED TO DEV**
 
+---
+
+## Follow-Up Session: Reactive Dashboard & Universal Excel (2026-06-15)
+
+**Objective:** Fix gaps in the previous implementation and add reactive filtering + universal Excel export across all panels.
+
+### Task 1: Fix CM Project Scoping Regression ✅
+- **File:** `server/src/controllers/request/project.controller.ts`
+- **Issue:** `getByFilters` was applying AND logic between `createdBy: username` and `centerName`, blocking CM visibility
+- **Fix:** Exempt CM from `createdBy` clamp using OR logic (if CM, use undefined)
+- **Result:** CM users now see all center projects in filter queries
+
+### Task 2-3: Reactive Admin Dashboard ✅
+- **Files:** `server/src/controllers/admin/stats.controller.ts`, `client/src/api/apiService.ts`, `client/src/components/admin/AdminDashboard.tsx`, `client/src/pages/MainPage.tsx`
+- **Changes:**
+  - Backend: Parse `?centers[]=a&centers[]=b` query params, apply `where: { centerName: { in: centers } }` to all Prisma queries
+  - Frontend: Wire `selectedCenters` from MainPage → AdminDashboard → fetchAdminStats
+  - Result: Dashboard metrics update instantly when admin selects a center
+- **Status:** Dashboard now reacts to global center filter dropdown
+
+### Task 4-5: Universal Excel Export ✅
+- **Files:** `server/src/controllers/excel/excel.controller.ts`, `client/src/api/apiService.ts`, `client/src/components/excel/ExcelToolbar.tsx` + all 3 panels
+- **Changes:**
+  - Backend: Support multi-center `?centers[]=a&centers[]=b`, fallback to legacy `?center=x`, auto-scope CM exports
+  - Frontend: Replace `centerName?: string` prop with `selectedCenters?: string[]`, add `showImport?: boolean` guard
+  - Toolbar added to: MyRequestsPanel (import enabled), ApprovalRequestsPanel (export only), HistoryPanel (export only)
+- **Status:** Export buttons now visible on all three main tabs
+
+**Git:** All changes committed to dev branch (commit 3415992)
+**Build:** Docker build successful, TypeScript clean on both client and server
+
+---
+
 ## Summary
 
 Comprehensive implementation across 4 independent subsystems: CM role scoping, drawer UX refinement, admin analytics dashboard, and bidirectional Excel import/export engine.
