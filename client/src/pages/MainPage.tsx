@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { TopNavTabs } from '../components/main/TopNavTabs';
 import type { TopNavTabId } from '../components/main/TopNavTabs';
 import ApprovalRequestsPanel from '../components/main/panels/ApprovalRequestsPanel';
@@ -10,10 +10,11 @@ import { useCurrentUser } from '../hooks/useCurrentUser';
 import { getDefaultTab, isModeratorOrAdmin } from '../utils/roleUtils';
 import type { SubViewId } from '../utils/roleUtils';
 import type { UserRole } from '../types/domain';
+import NavigationContext from '../contexts/NavigationContext';
 
 const DEFAULT_TAB: TopNavTabId = 'myRequests';
 const DEFAULT_SUBVIEWS: Record<TopNavTabId, SubViewId> = {
-  approvalRequests: 'requirements',
+  approvalRequests: 'projects',
   myRequests: 'projects',
   history: 'requirements',
   dashboard: 'projects' as SubViewId,
@@ -41,43 +42,51 @@ export default function MainPage() {
     setSubViewByTab((prev) => ({ ...prev, [topNavTab]: view }));
   };
 
+  const handleNavigateHome = useCallback(() => {
+    const homeTab = getDefaultTab(currentUser?.role ?? 'REGULAR_USER');
+    setTopNavTab(homeTab);
+    setSubViewByTab(prev => ({ ...prev, [homeTab]: 'projects' }));
+  }, [currentUser?.role]);
+
   return (
-    <div className="flex flex-col h-full">
-      <TopNavTabs activeTab={topNavTab} onTabChange={setTopNavTab} role={role} />
+    <NavigationContext.Provider value={{ navigateToHome: handleNavigateHome }}>
+      <div className="flex flex-col h-full">
+        <TopNavTabs activeTab={topNavTab} onTabChange={setTopNavTab} role={role} />
 
-      {currentUser !== null && isModeratorOrAdmin(role) && (
-        <div className="bg-bg-paper border-b border-divider px-6 py-3">
-          <CenterFilter selectedCenters={selectedCenters} onChange={setSelectedCenters} />
+        {currentUser !== null && isModeratorOrAdmin(role) && (
+          <div className="bg-bg-paper border-b border-divider px-6 py-3">
+            <CenterFilter selectedCenters={selectedCenters} onChange={setSelectedCenters} />
+          </div>
+        )}
+
+        <div className="flex-1 overflow-hidden">
+          {topNavTab === 'approvalRequests' && (
+            <ApprovalRequestsPanel
+              subView={subView}
+              onSubViewChange={handleSubViewChange}
+              role={role}
+              selectedCenters={selectedCenters}
+            />
+          )}
+          {topNavTab === 'myRequests' && (
+            <MyRequestsPanel
+              subView={subView}
+              onSubViewChange={handleSubViewChange}
+              currentUser={currentUser}
+              selectedCenters={selectedCenters}
+            />
+          )}
+          {topNavTab === 'history' && (
+            <HistoryPanel
+              subView={subView}
+              onSubViewChange={handleSubViewChange}
+              currentUser={currentUser}
+              selectedCenters={selectedCenters}
+            />
+          )}
+          {topNavTab === 'dashboard' && <AdminDashboard selectedCenters={selectedCenters} />}
         </div>
-      )}
-
-      <div className="flex-1 overflow-hidden">
-        {topNavTab === 'approvalRequests' && (
-          <ApprovalRequestsPanel
-            subView={subView}
-            onSubViewChange={handleSubViewChange}
-            role={role}
-            selectedCenters={selectedCenters}
-          />
-        )}
-        {topNavTab === 'myRequests' && (
-          <MyRequestsPanel
-            subView={subView}
-            onSubViewChange={handleSubViewChange}
-            currentUser={currentUser}
-            selectedCenters={selectedCenters}
-          />
-        )}
-        {topNavTab === 'history' && (
-          <HistoryPanel
-            subView={subView}
-            onSubViewChange={handleSubViewChange}
-            currentUser={currentUser}
-            selectedCenters={selectedCenters}
-          />
-        )}
-        {topNavTab === 'dashboard' && <AdminDashboard selectedCenters={selectedCenters} />}
       </div>
-    </div>
+    </NavigationContext.Provider>
   );
 }

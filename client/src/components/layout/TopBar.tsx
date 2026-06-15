@@ -9,6 +9,7 @@ import type { UserProfile } from '../../types/navigation';
 import LanguageSwitcher from '../LanguageSwitcher';
 import NotificationBell from '../notifications/NotificationBell';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useNavigation } from '../../contexts/NavigationContext';
 
 interface TopBarProps {
   userProfile: UserProfile;
@@ -19,6 +20,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
   const auth = useAuth();
   const navigate = useNavigate();
   const { effectiveTheme, toggleTheme } = useTheme();
+  const { navigateToHome } = useNavigation();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -38,12 +40,16 @@ export default function TopBar({ userProfile }: TopBarProps) {
   return (
     <header className="h-14 bg-bg-paper border-b border-divider flex items-center justify-between px-6 shrink-0">
       {/* Logo */}
-      <div className="flex items-center gap-3">
+      <button
+        onClick={navigateToHome}
+        className="flex items-center gap-3 cursor-pointer bg-transparent border-none p-0 hover:opacity-80 transition-opacity"
+        aria-label="חזרה לדף הבית"
+      >
         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
           <MdStorage size={20} className="text-white" />
         </div>
         <span className="text-base font-bold text-text-primary">{t('app.title')}</span>
-      </div>
+      </button>
 
       {/* Right side: language + role icon + user */}
       <div className="flex items-center gap-4">
