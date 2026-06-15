@@ -6,14 +6,17 @@ import { notificationService } from "../notification/notification.service";
 export const projectService = {
   findAll: async (
     createdBy?: string,
-    pagination?: { page: number; limit: number }
+    pagination?: { page: number; limit: number },
+    centerName?: string
   ) => {
     const { page = 1, limit = 10 } = pagination || {};
     const skip = (page - 1) * limit;
 
+    const where: any = centerName ? { centerName } : createdBy ? { createdBy } : undefined;
+
     const [data, total] = await Promise.all([
       prisma.project.findMany({
-        where: createdBy ? { createdBy } : undefined,
+        where,
         include: {
           location: true,
           kind: true,
@@ -26,7 +29,7 @@ export const projectService = {
         take: limit,
       }),
       prisma.project.count({
-        where: createdBy ? { createdBy } : undefined,
+        where,
       }),
     ]);
 
@@ -42,7 +45,7 @@ export const projectService = {
   },
 
   findByFilters: async (
-    filters: { name?: string; createdBy?: string },
+    filters: { name?: string; createdBy?: string; centerName?: string },
     pagination?: { page: number; limit: number }
   ) => {
     const { page = 1, limit = 10 } = pagination || {};
@@ -52,7 +55,9 @@ export const projectService = {
     if (filters.name) {
       where.name = { contains: filters.name, mode: "insensitive" };
     }
-    if (filters.createdBy) {
+    if (filters.centerName) {
+      where.centerName = filters.centerName;
+    } else if (filters.createdBy) {
       where.createdBy = filters.createdBy;
     }
 
