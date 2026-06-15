@@ -9,29 +9,38 @@ export const statsController = {
     }
 
     try {
+      const rawCenters = req.query.centers;
+      const centers: string[] = Array.isArray(rawCenters)
+        ? (rawCenters as string[]).filter(Boolean)
+        : typeof rawCenters === 'string' && rawCenters
+        ? [rawCenters]
+        : [];
+
+      const where = centers.length > 0 ? { centerName: { in: centers } } : undefined;
+
       const [byStatus, byCenter, byService, totalProjects] = await Promise.all([
-        prisma.demand.groupBy({ by: ['status'], _count: { id: true } }),
-        prisma.demand.groupBy({ by: ['centerName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } } }),
-        prisma.demand.groupBy({ by: ['serviceName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } } }),
-        prisma.project.count(),
+        prisma.demand.groupBy({ by: ['status'], _count: { id: true }, where }),
+        prisma.demand.groupBy({ by: ['centerName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, where }),
+        prisma.demand.groupBy({ by: ['serviceName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, where }),
+        prisma.project.count({ where }),
       ]);
 
-      const totalDemands = byStatus.reduce((sum: number, r: any) => sum + r._count.id, 0);
+      const totalDemands = byStatus.reduce((sum, r) => sum + r._count.id, 0);
       const pendingCount = byStatus
-        .filter((r: any) => r.status === 'Pending' || r.status === 'PendingCenterManager')
-        .reduce((sum: number, r: any) => sum + r._count.id, 0);
+        .filter(r => r.status === 'Pending' || r.status === 'PendingCenterManager')
+        .reduce((sum, r) => sum + r._count.id, 0);
       const approvedCount = byStatus
-        .filter((r: any) => r.status === 'Approved' || r.status === 'ApprovedWithCondition' || r.status === 'PartiallyApproved')
-        .reduce((sum: number, r: any) => sum + r._count.id, 0);
+        .filter(r => ['Approved', 'ApprovedWithCondition', 'PartiallyApproved'].includes(r.status))
+        .reduce((sum, r) => sum + r._count.id, 0);
 
       res.json({
         totalDemands,
         totalProjects,
         pendingCount,
         approvedCount,
-        byStatus: Object.fromEntries(byStatus.map((r: any) => [r.status, r._count.id])),
-        byCenter: byCenter.map((r: any) => ({ center: r.centerName, count: r._count.id })),
-        byService: byService.map((r: any) => ({ service: r.serviceName, count: r._count.id })),
+        byStatus: Object.fromEntries(byStatus.map(r => [r.status, r._count.id])),
+        byCenter: byCenter.map(r => ({ center: r.centerName, count: r._count.id })),
+        byService: byService.map(r => ({ service: r.serviceName, count: r._count.id })),
       });
     } catch (error) {
       console.error('statsController.getDashboardStats error:', error);
