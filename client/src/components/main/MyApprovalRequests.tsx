@@ -2,9 +2,11 @@ import { useEffect, useState, useCallback, useImperativeHandle, forwardRef, useM
 import { useTranslation } from 'react-i18next';
 import { MdGavel } from 'react-icons/md';
 import FilterSort from '../common/filters/FilterSort';
+import SortableHeader from '../common/SortableHeader';
 import CmDecisionModal from '../management/CmDecisionModal';
 import StatusBadge from '../projects/StatusBadge';
 import type { Demand } from '../../types/domain';
+import type { FilterGroupConfig, SortState } from '../../types/filter';
 import { fetchCenterPendingDemands } from '../../api/apiService';
 
 interface MyApprovalRequestsProps {}
@@ -14,11 +16,22 @@ export interface MyApprovalRequestsHandle {
 }
 
 type ApprovalFilterKey = 'serviceName' | 'resourceName' | 'projectName';
+type ApprovalSortKey = 'projectName' | 'serviceName' | 'resourceName' | 'value' | 'createdBy' | 'createdAt' | 'status';
 
 const INITIAL_FILTERS: Record<ApprovalFilterKey, string> = {
   serviceName: '',
   resourceName: '',
   projectName: '',
+};
+
+const SORTABLE_KEYS: Record<ApprovalSortKey, ApprovalSortKey> = {
+  projectName: 'projectName',
+  serviceName: 'serviceName',
+  resourceName: 'resourceName',
+  value: 'value',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt',
+  status: 'status',
 };
 
 const noop = () => {};
@@ -30,6 +43,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState<Record<ApprovalFilterKey, string>>(INITIAL_FILTERS);
     const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
+    const [sortState, setSortState] = useState<SortState<ApprovalSortKey>>({ field: 'createdAt', direction: 'desc' });
 
     const reload = useCallback(() => {
       setLoading(true);
@@ -86,14 +100,47 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
 
     const handleClearFilters = useCallback(() => setFilters(INITIAL_FILTERS), []);
 
+    const handleColumnSort = useCallback((key: ApprovalSortKey) => {
+      setSortState(prev => {
+        if (prev.field === key) {
+          return { field: key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+        }
+        return { field: key, direction: 'asc' };
+      });
+    }, []);
+
     const filteredDemands = useMemo(() => {
-      return demands.filter(d => {
+      let result = demands.filter(d => {
         if (filters.serviceName && d.serviceName !== filters.serviceName) return false;
         if (filters.resourceName && d.resourceName !== filters.resourceName) return false;
         if (filters.projectName && d.projectName !== filters.projectName) return false;
         return true;
       });
-    }, [demands, filters]);
+
+      if (sortState.field) {
+        result = [...result].sort((a, b) => {
+          const aVal = a[sortState.field as keyof Demand];
+          const bVal = b[sortState.field as keyof Demand];
+
+          let comparison = 0;
+          if (typeof aVal === 'string' && typeof bVal === 'string') {
+            comparison = aVal.localeCompare(bVal);
+          } else if (typeof aVal === 'number' && typeof bVal === 'number') {
+            comparison = aVal - bVal;
+          } else if (aVal instanceof Date && bVal instanceof Date) {
+            comparison = aVal.getTime() - bVal.getTime();
+          } else if (typeof aVal === 'string' && typeof bVal === 'number') {
+            comparison = parseFloat(aVal) - bVal;
+          } else if (typeof aVal === 'number' && typeof bVal === 'string') {
+            comparison = aVal - parseFloat(bVal);
+          }
+
+          return sortState.direction === 'asc' ? comparison : -comparison;
+        });
+      }
+
+      return result;
+    }, [demands, filters, sortState]);
 
     if (loading) return <div className="p-4 text-center text-gray-400">{t('common.loading')}</div>;
     if (demands.length === 0)
@@ -121,13 +168,62 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="border-b border-divider bg-bg-default">
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.project')}</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.service')}</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.resource')}</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.value')}</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.createdBy')}</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.createdAt')}</th>
-                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('common.status')}</th>
+                  <SortableHeader
+                    label={t('demands.project')}
+                    sortKey="projectName"
+                    currentSortKey={sortState.field}
+                    currentSortDir={sortState.direction}
+                    onSort={handleColumnSort}
+                    align="end"
+                  />
+                  <SortableHeader
+                    label={t('demands.service')}
+                    sortKey="serviceName"
+                    currentSortKey={sortState.field}
+                    currentSortDir={sortState.direction}
+                    onSort={handleColumnSort}
+                    align="end"
+                  />
+                  <SortableHeader
+                    label={t('demands.resource')}
+                    sortKey="resourceName"
+                    currentSortKey={sortState.field}
+                    currentSortDir={sortState.direction}
+                    onSort={handleColumnSort}
+                    align="end"
+                  />
+                  <SortableHeader
+                    label={t('demands.value')}
+                    sortKey="value"
+                    currentSortKey={sortState.field}
+                    currentSortDir={sortState.direction}
+                    onSort={handleColumnSort}
+                    align="end"
+                  />
+                  <SortableHeader
+                    label={t('demands.createdBy')}
+                    sortKey="createdBy"
+                    currentSortKey={sortState.field}
+                    currentSortDir={sortState.direction}
+                    onSort={handleColumnSort}
+                    align="end"
+                  />
+                  <SortableHeader
+                    label={t('demands.createdAt')}
+                    sortKey="createdAt"
+                    currentSortKey={sortState.field}
+                    currentSortDir={sortState.direction}
+                    onSort={handleColumnSort}
+                    align="end"
+                  />
+                  <SortableHeader
+                    label={t('common.status')}
+                    sortKey="status"
+                    currentSortKey={sortState.field}
+                    currentSortDir={sortState.direction}
+                    onSort={handleColumnSort}
+                    align="end"
+                  />
                   <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('common.actions')}</th>
                 </tr>
               </thead>

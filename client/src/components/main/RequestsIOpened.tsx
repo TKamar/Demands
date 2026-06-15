@@ -12,7 +12,7 @@ import { useCachedProjects } from '../../hooks/useCachedProjects';
 import { useClientInfiniteScroll } from '../../hooks/useClientInfiniteScroll';
 import { useToast } from '../common/Toast';
 import type { Demand, Project } from '../../types/domain';
-import type { FilterGroupConfig } from '../../types/filter';
+import type { FilterGroupConfig, SortState } from '../../types/filter';
 import type { CreateDemandPayload, UpdateDemandPayload } from '../../api/types';
 
 const MY_REQUESTS_COLUMNS = demandColumnConfig.filter((col) =>
@@ -20,6 +20,7 @@ const MY_REQUESTS_COLUMNS = demandColumnConfig.filter((col) =>
 );
 
 type MyRequestsFilterKey = 'status' | 'serviceName' | 'resourceName';
+type MyRequestsSortKey = 'project' | 'service' | 'resource' | 'status' | 'value' | 'createdAt';
 
 const INITIAL_FILTERS: Record<MyRequestsFilterKey, string> = {
   status: '',
@@ -51,6 +52,7 @@ export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, sel
   const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
   const [demandToCancel, setDemandToCancel] = useState<Demand | null>(null);
   const [filters, setFilters] = useState<Record<MyRequestsFilterKey, string>>(INITIAL_FILTERS);
+  const [sortState, setSortState] = useState<SortState<MyRequestsSortKey>>({ field: 'createdAt', direction: 'desc' });
 
   const centerName = selectedCenters && selectedCenters.length > 0 ? selectedCenters.join(',') : undefined;
 
@@ -112,6 +114,15 @@ export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, sel
   }, []);
 
   const handleClearFilters = useCallback(() => setFilters(INITIAL_FILTERS), []);
+
+  const handleColumnSort = useCallback((key: MyRequestsSortKey) => {
+    setSortState(prev => {
+      if (prev.field === key) {
+        return { field: key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      }
+      return { field: key, direction: 'asc' };
+    });
+  }, []);
 
   const handleSubmitDemand = useCallback(
     async (payload: CreateDemandPayload | UpdateDemandPayload, demandId?: number) => {
@@ -187,6 +198,8 @@ export const RequestsIOpened: React.FC<RequestsIOpenedProps> = ({ createdBy, sel
           onEdit={setEditingDemand}
           onCancel={setDemandToCancel}
           onRestore={handleRestore}
+          sortState={sortState}
+          onColumnSort={handleColumnSort}
         />
         <InfiniteScrollSentinel
           sentinelRef={sentinelRef}

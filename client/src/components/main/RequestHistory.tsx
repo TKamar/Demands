@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import FilterSort from '../common/filters/FilterSort';
 import DemandsTable, { demandColumnConfig } from '../projects/DemandsTable';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import ConfirmDialog from '../common/ConfirmDialog';
@@ -9,6 +10,7 @@ import { useHistoryDemands } from '../../hooks/useHistoryDemands';
 import { useToast } from '../common/Toast';
 import { restoreDemand } from '../../api/apiService';
 import type { Demand, Project } from '../../types/domain';
+import type { FilterGroupConfig, SortState } from '../../types/filter';
 
 const HISTORY_COLUMNS = demandColumnConfig.filter((col) =>
   ['project', 'service', 'resource', 'status', 'value', 'approvedValue', 'createdBy', 'createdAt', 'actions'].includes(col.key)
@@ -18,6 +20,10 @@ interface RequestHistoryProps {
   selectedCenters?: string[];
 }
 
+type HistorySortKey = 'project' | 'service' | 'resource' | 'status' | 'value' | 'approvedValue' | 'createdBy' | 'createdAt';
+
+const noop = () => {};
+
 export default function RequestHistory({ selectedCenters }: RequestHistoryProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -26,6 +32,7 @@ export default function RequestHistory({ selectedCenters }: RequestHistoryProps)
   const { demands, isLoading, isFetchingMore, hasMore, sentinelRef } = useHistoryDemands({ centerName });
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [demandToRestore, setDemandToRestore] = useState<Demand | null>(null);
+  const [sortState, setSortState] = useState<SortState<HistorySortKey>>({ field: 'createdAt', direction: 'desc' });
 
   const { projects } = useCachedProjects();
   const projectMap = useMemo(() => {
@@ -36,6 +43,15 @@ export default function RequestHistory({ selectedCenters }: RequestHistoryProps)
 
   const handleRestore = useCallback((demand: Demand) => {
     setDemandToRestore(demand);
+  }, []);
+
+  const handleColumnSort = useCallback((key: HistorySortKey) => {
+    setSortState(prev => {
+      if (prev.field === key) {
+        return { field: key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      }
+      return { field: key, direction: 'asc' };
+    });
   }, []);
 
   const confirmRestore = useCallback(async () => {
@@ -53,6 +69,18 @@ export default function RequestHistory({ selectedCenters }: RequestHistoryProps)
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
+        <div className="relative flex items-center justify-end gap-2 px-4 py-2 border-b border-divider">
+          <FilterSort
+            compact
+            filterGroups={[]}
+            filterValues={{}}
+            onFilterChange={noop}
+            onClearAllFilters={noop}
+            sortOptions={[]}
+            sortState={{ field: null, direction: 'asc' }}
+            onSortChange={noop}
+          />
+        </div>
         <DemandsTable
           demands={demands}
           projectMap={projectMap}
@@ -61,6 +89,8 @@ export default function RequestHistory({ selectedCenters }: RequestHistoryProps)
           selectedDemand={selectedDemand}
           onSelectDemand={setSelectedDemand}
           onRestore={handleRestore}
+          sortState={sortState}
+          onColumnSort={handleColumnSort}
         />
         <InfiniteScrollSentinel
           sentinelRef={sentinelRef}
