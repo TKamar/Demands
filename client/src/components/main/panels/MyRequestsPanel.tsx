@@ -51,7 +51,7 @@ export default function MyRequestsPanel({ subView, onSubViewChange, currentUser,
           </div>
           <div className="flex items-center gap-3 ms-auto">
             <ExcelToolbar
-              centerName={currentUser?.centerName ?? undefined}
+              selectedCenters={selectedCenters}
               onImportSuccess={triggerRefreshProjects}
             />
             <button

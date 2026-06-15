@@ -5,11 +5,12 @@ import { exportProjects, importProjects } from '../../api/apiService';
 import { useToast } from '../common/Toast';
 
 interface ExcelToolbarProps {
-  centerName?: string;
+  selectedCenters?: string[];
+  showImport?: boolean;
   onImportSuccess?: () => void;
 }
 
-export default function ExcelToolbar({ centerName, onImportSuccess }: ExcelToolbarProps) {
+export default function ExcelToolbar({ selectedCenters, showImport = true, onImportSuccess }: ExcelToolbarProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,7 +26,7 @@ export default function ExcelToolbar({ centerName, onImportSuccess }: ExcelToolb
     try {
       setIsExporting(true);
       setFeedback(null);
-      await exportProjects(centerName);
+      await exportProjects(selectedCenters && selectedCenters.length > 0 ? selectedCenters : undefined);
       showToast(t('excel.exportSuccess', 'Projects exported successfully'), 'success');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Export failed';
@@ -102,15 +103,17 @@ export default function ExcelToolbar({ centerName, onImportSuccess }: ExcelToolb
           {t('excel.export', 'Export')}
         </button>
 
-        <button
-          onClick={handleImportClick}
-          disabled={isImporting}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 rounded transition-colors"
-          title={t('excel.importTooltip', 'Import projects from Excel')}
-        >
-          <MdFileUpload size={16} />
-          {t('excel.import', 'Import')}
-        </button>
+        {showImport && (
+          <button
+            onClick={handleImportClick}
+            disabled={isImporting}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 rounded transition-colors"
+            title={t('excel.importTooltip', 'Import projects from Excel')}
+          >
+            <MdFileUpload size={16} />
+            {t('excel.import', 'Import')}
+          </button>
+        )}
 
         <input
           ref={fileInputRef}

@@ -49,11 +49,16 @@ export const projectController = {
       const limit = Number(limitQuery) || 10;
 
       const centerFilter = isCenterManager && !isPrivileged ? centerName : undefined;
+      const createdByFilter = isPrivileged
+        ? (typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined)
+        : isCenterManager
+        ? undefined
+        : username;
       const result = await projectService.findByFilters(
         {
           name: name as string | undefined,
           centerName: centerFilter,
-          createdBy: isPrivileged ? (typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined) : username,
+          createdBy: createdByFilter,
         },
         { page, limit }
       );

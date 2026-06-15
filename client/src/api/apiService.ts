@@ -407,8 +407,11 @@ export interface AdminStats {
   byService: { service: string; count: number }[];
 }
 
-export async function fetchAdminStats(): Promise<AdminStats> {
-  const response = await api.get<AdminStats>('/api/admin/stats');
+export async function fetchAdminStats(centers?: string[]): Promise<AdminStats> {
+  const params = centers && centers.length > 0
+    ? '?' + centers.map(c => `centers=${encodeURIComponent(c)}`).join('&')
+    : '';
+  const response = await api.get<AdminStats>(`/api/admin/stats${params}`);
   return response.data;
 }
 
@@ -417,8 +420,10 @@ export async function fetchUsers(): Promise<AppUser[]> {
   return res.data;
 }
 
-export async function exportProjects(centerName?: string): Promise<void> {
-  const params = centerName ? `?center=${encodeURIComponent(centerName)}` : '';
+export async function exportProjects(centers?: string[]): Promise<void> {
+  const params = centers && centers.length > 0
+    ? '?' + centers.map(c => `centers=${encodeURIComponent(c)}`).join('&')
+    : '';
   const response = await api.get(`/api/projects/export${params}`, { responseType: 'blob' });
   const url = URL.createObjectURL(new Blob([response.data]));
   const a = document.createElement('a');

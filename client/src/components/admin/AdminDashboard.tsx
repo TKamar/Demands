@@ -38,7 +38,11 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, clas
   </div>
 );
 
-const AdminDashboard: React.FC = () => {
+interface AdminDashboardProps {
+  selectedCenters?: string[];
+}
+
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] }) => {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +52,7 @@ const AdminDashboard: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await fetchAdminStats();
+        const data = await fetchAdminStats(selectedCenters.length > 0 ? selectedCenters : undefined);
         setStats(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load dashboard stats');
@@ -58,7 +62,7 @@ const AdminDashboard: React.FC = () => {
     };
 
     loadStats();
-  }, []);
+  }, [selectedCenters]);
 
   if (loading) {
     return (

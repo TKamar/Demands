@@ -76,7 +76,7 @@ export default function MainPage() {
             selectedCenters={selectedCenters}
           />
         )}
-        {topNavTab === 'dashboard' && <AdminDashboard />}
+        {topNavTab === 'dashboard' && <AdminDashboard selectedCenters={selectedCenters} />}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import ProjectsAccordion from '../ProjectsAccordion';
 import RequestHistory from '../RequestHistory';
+import ExcelToolbar from '../../excel/ExcelToolbar';
 import type { SubViewId } from '../../../utils/roleUtils';
 import type { AppUser } from '../../../types/domain';
 
@@ -34,6 +35,11 @@ export default function HistoryPanel({ subView, onSubViewChange, currentUser, se
             )}
           </button>
         ))}
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex items-center justify-end px-6 py-3 bg-bg-paper border-b border-divider">
+        <ExcelToolbar selectedCenters={selectedCenters} showImport={false} />
       </div>
 
       {/* Content */}
