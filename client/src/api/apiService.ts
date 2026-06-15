@@ -402,6 +402,29 @@ export async function fetchUsers(): Promise<AppUser[]> {
   return res.data;
 }
 
+export async function exportProjects(centerName?: string): Promise<void> {
+  const params = centerName ? `?center=${encodeURIComponent(centerName)}` : '';
+  const response = await api.get(`/api/projects/export${params}`, { responseType: 'blob' });
+  const url = URL.createObjectURL(new Blob([response.data]));
+  const a = document.createElement('a');
+  a.href = url;
+  const today = new Date().toISOString().slice(0, 10);
+  a.download = `projects-${today}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+export async function importProjects(file: File): Promise<{ created: { projects: number; demands: number; skipped: number }; errors?: string[] }> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/api/projects/import', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+}
+
 export async function updateUser(username: string, payload: UpdateUserPayload): Promise<AppUser> {
   const res = await api.patch<AppUser>(`/api/users/${username}`, payload);
   return res.data;
