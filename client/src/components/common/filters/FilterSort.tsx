@@ -29,12 +29,27 @@ export default function FilterSort<
   useEffect(() => {
     if (!isCollapsed && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
+      const dropdownWidth = 600; // max width from className
+      const padding = 16; // padding from viewport edge
+
+      // Check if dropdown would overflow right edge
+      let left = rect.right - dropdownWidth;
+      if (left < padding) {
+        left = padding; // Align to left edge with padding
+      }
+
+      // Also check right edge doesn't exceed viewport
+      const rightEdge = left + dropdownWidth;
+      if (rightEdge > window.innerWidth - padding) {
+        left = window.innerWidth - dropdownWidth - padding;
+      }
+
       setDropdownStyle({
         position: 'fixed',
         top: rect.bottom + 4,
-        right: window.innerWidth - rect.right,
+        left: Math.max(padding, left),
         zIndex: 9999,
-        minWidth: 'min(600px, 90vw)',
+        width: 'min(600px, calc(100vw - 32px))',
       });
     }
   }, [isCollapsed]);
