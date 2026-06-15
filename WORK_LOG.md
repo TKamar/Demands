@@ -15,8 +15,9 @@
 - **File:** `client/src/components/common/filters/FilterSort.tsx`
 - **Issue:** FilterSort compact dropdown was clipped by `overflow-hidden` card wrappers
 - **Fix:** Portal-render the dropdown via `createPortal` to `document.body` with `position: fixed` instead of inline `position: absolute`
-- **Result:** Filter popover now fully visible, unrestricted by ancestor overflow settings
-- **Commit:** 01ec4ad
+- **Positioning:** Uses `left` positioning with viewport bounds checking to ensure dropdown stays on-screen (accounts for window width)
+- **Result:** Filter popover now fully visible, unrestricted by ancestor overflow settings, properly positioned within viewport
+- **Commits:** 01ec4ad (initial), bbfcbad (positioning fix)
 
 ### Task 2: Default Navigation & Logo Home Click ✅
 - **Branch:** `routing/default-landing-task2`
