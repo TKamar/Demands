@@ -72,6 +72,7 @@ export default function FilterSort<
         {/* Compact toggle button with badge */}
         <div className="relative">
           <button
+            ref={triggerRef}
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors border-none bg-transparent cursor-pointer text-text-secondary hover:text-primary"
@@ -85,12 +86,15 @@ export default function FilterSort<
           )}
         </div>
 
-        {/* Expanded panel rendered below the button row (inside the card) */}
-        {!isCollapsed && (
-          <div className="absolute end-0 top-full z-20 w-[min(600px,90vw)] bg-bg-paper border border-divider rounded-xl shadow-lg mt-1">
+        {/* Expanded panel rendered via portal to escape overflow-hidden clip */}
+        {!isCollapsed && createPortal(
+          <div
+            style={dropdownStyle}
+            className="bg-bg-paper border border-divider rounded-xl shadow-xl p-4 max-h-96 overflow-y-auto"
+          >
             {/* Clear filters link */}
             {totalActiveFilters > 0 && (
-              <div className="flex items-center justify-between px-4 py-2 border-b border-divider">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-divider">
                 <span className="text-xs text-text-secondary">
                   {t('common.filters')} ({totalActiveFilters})
                 </span>
@@ -117,7 +121,7 @@ export default function FilterSort<
             )}
 
             {/* Filter Groups */}
-            <div className="p-4 space-y-2">
+            <div className="space-y-2">
               {filterGroups.map((group) => (
                 <FilterGroup
                   key={group.id}
@@ -128,7 +132,8 @@ export default function FilterSort<
                 />
               ))}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     );

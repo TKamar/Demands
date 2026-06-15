@@ -680,11 +680,21 @@ export const demandController = {
 
   getHistory: async (req: Request, res: Response) => {
     try {
-      const { username } = getUserContext(req);
+      const { username, isAdmin, isModerator, isCenterManager, userCenterName } = getUserContext(req);
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 20;
+      const centerFilter = typeof req.query.center === 'string' ? req.query.center : undefined;
 
-      const result = await demandService.getHistoryDemands(username, { page, limit });
+      const result = await demandService.getHistoryDemands(
+        {
+          username,
+          isAdmin,
+          isModerator,
+          isCenterManager,
+          centerName: centerFilter ?? (isCenterManager ? userCenterName ?? undefined : undefined),
+        },
+        { page, limit }
+      );
       res.json(result);
     } catch (error) {
       console.error('demandController.getHistory error:', error);
