@@ -17,6 +17,8 @@ function getUserContext(req: Request) {
     isPrivileged,
     isAdmin,
     isModerator,
+    isCenterManager: user.isCenterManager,
+    userCenterName: user.centerName,
   };
 }
 
@@ -66,7 +68,7 @@ export const demandController = {
 
   getByFilters: async (req: Request, res: Response) => {
     try {
-      const { username, isAdmin, isModerator, isPrivileged } = getUserContext(req);
+      const { username, isAdmin, isModerator, isPrivileged, isCenterManager, userCenterName } = getUserContext(req);
       const {
         project,
         resource,
@@ -90,7 +92,7 @@ export const demandController = {
         sortDir,
       } = req.query;
 
-      const centerName = typeof req.query.center === 'string' ? req.query.center : undefined;
+      const centerName = (typeof req.query.center === 'string' ? req.query.center : undefined) || (isCenterManager && !isPrivileged ? userCenterName : undefined);
 
       const page = Number(pageQuery) || 1;
       const limit = Number(limitQuery) || 10;
@@ -110,8 +112,15 @@ export const demandController = {
         }
         // Admin on management page: no restrictions (all demands visible)
       } else {
-        // Demands page: privileged users (admin/moderator) can filter by any createdBy (or omit for all); others are always clamped to own username
-        createdByFilter = isPrivileged ? (typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined) : username;
+        // Demands page: privileged users (admin/moderator) can filter by any createdBy (or omit for all); center managers can see all demands in their center; others are clamped to own username
+        // CM exemption: center managers see all demands in their center without createdBy restriction
+        if (isPrivileged) {
+          createdByFilter = typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined;
+        } else if (isCenterManager) {
+          createdByFilter = undefined;
+        } else {
+          createdByFilter = username;
+        }
       }
 
       const result = await demandService.findByFilters(

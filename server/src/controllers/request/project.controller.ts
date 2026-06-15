@@ -15,19 +15,23 @@ function getUserContext(req: Request) {
     username: user.username,
     fullName: user.fullName ?? user.username ?? user.email ?? "Unknown",
     isPrivileged,
+    isCenterManager: user.isCenterManager,
+    centerName: user.centerName ?? undefined,
   };
 }
 
 export const projectController = {
   getAll: async (req: Request, res: Response) => {
     try {
-      const { username, isPrivileged } = getUserContext(req);
+      const { username, isPrivileged, isCenterManager, centerName } = getUserContext(req);
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 10;
 
+      const centerFilter = isCenterManager && !isPrivileged ? centerName : undefined;
       const result = await projectService.findAll(
         isPrivileged ? undefined : username,
-        { page, limit }
+        { page, limit },
+        centerFilter
       );
       res.json(result);
     } catch (error) {
@@ -38,15 +42,17 @@ export const projectController = {
 
   getByFilters: async (req: Request, res: Response) => {
     try {
-      const { username, isPrivileged } = getUserContext(req);
+      const { username, isPrivileged, isCenterManager, centerName } = getUserContext(req);
       const { name, page: pageQuery, limit: limitQuery } = req.query;
 
       const page = Number(pageQuery) || 1;
       const limit = Number(limitQuery) || 10;
 
+      const centerFilter = isCenterManager && !isPrivileged ? centerName : undefined;
       const result = await projectService.findByFilters(
         {
           name: name as string | undefined,
+          centerName: centerFilter,
           createdBy: isPrivileged ? (typeof req.query.createdBy === 'string' ? req.query.createdBy : undefined) : username,
         },
         { page, limit }
