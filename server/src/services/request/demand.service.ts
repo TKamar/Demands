@@ -475,15 +475,45 @@ export const demandService = {
   },
 
   getHistoryDemands: async (
-    userId: string,
-    pagination: { page: number; limit: number }
+    filters: {
+      username: string;
+      isAdmin: boolean;
+      isModerator: boolean;
+      isCenterManager: boolean;
+      centerName?: string;
+    },
+    pagination?: { page: number; limit: number }
   ) => {
-    const terminalStatuses = ['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled'];
-    // All roles see only their own created demands in the History tab — no role-based scoping
-    const where: any = { status: { in: terminalStatuses }, isInternalTicket: false, createdBy: userId };
-
-    const { page, limit } = pagination;
+    const { username, isAdmin, isModerator, isCenterManager, centerName } = filters;
+    const { page = 1, limit = 20 } = pagination || {};
     const skip = (page - 1) * limit;
+
+    const terminalStatuses = [
+      'Approved', 'PartiallyApproved', 'ApprovedWithCondition',
+      'Rejected', 'CenterManagerRejected', 'Cancelled',
+    ];
+
+    const where: any = { status: { in: terminalStatuses }, isInternalTicket: false };
+
+    if (isAdmin) {
+      // Global audit log — see all; respect explicit center filter
+      if (centerName) where.centerName = centerName;
+    } else if (isModerator) {
+      // See all demands in managed services (across any center)
+      const managedServices = await prisma.service.findMany({
+        where: { moderators: { has: username } },
+        select: { name: true },
+      });
+      where.serviceName = { in: managedServices.map(s => s.name) };
+      if (centerName) where.centerName = centerName;
+    } else if (isCenterManager) {
+      // See all demands in their center
+      if (centerName) where.centerName = centerName;
+    } else {
+      // Regular user sees only own demands
+      where.createdBy = username;
+    }
+
     const [data, total] = await Promise.all([
       prisma.demand.findMany({
         where,
