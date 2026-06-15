@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback, useImperativeHandle, forwardRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdGavel } from 'react-icons/md';
 import FilterSort from '../common/filters/FilterSort';
 import CmDecisionModal from '../management/CmDecisionModal';
+import StatusBadge from '../projects/StatusBadge';
 import type { Demand } from '../../types/domain';
 import { fetchCenterPendingDemands } from '../../api/apiService';
 
@@ -118,27 +120,34 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
           ) : (
             <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-2 text-right">{t('demands.project')}</th>
-                  <th className="p-2 text-right">{t('demands.service')}</th>
-                  <th className="p-2 text-right">{t('demands.resource')}</th>
-                  <th className="p-2 text-right">{t('demands.value')}</th>
-                  <th className="p-2 text-right">{t('demands.createdBy')}</th>
-                  <th className="p-2 text-right">{t('demands.createdAt')}</th>
-                  <th className="p-2 text-right">{t('common.actions')}</th>
+                <tr className="border-b border-divider bg-bg-default">
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.project')}</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.service')}</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.resource')}</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.value')}</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.createdBy')}</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('demands.createdAt')}</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('common.status')}</th>
+                  <th className="px-4 py-2.5 text-right text-xs font-semibold text-secondary uppercase tracking-wide">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredDemands.map(demand => (
-                  <tr key={demand.id} className="border-b hover:bg-gray-50">
-                    <td className="p-2">{demand.projectName}</td>
-                    <td className="p-2">{demand.serviceName}</td>
-                    <td className="p-2">{demand.resourceName}</td>
-                    <td className="p-2">{demand.value} {demand.unit}</td>
-                    <td className="p-2">{demand.createdByName ?? demand.createdBy}</td>
-                    <td className="p-2">{new Date(demand.createdAt).toLocaleDateString('he-IL')}</td>
-                    <td className="p-2">
-                      <button onClick={() => setSelectedDemand(demand)} className="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/90">
+                  <tr key={demand.id} className="border-b border-divider hover:bg-primary/5 cursor-pointer transition-colors">
+                    <td className="px-4 py-2.5 text-sm font-medium text-primary">{demand.projectName}</td>
+                    <td className="px-4 py-2.5 text-sm text-secondary">{demand.serviceName}</td>
+                    <td className="px-4 py-2.5 text-sm text-secondary">{demand.resourceName}</td>
+                    <td className="px-4 py-2.5 text-sm text-secondary">{demand.value} {demand.unit}</td>
+                    <td className="px-4 py-2.5 text-sm text-secondary">{demand.createdByName ?? demand.createdBy}</td>
+                    <td className="px-4 py-2.5 text-sm text-secondary">{new Date(demand.createdAt).toLocaleDateString('he-IL')}</td>
+                    <td className="px-4 py-2.5 text-sm text-secondary"><StatusBadge status={demand.status} /></td>
+                    <td className="px-4 py-2.5">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedDemand(demand); }}
+                        className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded text-primary hover:bg-primary/10 border border-primary/20 transition-colors"
+                        title={t('management.makeDecision', 'קבל החלטה')}
+                      >
+                        <MdGavel size={14} />
                         {t('management.makeDecision', 'קבל החלטה')}
                       </button>
                     </td>
