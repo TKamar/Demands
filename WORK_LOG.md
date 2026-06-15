@@ -6,6 +6,59 @@
 
 ---
 
+## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)
+
+**Objective:** Fix UI regressions, improve navigation defaults, implement role-aware history visibility, and standardize table sorting/filtering across all views.
+
+### Task 1: Filter Dropdown Clipping Fix ✅
+- **Branch:** `bugfix/filter-dropdown-clipping`
+- **File:** `client/src/components/common/filters/FilterSort.tsx`
+- **Issue:** FilterSort compact dropdown was clipped by `overflow-hidden` card wrappers
+- **Fix:** Portal-render the dropdown via `createPortal` to `document.body` with `position: fixed` instead of inline `position: absolute`
+- **Result:** Filter popover now fully visible, unrestricted by ancestor overflow settings
+- **Commit:** 01ec4ad
+
+### Task 2: Default Navigation & Logo Home Click ✅
+- **Branch:** `routing/default-landing-task2`
+- **Files:** `MainPage.tsx` (change default sub-view), NEW `NavigationContext.tsx`, `TopBar.tsx` (add logo click)
+- **Changes:**
+  - Default sub-view changed from `requirements` to `projects` for approval requests tab
+  - Created `NavigationContext` to pass navigation callback from MainPage to TopBar sibling
+  - Wrapped logo icon in clickable button that routes to home tab (role-dependent)
+- **Result:** Users land on Projects view by default; clicking logo returns to home
+- **Commit:** 9262cc1
+
+### Task 3: Role-Aware Request History ✅
+- **Branch:** `feature/history-scoping`
+- **Files:** `demand.controller.ts` (getHistory), `demand.service.ts` (getHistoryDemands)
+- **Changes:**
+  - Backend now branches by role instead of applying universal `createdBy = username` filter
+  - Admin: sees all demands globally (no createdBy restriction), respects explicit center filter
+  - Moderator: sees demands from managed services (queries Service.moderators array), respects center filter
+  - Center Manager: sees all demands in their center (no createdBy restriction), respects explicit center filter
+  - Regular user: unchanged (only own demands)
+- **Result:** Admins/Moderators/CMs now see their decisions in History tab; Admin has full audit visibility
+- **Commit:** e3d5a84
+
+### Task 4: Unified Table Sorting & Filtering ✅
+- **Branch:** `feature/unified-table-filters`
+- **Files:** NEW `SortableHeader.tsx`, + modifications to `DemandsTable.tsx`, `MyApprovalRequests.tsx`, `RequestHistory.tsx`, `RequestsIOpened.tsx`
+- **Changes:**
+  - Created reusable `SortableHeader` component (replaces 20+ lines of inline logic)
+  - Extracted sort header rendering from `DemandsTable` into component
+  - Applied `SortableHeader` to all demand tables (MyApprovalRequests, RequestHistory, RequestsIOpened)
+  - Added local sort state and handlers to each table
+  - Added `FilterSort compact` button to RequestHistory (was missing)
+  - All tables now consistent: sort icons on headers + filter panel button
+- **Result:** Unified sorting/filtering architecture; shared `SortableHeader` component reduces duplication
+- **Commit:** 484d1f6
+
+**All branches merged to dev in order; all conflicts resolved cleanly.**
+**Git log:** ba9cfb0 (merge unified-filters), 8cd5016 (merge history-scoping), f1851f6 (merge routing)
+**Build:** TypeScript clean on both client and server
+
+---
+
 ## Follow-Up Session: Reactive Dashboard & Universal Excel (2026-06-15)
 
 **Objective:** Fix gaps in the previous implementation and add reactive filtering + universal Excel export across all panels.
