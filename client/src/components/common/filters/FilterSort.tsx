@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { createPortal } from 'react-dom';
 import { MdFilterList } from 'react-icons/md';
 import FilterGroup from './FilterGroup';
 import SortControl from './SortControl';
@@ -21,6 +22,34 @@ export default function FilterSort<
 }: FilterSortProps<TFilterKey, TSortKey>) {
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+
+  // Calculate dropdown position when expanded
+  useEffect(() => {
+    if (!isCollapsed && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        right: window.innerWidth - rect.right,
+        zIndex: 9999,
+        minWidth: 'min(600px, 90vw)',
+      });
+    }
+  }, [isCollapsed]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (isCollapsed) return;
+    const handler = (e: MouseEvent) => {
+      if (!triggerRef.current?.contains(e.target as Node)) {
+        setIsCollapsed(true);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isCollapsed]);
 
   // Calculate total active filters
   const totalActiveFilters = useMemo(
