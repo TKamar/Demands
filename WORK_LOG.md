@@ -1,3 +1,101 @@
+# Center Manager Hotfixes, Split-View UX, Admin Dashboard & Excel Engine — Work Log
+
+**Branches:** `fix/cm-role`, `fix/cm-table-styling`, `fix/drawer-ux`, `feat/admin-dashboard-backend`, `feat/admin-dashboard-frontend`, `feat/excel-engine`
+**Started:** 2026-06-15
+**Status:** **✅ ALL TASKS COMPLETE**
+
+## Summary
+
+Comprehensive implementation across 4 independent subsystems: CM role scoping, drawer UX refinement, admin analytics dashboard, and bidirectional Excel import/export engine.
+
+### Task 1: Backend — CM Project Scoping ✅
+- **Branch:** `fix/cm-role`
+- **Changes:** Updated `project.service.ts` and `project.controller.ts`
+- **Result:** CENTER_MANAGER users now see all projects in their assigned center (not just projects they created)
+- **Status:** Spec compliance ✅, Code quality ✅
+
+### Task 2: Backend — CM Demand Scoping ✅
+- **Branch:** `fix/cm-role` (same as Task 1)
+- **Changes:** Updated `demand.controller.ts` with center-based filtering
+- **Result:** CM users see all demands in their center without `createdBy` restriction
+- **Status:** Spec compliance ✅, Code quality ✅ (with 3 fixes: removed redundant nullish coalescing, single-line assignment, explanatory comment)
+
+### Task 3: Frontend — Table Styling Standardisation ✅
+- **Branch:** `fix/cm-table-styling`
+- **Changes:** Refactored `MyApprovalRequests.tsx` table with design tokens
+- **Result:** Table uses app-wide design tokens (bg-bg-default, border-divider, hover:bg-primary/5), added StatusBadge + gavel action button
+- **Status:** Spec compliance ✅, Code quality ✅
+
+### Task 4: Split-View Drawer UX Refinement ✅
+- **Branch:** `fix/drawer-ux`
+- **Changes:** Modified `DemandDetailSidebar.tsx` and `ProjectDetailSidebar.tsx`
+- **Result:** Removed dark bg-black/50 backdrop, disabled click-outside dismiss; X button and Escape still close panels
+- **Status:** Spec compliance ✅, Code quality ✅
+
+### Task 5: Backend — Admin Stats Endpoint ✅
+- **Branch:** `feat/admin-dashboard-backend`
+- **Changes:** Created `stats.controller.ts`, registered `GET /api/admin/stats` route
+- **Result:** Endpoint returns aggregated demand metrics (by status, center, service) + project counts
+- **Status:** Spec compliance ✅, Code quality ✅
+
+### Task 6: Frontend — Admin Dashboard Component & Tab Wiring ✅
+- **Branch:** `feat/admin-dashboard-frontend`
+- **Changes:** Created `AdminDashboard.tsx`, updated `apiService.ts`, `roleUtils.ts`, `TopNavTabs.tsx`, `MainPage.tsx`
+- **Result:** ADMIN-only dashboard tab displays 4 metric cards, status distribution, center breakdown, top services
+- **Status:** Spec compliance ✅, Code quality ✅
+
+### Task 7: Server — Excel Export Endpoint ✅
+- **Branch:** `feat/excel-engine`
+- **Changes:** Created `excel.controller.ts`, registered `/projects/export` and `/projects/import` routes
+- **Installed:** exceljs, multer, @types/multer
+- **Result:** `GET /projects/export` returns 2-sheet Excel workbook (Projects + Demands); `POST /projects/import` validates and creates records
+- **Status:** Spec compliance ✅, Code quality ✅
+
+### Task 8: Frontend — Excel Import/Export Toolbar ✅
+- **Branch:** `feat/excel-engine` (same as Task 7)
+- **Changes:** Created `ExcelToolbar.tsx`, added API functions to `apiService.ts`, wired into `MyRequestsPanel.tsx`
+- **Result:** Export/Import buttons with file handling, feedback messages, auto-refresh on import success
+- **Status:** Spec compliance ✅, Code quality ✅
+
+## Git Commits Summary
+
+| Task | Branch | Commit |
+|------|--------|--------|
+| 1-2 | `fix/cm-role` | `cbc1cc2`, `46e77d9` |
+| 3 | `fix/cm-table-styling` | `5229518` |
+| 4 | `fix/drawer-ux` | `8835bcb` |
+| 5 | `feat/admin-dashboard-backend` | `b233a86` |
+| 6 | `feat/admin-dashboard-frontend` | `33b8247` |
+| 7-8 | `feat/excel-engine` | `6e2a2dd`, `5f8e47c` |
+
+## Verification Checklist ✅
+
+### CM Role Fixes
+- ✅ CM users see all center projects (not just own)
+- ✅ CM users see all center demands (not just own)
+- ✅ Table styling uses design tokens throughout
+- ✅ StatusBadge and gavel action button present
+
+### Drawer UX
+- ✅ No dark backdrop overlay
+- ✅ Click-outside doesn't dismiss
+- ✅ X button closes panel
+- ✅ Escape key closes panel
+
+### Admin Dashboard
+- ✅ Dashboard tab visible ONLY for ADMIN role
+- ✅ 4 metric cards rendering correctly
+- ✅ Status distribution, center breakdown, top services visible
+- ✅ Proper loading/error states
+
+### Excel Engine
+- ✅ Export downloads valid .xlsx file
+- ✅ Export includes Projects and Demands sheets
+- ✅ Import validates file structure and data
+- ✅ Import creates projects + demands with FK validation
+
+---
+
 # Docker Cross-Platform Stability Patch — Work Log
 
 Branch: `fix/docker-cross-platform-stability`

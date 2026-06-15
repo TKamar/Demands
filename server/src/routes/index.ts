@@ -40,6 +40,9 @@ import emergencyOptionRoutes from "./request/emergencyOption.routes";
 // Notification routes
 import notificationRoutes from "./notification/notification.routes";
 
+// Excel routes
+import { excelController, upload } from "../controllers/excel/excel.controller";
+
 const router = Router();
 
 // Current user endpoint
@@ -89,6 +92,14 @@ router.use("/capacities", capacityRoutes);
 
 // Wallet endpoints
 router.use("/wallets", walletRoutes);
+
+// Excel endpoints - projects import/export (must be registered BEFORE /projects route)
+router.get('/projects/export', authenticate, requireAuth, (req, res) =>
+  excelController.exportProjects(req, res)
+);
+router.post('/projects/import', authenticate, requireAuth, upload.single('file'), (req, res) =>
+  excelController.importProjects(req, res)
+);
 
 // Request endpoints
 router.use("/projects", projectRoutes);
