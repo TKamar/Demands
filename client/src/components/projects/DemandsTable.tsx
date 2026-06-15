@@ -1,10 +1,11 @@
 import { useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdEdit, MdCancel, MdGavel, MdArrowUpward, MdArrowDownward, MdUnfoldMore, MdRestore } from 'react-icons/md';
+import { MdEdit, MdCancel, MdGavel, MdRestore } from 'react-icons/md';
 import type { Demand, Project } from '../../types/domain';
 import type { ColumnConfig } from '../../types/table';
 import type { SortState } from '../../types/filter';
 import type { DemandSortKey } from '../../configs/demandFilters';
+import SortableHeader from '../common/SortableHeader';
 import StatusBadge from './StatusBadge';
 import PriorityBadge from './PriorityBadge';
 
@@ -358,26 +359,22 @@ export default function DemandsTable({
             )}
             {visibleColumns.map((col) => {
               const sortKey = SORTABLE_COLUMNS[col.key];
-              const isSorted = sortState?.field === sortKey;
-              return (
+              return sortKey ? (
+                <SortableHeader
+                  key={col.key}
+                  label={t(col.label)}
+                  sortKey={sortKey}
+                  currentSortKey={sortState?.field}
+                  currentSortDir={sortState?.direction}
+                  onSort={onColumnSort}
+                  className="bg-bg-default"
+                />
+              ) : (
                 <th
                   key={col.key}
-                  className={`px-4 py-3 text-start font-semibold text-text-secondary whitespace-nowrap bg-bg-default ${sortKey ? 'cursor-pointer select-none hover:text-text-primary' : ''}`}
-                  onClick={sortKey ? () => onColumnSort?.(sortKey) : undefined}
+                  className="px-4 py-3 text-start font-semibold text-text-secondary whitespace-nowrap bg-bg-default"
                 >
-                  <span className="inline-flex items-center gap-1">
-                    {t(col.label)}
-                    {sortKey && (
-                      <span className={isSorted ? 'text-primary' : 'text-text-secondary/40'}>
-                        {isSorted
-                          ? sortState!.direction === 'asc'
-                            ? <MdArrowUpward size={14} />
-                            : <MdArrowDownward size={14} />
-                          : <MdUnfoldMore size={14} />
-                        }
-                      </span>
-                    )}
-                  </span>
+                  {t(col.label)}
                 </th>
               );
             })}
