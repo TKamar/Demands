@@ -9,6 +9,7 @@ import usersGroupsRoutes from "./usersGroups/usersGroups.routes";
 
 // Admin routes
 import userRoutes from "./admin/user.routes";
+import { statsController } from '../controllers/admin/stats.controller';
 
 // Organization routes
 import centerRoutes from "./organization/center.routes";
@@ -97,5 +98,10 @@ router.use("/emergency-options", emergencyOptionRoutes);
 
 // Notification endpoints
 router.use("/notifications", notificationRoutes);
+
+// Admin stats endpoint
+router.get('/admin/stats', authenticate, requireAuth, (req, res) =>
+  statsController.getDashboardStats(req, res)
+);
 
 export default router;
