@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { createPortal } from 'react-dom';
 import { MdFilterList } from 'react-icons/md';
 import FilterGroup from './FilterGroup';
 import SortControl from './SortControl';
@@ -21,6 +22,34 @@ export default function FilterSort<
 }: FilterSortProps<TFilterKey, TSortKey>) {
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+
+  // Calculate dropdown position when expanded
+  useEffect(() => {
+    if (!isCollapsed && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4,
+        right: window.innerWidth - rect.right,
+        zIndex: 9999,
+        minWidth: 'min(600px, 90vw)',
+      });
+    }
+  }, [isCollapsed]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (isCollapsed) return;
+    const handler = (e: MouseEvent) => {
+      if (!triggerRef.current?.contains(e.target as Node)) {
+        setIsCollapsed(true);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isCollapsed]);
 
   // Calculate total active filters
   const totalActiveFilters = useMemo(
@@ -43,6 +72,7 @@ export default function FilterSort<
         {/* Compact toggle button with badge */}
         <div className="relative">
           <button
+            ref={triggerRef}
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors border-none bg-transparent cursor-pointer text-text-secondary hover:text-primary"
@@ -56,12 +86,15 @@ export default function FilterSort<
           )}
         </div>
 
-        {/* Expanded panel rendered below the button row (inside the card) */}
-        {!isCollapsed && (
-          <div className="absolute end-0 top-full z-20 w-[min(600px,90vw)] bg-bg-paper border border-divider rounded-xl shadow-lg mt-1">
+        {/* Expanded panel rendered via portal to escape overflow-hidden clip */}
+        {!isCollapsed && createPortal(
+          <div
+            style={dropdownStyle}
+            className="bg-bg-paper border border-divider rounded-xl shadow-xl p-4 max-h-96 overflow-y-auto"
+          >
             {/* Clear filters link */}
             {totalActiveFilters > 0 && (
-              <div className="flex items-center justify-between px-4 py-2 border-b border-divider">
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-divider">
                 <span className="text-xs text-text-secondary">
                   {t('common.filters')} ({totalActiveFilters})
                 </span>
@@ -88,7 +121,7 @@ export default function FilterSort<
             )}
 
             {/* Filter Groups */}
-            <div className="p-4 space-y-2">
+            <div className="space-y-2">
               {filterGroups.map((group) => (
                 <FilterGroup
                   key={group.id}
@@ -99,7 +132,8 @@ export default function FilterSort<
                 />
               ))}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     );
