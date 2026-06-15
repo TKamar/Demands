@@ -92,7 +92,7 @@ export const demandController = {
         sortDir,
       } = req.query;
 
-      const centerName = (typeof req.query.center === 'string' ? req.query.center : undefined) || (isCenterManager && !isPrivileged ? userCenterName : undefined);
+      const centerName = (typeof req.query.center === 'string' ? req.query.center : undefined) || (isCenterManager && !isPrivileged ? userCenterName ?? undefined : undefined);
 
       const page = Number(pageQuery) || 1;
       const limit = Number(limitQuery) || 10;
