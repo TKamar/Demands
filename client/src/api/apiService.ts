@@ -397,6 +397,21 @@ export async function deleteWallet(id: number): Promise<void> {
 
 // --- Users (admin) ---
 
+export interface AdminStats {
+  totalDemands: number;
+  totalProjects: number;
+  pendingCount: number;
+  approvedCount: number;
+  byStatus: Record<string, number>;
+  byCenter: { center: string; count: number }[];
+  byService: { service: string; count: number }[];
+}
+
+export async function fetchAdminStats(): Promise<AdminStats> {
+  const response = await api.get<AdminStats>('/api/admin/stats');
+  return response.data;
+}
+
 export async function fetchUsers(): Promise<AppUser[]> {
   const res = await api.get<AppUser[]>('/api/users');
   return res.data;
