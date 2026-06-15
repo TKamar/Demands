@@ -59,13 +59,8 @@ export default function ProjectDetailSidebar({
   };
 
   return createPortal(
-    <div
-      className="fixed inset-0 z-50 bg-black/50"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className={`fixed top-0 end-0 h-full w-full max-w-md bg-bg-paper shadow-xl border-s border-divider flex flex-col ${isRtl ? 'animate-[slide-in-left_0.3s_ease-out]' : 'animate-[slide-in-right_0.3s_ease-out]'}`}>
+    <div className="fixed inset-0 z-50 pointer-events-none">
+      <div className={`fixed top-0 end-0 h-full w-full max-w-md bg-bg-paper shadow-xl border-s border-divider flex flex-col pointer-events-auto ${isRtl ? 'animate-[slide-in-left_0.3s_ease-out]' : 'animate-[slide-in-right_0.3s_ease-out]'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-divider">
           <h2 className="text-xl font-bold text-text-primary m-0 truncate flex-1">
