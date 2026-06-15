@@ -1,3 +1,42 @@
+# Center Manager Role Hotfixes — Work Log
+
+Branch: `fix/cm-role`
+Started: 2026-06-15
+Status: **✅ COMPLETE**
+
+## Summary
+
+Fixed CENTER_MANAGER data scoping bugs to allow CM users to see all projects and demands in their center, not just resources they personally created.
+
+### Task 1: Backend — CM Project Scoping
+- **File:** `server/src/services/request/project.service.ts`, `server/src/controllers/request/project.controller.ts`
+- **Changes:**
+  - Updated `findAll` to accept `centerName` filter parameter (3rd param)
+  - Updated `findByFilters` to accept and apply `centerName` filter
+  - Updated `getUserContext` in controller to expose `isCenterManager` and `centerName`
+  - Applied center filtering in `getAll` and `getByFilters` handlers when user is CM and not privileged
+- **Spec compliance:** ✅ VERIFIED
+- **Code quality:** ✅ APPROVED
+
+### Task 2: Backend — CM Demand Scoping
+- **File:** `server/src/controllers/request/demand.controller.ts`
+- **Changes:**
+  - Extended `getUserContext` to return `isCenterManager` and `userCenterName`
+  - Updated `getByFilters` to apply CM's center automatically when no explicit filter passed
+  - Exempted CM users from `createdBy` clamp (allows seeing all center demands, not just own)
+  - Added clarifying comment for CM exemption logic
+- **Spec compliance:** ✅ VERIFIED
+- **Code quality:** ✅ APPROVED (with 3 fixes applied: removed redundant nullish coalescing, single-line centerName assignment, added explanatory comment)
+
+## Result
+
+✅ CENTER_MANAGER users now:
+- See all projects in their assigned center (not just projects they created)
+- See all demands in their assigned center (not just demands they created)
+- Can perform CM-specific actions on center resources
+
+---
+
 # Docker Cross-Platform Stability Patch — Work Log
 
 Branch: `fix/docker-cross-platform-stability`
