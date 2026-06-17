@@ -244,6 +244,7 @@ model Project {
   demands             Demand[]
   emergencyOptionName String?
   emergencyOption     EmergencyOption? @relation(fields: [emergencyOptionName], references: [name])
+  americaSystemName   String?
   createdBy           String?
   createdByName       String?
   createdAt           DateTime         @default(now())

@@ -39,6 +39,7 @@ const initialForm = {
   cluster: '',
   purpose: '',
   emergencyOption: '',
+  americaSystemName: '',
 };
 
 const inputClass =
@@ -359,6 +360,7 @@ export default function CreateProjectModal({
       branchName: form.branch,
       sectionName: form.section,
       priority: form.priority as Priority,
+      americaSystemName: form.americaSystemName.trim() || undefined,
     };
 
     if (form.requestType === 'Emergency' && form.emergencyOption) {
@@ -490,6 +492,21 @@ export default function CreateProjectModal({
               value={form.trackOrApp}
               onChange={handleChange}
               placeholder={t('projects.createProject.trackOrAppPlaceholder')}
+              className={inputClass}
+            />
+          </div>
+
+          {/* America System */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1.5">
+              {t('projects.createProject.americaSystem')}
+            </label>
+            <input
+              type="text"
+              name="americaSystemName"
+              value={form.americaSystemName}
+              onChange={handleChange}
+              placeholder="שם הפרויקט שקיים כיום באמריקה"
               className={inputClass}
             />
           </div>

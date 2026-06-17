@@ -89,7 +89,7 @@ export const projectController = {
   create: async (req: Request, res: Response) => {
     try {
       const { username, fullName } = getUserContext(req);
-      const { name, purpose, relatedTo, type, kind, locationId, emergencyOption, centerName, branchName, sectionName } = req.body;
+      const { name, purpose, relatedTo, type, kind, locationId, emergencyOption, centerName, branchName, sectionName, americaSystemName } = req.body;
 
       // Auto-derive year and median for Semiannual projects
       let year: number | undefined;
@@ -180,6 +180,7 @@ export const projectController = {
         year: type === ProjectType.Semiannual ? year : undefined,
         median: type === ProjectType.Semiannual ? median : undefined,
         emergencyOptionName: type === ProjectType.Emergency ? emergencyOption : undefined,
+        americaSystemName: americaSystemName || undefined,
         centerName,
         branchName,
         sectionName,
@@ -196,7 +197,7 @@ export const projectController = {
   update: async (req: Request, res: Response) => {
     try {
       const { username, isPrivileged } = getUserContext(req);
-      const { purpose, relatedTo, type, kind, locationId, year, median, emergencyOption, centerName, branchName, sectionName } = req.body;
+      const { purpose, relatedTo, type, kind, locationId, year, median, emergencyOption, centerName, branchName, sectionName, americaSystemName } = req.body;
 
       // If type is being updated to Semiannual, validate year and median
       if (type === ProjectType.Semiannual) {
@@ -277,6 +278,7 @@ export const projectController = {
         year?: number | null;
         median?: Median | null;
         emergencyOptionName?: string | null;
+        americaSystemName?: string | null;
         centerName?: string;
         branchName?: string;
         sectionName?: string;
@@ -310,6 +312,7 @@ export const projectController = {
       if (centerName !== undefined) updateData.centerName = centerName;
       if (branchName !== undefined) updateData.branchName = branchName;
       if (sectionName !== undefined) updateData.sectionName = sectionName;
+      if (americaSystemName !== undefined) updateData.americaSystemName = americaSystemName || null;
 
       const project = await projectService.update(
         req.params.name,

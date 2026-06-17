@@ -114,6 +114,7 @@ export const projectService = {
     year?: number;
     median?: Median;
     emergencyOptionName?: string;
+    americaSystemName?: string;
     centerName: string;
     branchName: string;
     sectionName: string;
@@ -152,6 +153,7 @@ export const projectService = {
       year?: number | null;
       median?: Median | null;
       emergencyOptionName?: string | null;
+      americaSystemName?: string | null;
       centerName?: string;
       branchName?: string;
       sectionName?: string;
