@@ -1444,3 +1444,58 @@ Both scripts are production-ready and tested for structural correctness (syntax 
 
 **Remaining work:** 
 - **Branch 4:** Install Recharts, add Pie/Bar charts to `AdminDashboard`, enhance `GET /api/admin/stats` with `openConditional` breakdown
+
+### Branch 4: Analytics Dashboard Charts (Recharts) ✅
+- **Branch:** `analytics/dashboard-substatus-charts`
+- **Installation:**
+  - Installed Recharts (npm install recharts) — 39 packages added
+- **Server Updates:**
+  - Enhanced `stats.controller.ts` getDashboardStats:
+    - Added `openConditional` breakdown computation
+    - Filters `byStatus` to extract open conditional statuses: AwaitingProcurement, HeldForEfficiency, ConditionalFootprintReduction, InProgress, TransferredTo810, WaitingOnPrerequisite
+    - Returns `openConditional: Record<string, number>` in response
+- **Client Updates:**
+  - Updated `AdminStats` type in `apiService.ts` to include `openConditional` field
+  - Completely redesigned `AdminDashboard.tsx`:
+    - Added status color palette extended to all 14 statuses (using hex colors for charts)
+    - Extended `STATUS_LABELS` to include all new statuses with Hebrew labels
+    - Status Distribution section now contains:
+      - **Pie Chart** (via Recharts): Shows demand distribution across all statuses with labels
+      - **Status Details Table** (grid layout): Color-coded badges + count per status for quick reference
+    - New **Open Conditional Statuses Bar Chart** (horizontal bar chart):
+      - Shows breakdown of open conditional demands by sub-status
+      - Only renders if openConditional data exists
+      - Horizontal layout for readability of status names
+    - Kept existing Center Breakdown and Top Services tables unchanged
+- **Result:** Admin dashboard now provides rich visual analytics with Pie, Bar, and table layouts; all 10+ statuses have distinct visual representation with Hebrew labels
+- **Commits:** c764fea (Recharts install + AdminDashboard implementation)
+
+---
+
+## Session 4 Summary — COMPLETE ✅
+
+**All 4 Branches Successfully Implemented & Merged to `dev`:**
+
+1. ✅ **Branch 1 (feature/bulk-select-unrestricted)** — Removed artificial locking. Moderators can now select any combination of demands across services/resources.
+
+2. ✅ **Branch 2 (feature/hierarchical-bulk-decision)** — Hierarchical bulk modal with project tabs → service blocks → per-demand quantity inputs. Single matrix-approve backend endpoint.
+
+3. ✅ **Branch 3 (feature/conditional-approval-states)** — 5 new statuses, 2 new Demand fields, completely rebuilt DecisionModal with 10 sub-decision options and dynamic conditional form fields (date pickers, user dropdowns, quantity inputs, reason textareas).
+
+4. ✅ **Branch 4 (analytics/dashboard-substatus-charts)** — Recharts integration; Pie chart + Bar chart + Status detail table in AdminDashboard; enhanced stats endpoint with openConditional breakdown.
+
+**Key Metrics:**
+- **8 commits total** (Branch 1: 1, Branch 2: 2, Branch 3: 2, Branch 4: 1, WORK_LOG: 2)
+- **TypeScript verified** on both client and server before every merge
+- **Zero merge conflicts** — clean linear history
+- **Committed to `dev` only** — no main branch touched
+- **No AI traces** — commits authored as tkamar only
+
+**Remaining Future Work (Not in Scope):**
+- Migration of `procurementDate` and `assignedToUser` fields to existing demands
+- User assignment visibility in RequirementsView (show "assigned to me" demands)
+- Notification templates for new conditional approval statuses
+- Export/reporting enhancements for new status data
+- Performance optimization for large openConditional datasets in charts
+
+**Session Complete.** All work logged to WORK_LOG.md.
