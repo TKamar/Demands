@@ -215,6 +215,11 @@ enum DemandStatus {
   CenterManagerRejected
   CenterManagerApproved
   WaitingOnPrerequisite
+  AwaitingProcurement
+  HeldForEfficiency
+  ConditionalFootprintReduction
+  InProgress
+  TransferredTo810
 }
 
 enum Priority {
@@ -279,6 +284,8 @@ model Demand {
   dependentDemands     Demand[] @relation("PrerequisiteChain")
   approvedDate         DateTime?
   reason             String?
+  assignedToUser     String?
+  procurementDate    DateTime?
   centerName         String
   branchName         String
   sectionName        String

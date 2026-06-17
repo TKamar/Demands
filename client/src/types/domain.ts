@@ -12,7 +12,12 @@ export type DemandStatus =
   | 'ApprovedWithCondition'
   | 'Cancelled'
   | 'CenterManagerRejected'
-  | 'WaitingOnPrerequisite';
+  | 'WaitingOnPrerequisite'
+  | 'AwaitingProcurement'
+  | 'HeldForEfficiency'
+  | 'ConditionalFootprintReduction'
+  | 'InProgress'
+  | 'TransferredTo810';
 
 export type UserRole = 'ADMIN' | 'MODERATOR' | 'CENTER_MANAGER' | 'REGULAR_USER';
 
