@@ -165,7 +165,8 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
           {filteredDemands.length === 0 ? (
             <div className="p-4 text-center text-gray-400">{t('common.noResults')}</div>
           ) : (
-            <table className="w-full text-sm border-collapse">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="border-b border-divider bg-bg-default">
                   <SortableHeader
@@ -251,6 +252,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
 

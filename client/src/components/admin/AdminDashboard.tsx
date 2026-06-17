@@ -144,9 +144,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
                     data={pieChartData}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}`}
-                    outerRadius={80}
+                    outerRadius={110}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -158,6 +156,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
                     ))}
                   </Pie>
                   <Tooltip formatter={(value) => value} />
+                  <Legend />
                 </PieChart>
               </ResponsiveContainer>
             </div>
