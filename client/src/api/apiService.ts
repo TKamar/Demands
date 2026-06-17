@@ -240,7 +240,7 @@ export async function fetchDemandsByProjectName(projectName: string): Promise<De
   const { data } = await api.get<any>('/api/demands/filter', {
     params: { project: projectName, limit: 500, page: 1 }
   });
-  const items = Array.isArray(data) ? data : (data.items ?? []);
+  const items = Array.isArray(data) ? data : (data.data ?? []);
   return items.map(mapDemand);
 }
 

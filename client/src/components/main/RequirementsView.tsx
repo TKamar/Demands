@@ -8,7 +8,6 @@ import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import { FilterSort } from '../common/filters';
 import CreateDemandModal from '../projects/CreateDemandModal';
 import DecisionModal from '../management/DecisionModal';
-import BulkDecisionModal from '../management/BulkDecisionModal';
 import HierarchicalBulkDecisionModal, { type MatrixDecision } from '../management/HierarchicalBulkDecisionModal';
 import { useDemands } from '../../hooks/useDemands';
 import { useCachedProjects } from '../../hooks/useCachedProjects';
