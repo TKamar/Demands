@@ -20,6 +20,7 @@ import DemandSubTable from './DemandSubTable';
 import ProjectDetailSidebar from '../projects/ProjectDetailSidebar';
 import CreateProjectModal from '../projects/CreateProjectModal';
 import DuplicateProjectModal from '../projects/DuplicateProjectModal';
+import BulkProjectActionModal from '../management/BulkProjectActionModal';
 import { useClientInfiniteScroll } from '../../hooks/useClientInfiniteScroll';
 import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
 import { useToast } from '../common/Toast';
@@ -155,6 +156,8 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [duplicatingProject, setDuplicatingProject] = useState<Project | null>(null);
+  const [selectedProjectNames, setSelectedProjectNames] = useState<Set<string>>(new Set());
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   // Client-side column filters
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({
@@ -245,6 +248,26 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
     });
   }, []);
 
+  const toggleSelectProject = useCallback((name: string) => {
+    setSelectedProjectNames((prev) => {
+      const next = new Set(prev);
+      next.has(name) ? next.delete(name) : next.add(name);
+      return next;
+    });
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    if (selectedProjectNames.size === pageProjects.length) {
+      setSelectedProjectNames(new Set());
+    } else {
+      setSelectedProjectNames(new Set(pageProjects.map((p) => p.name)));
+    }
+  }, [pageProjects, selectedProjectNames]);
+
+  const clearSelection = useCallback(() => {
+    setSelectedProjectNames(new Set());
+  }, []);
+
   const handleDeleteProject = useCallback(
     async (project: Project) => {
       if (!window.confirm(t('project.deleteConfirm', 'Delete this project?'))) return;
@@ -279,6 +302,13 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
       <div className="rounded-2xl border border-divider overflow-visible bg-bg-paper shadow-sm">
         {/* Column header row */}
         <div className="flex items-center gap-3 bg-bg-default border-b border-divider px-4 py-3">
+          <input
+            type="checkbox"
+            checked={selectedProjectNames.size > 0 && selectedProjectNames.size === pageProjects.length}
+            onChange={toggleSelectAll}
+            className="w-4 h-4 shrink-0 cursor-pointer"
+            title={t('common.selectAll', 'Select all')}
+          />
           <div className="w-6 shrink-0" />
           <div className="flex-1 min-w-0">
             <ColumnHeader
@@ -340,6 +370,29 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
           </div>
         </div>
 
+        {/* Batch action bar */}
+        {selectedProjectNames.size > 0 && (
+          <div className="flex items-center gap-3 bg-primary/5 border-b border-primary/20 px-4 py-3">
+            <span className="text-sm font-medium text-text-primary">
+              {t('common.selected', 'Selected')}: {selectedProjectNames.size}
+            </span>
+            <button
+              onClick={clearSelection}
+              className="text-sm px-3 py-1 rounded bg-transparent border border-text-secondary text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors cursor-pointer"
+            >
+              {t('common.clearSelection', 'Clear')}
+            </button>
+            {(canDecide) && (
+              <button
+                onClick={() => setIsBulkModalOpen(true)}
+                className="text-sm px-3 py-1 rounded bg-danger/10 border border-danger text-danger hover:bg-danger/20 transition-colors cursor-pointer ml-auto"
+              >
+                {t('project.bulkDelete', 'Delete Selected')}
+              </button>
+            )}
+          </div>
+        )}
+
         {isLoading && (
           <div className="py-12 text-center text-sm text-text-secondary">
             {t('common.loading', 'Loading…')}
@@ -363,6 +416,14 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
                     isExpanded ? 'bg-primary/[0.03]' : ''
                   }`}
                 >
+                  {/* Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedProjectNames.has(project.name)}
+                    onChange={() => toggleSelectProject(project.name)}
+                    className="w-4 h-4 shrink-0 cursor-pointer"
+                  />
+
                   {/* Expand toggle */}
                   <button
                     onClick={(e) => toggleExpand(project.name, e)}
@@ -488,6 +549,24 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
           onSubmit={handleSubmitDuplicate}
         />
       )}
+
+      <BulkProjectActionModal
+        open={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        selectedNames={Array.from(selectedProjectNames)}
+        onDelete={async () => {
+          try {
+            for (const name of selectedProjectNames) {
+              await deleteProject(name);
+            }
+            clearSelection();
+            setIsBulkModalOpen(false);
+            showToast(t('project.bulkDeleted', 'Projects deleted'), 'success');
+          } catch {
+            showToast(t('project.bulkDeleteError', 'Failed to delete projects'), 'error');
+          }
+        }}
+      />
     </div>
   );
 }

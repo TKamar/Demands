@@ -169,7 +169,10 @@
     "updated": "עודכן בהצלחה",
     "back": "חזרה",
     "duplicate": "שכפל",
-    "loading": "טוען..."
+    "loading": "טוען...",
+    "selected": "נבחר",
+    "selectAll": "בחר הכל",
+    "clearSelection": "ביטול בחירה"
   },
   "settings": {
     "subtitle": "ניהול ישויות מערכת והגדרות",
@@ -615,6 +618,13 @@
     "deleteConfirm": "למחוק את הפרויקט?",
     "deleted": "הפרויקט נמחק",
     "deleteError": "מחיקת הפרויקט נכשלה",
+    "bulkDelete": "מחיקת נבחרים",
+    "bulkDeleteConfirm": "מחק פרוייקטים",
+    "bulkDeleteWarning": "למחוק את {{count}} הפרויקטים הנבחרים?",
+    "bulkDeleteIrreversible": "לא ניתן לבטל פעולה זו.",
+    "bulkDeleted": "הפרויקטים נמחקו בהצלחה",
+    "bulkDeleteError": "מחיקת הפרויקטים נכשלה",
+    "delete": "מחק",
     "inlineRequirements": {
       "title": "דרישות (אופציונלי)",
       "addRow": "הוסף דרישה",

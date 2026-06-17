@@ -169,7 +169,10 @@
     "updated": "Updated successfully",
     "back": "Back",
     "duplicate": "Duplicate",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "selected": "Selected",
+    "selectAll": "Select All",
+    "clearSelection": "Clear Selection"
   },
   "settings": {
     "subtitle": "Manage system entities and configurations",
@@ -615,6 +618,13 @@
     "deleteConfirm": "Delete this project?",
     "deleted": "Project deleted",
     "deleteError": "Failed to delete project",
+    "bulkDelete": "Delete Selected",
+    "bulkDeleteConfirm": "Delete Projects",
+    "bulkDeleteWarning": "Delete {{count}} selected projects?",
+    "bulkDeleteIrreversible": "This action cannot be undone.",
+    "bulkDeleted": "Projects deleted successfully",
+    "bulkDeleteError": "Failed to delete projects",
+    "delete": "Delete",
     "inlineRequirements": {
       "title": "Requirements (Optional)",
       "addRow": "Add Requirement",
