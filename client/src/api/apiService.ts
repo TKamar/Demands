@@ -236,6 +236,14 @@ export async function bulkRejectDemands(payload: BulkRejectDemandPayload): Promi
   return data;
 }
 
+export async function fetchDemandsByProjectName(projectName: string): Promise<Demand[]> {
+  const { data } = await api.get<any>('/api/demands/filter', {
+    params: { project: projectName, status: 'Pending', limit: 500, page: 1 }
+  });
+  const items = Array.isArray(data) ? data : (data.items ?? []);
+  return items.map(mapDemand);
+}
+
 export async function approveDemandMatrix(payload: BulkApproveMatrixPayload): Promise<BulkDecisionResult> {
   const { data } = await api.patch('/api/demands/bulk/approve-matrix', payload);
   return data;
