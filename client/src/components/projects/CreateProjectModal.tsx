@@ -110,6 +110,7 @@ export default function CreateProjectModal({
     base: string;
     environment: string;
     cluster: string;
+    standaloneCluster: string;
   }
   const [inlineRequirements, setInlineRequirements] = useState<InlineRequirement[]>([]);
 
@@ -117,7 +118,7 @@ export default function CreateProjectModal({
     setInlineRequirements(prev => [
       ...prev,
       { serviceName: '', resourceName: '', value: 0, type: 'New',
-        overrideLocation: false, network: '', base: '', environment: '', cluster: '' },
+        overrideLocation: false, network: '', base: '', environment: '', cluster: '', standaloneCluster: '' },
     ]);
   const removeRequirementRow = (idx: number) =>
     setInlineRequirements(prev => prev.filter((_, i) => i !== idx));
@@ -387,6 +388,15 @@ export default function CreateProjectModal({
                     l.clusterName === r.cluster
                 );
                 if (overrideLoc) reqLocationId = overrideLoc.id;
+              } else if (!r.overrideLocation && r.standaloneCluster) {
+                const standaloneClusterLoc = referenceData.locations.find(
+                  l =>
+                    l.networkName === form.network &&
+                    l.baseName === form.base &&
+                    l.environmentName === form.environment &&
+                    l.clusterName === r.standaloneCluster
+                );
+                if (standaloneClusterLoc) reqLocationId = standaloneClusterLoc.id;
               }
               return createDemand({
                 projectName: form.name.trim(),
@@ -630,7 +640,7 @@ export default function CreateProjectModal({
           {/* Cluster */}
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1.5">
-              {t('projects.createProject.cluster')} <span className="text-danger">*</span>
+              {t('projects.createProject.cluster')}
             </label>
             <Select
               options={clusterOptions}
@@ -798,6 +808,32 @@ export default function CreateProjectModal({
                         <option value="New">{t('demand.type.new', 'חדש')}</option>
                         <option value="Extension">{t('demand.type.extension', 'הרחבה')}</option>
                       </select>
+
+                      {/* Standalone cluster select — visible only when NOT overriding location */}
+                      {!req.overrideLocation && (
+                        <select
+                          value={req.standaloneCluster}
+                          onChange={e => updateRequirementRow(idx, 'standaloneCluster', e.target.value)}
+                          className="flex-1 min-w-[100px] px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                        >
+                          <option value="">{t('projects.createProject.cluster', 'קלאסטר')}</option>
+                          {referenceData.locations
+                            .filter(l =>
+                              l.networkName === form.network &&
+                              l.baseName === form.base &&
+                              l.environmentName === form.environment
+                            )
+                            .reduce<string[]>((acc, l) => acc.includes(l.clusterName) ? acc : [...acc, l.clusterName], [])
+                            .filter(name => {
+                              const ref = referenceData.clusters.find(c => c.name === name);
+                              return ref?.isActive !== false || name === req.standaloneCluster;
+                            })
+                            .map(name => {
+                              const ref = referenceData.clusters.find(c => c.name === name);
+                              return <option key={name} value={name}>{ref?.displayName || name}</option>;
+                            })}
+                        </select>
+                      )}
 
                       {/* Location override toggle */}
                       <button
