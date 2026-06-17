@@ -27,6 +27,7 @@ import type {
   BulkApproveDemandPayload,
   BulkRejectDemandPayload,
   BulkDecisionResult,
+  BulkApproveMatrixPayload,
   UpdateUserPayload,
 } from './types';
 
@@ -232,6 +233,11 @@ export async function bulkApproveDemands(payload: BulkApproveDemandPayload): Pro
 
 export async function bulkRejectDemands(payload: BulkRejectDemandPayload): Promise<BulkDecisionResult> {
   const { data } = await api.patch('/api/demands/bulk/reject', payload);
+  return data;
+}
+
+export async function approveDemandMatrix(payload: BulkApproveMatrixPayload): Promise<BulkDecisionResult> {
+  const { data } = await api.patch('/api/demands/bulk/approve-matrix', payload);
   return data;
 }
 

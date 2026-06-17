@@ -278,6 +278,16 @@ export interface BulkDecisionResult {
   count: number;
 }
 
+export interface MatrixDecision {
+  id: number;
+  approvedValue: number;
+  status: 'Approved' | 'PartiallyApproved';
+}
+
+export interface BulkApproveMatrixPayload {
+  decisions: MatrixDecision[];
+}
+
 export interface UpdateUserPayload {
   role: UserRole;
   centerName?: string;
