@@ -1267,3 +1267,85 @@ Both scripts are production-ready and tested for structural correctness (syntax 
 - **Keycloak realm not imported:** Delete Keycloak container and restart (entrypoint forces reimport)
 - **Database migration errors:** Ensure both Windows and Mac are on same `dev` branch
 
+---
+
+## Session 3: Bulk Actions, Form Overhaul, Role Constraints & UX Refinements (2026-06-17)
+
+**Objective:** Implement batch operations on projects table, overhaul project creation form with role-based access, auto-derived fields, structural field relocation, and UX label improvements.
+
+**Six-Branch Sprint:**
+
+### Branch 1: Table Bulk Select ✅
+- **Branch:** `feature/table-bulk-select`
+- **Files:** `ProjectsAccordion.tsx`, `BulkProjectActionModal.tsx` (new), i18n
+- **Changes:**
+  - Added checkbox column (leftmost) to projects table with header toggle for select-all
+  - Implemented batch action bar showing selected count with "Clear Selection" and role-gated delete button
+  - Created `BulkProjectActionModal` component for delete confirmation
+  - Backend handler for bulk delete at `POST /api/projects/bulk-action` (Moderator+ only)
+  - Added i18n keys: `common.selected`, `selectAll`, `clearSelection`, `project.bulkDelete`, etc.
+- **UX:** Multi-select checkboxes → batch action bar appears → confirm modal → bulk delete
+- **Commit:** 3753cd8
+
+### Branch 2: Form Role Constraints ✅
+- **Branch:** `feature/form-role-constraints`
+- **Files:** `CreateProjectModal.tsx`
+- **Changes:**
+  - Gated "Emergency" request type option to ADMIN role only
+  - Non-admin users see only "Semiannual" in the dropdown
+  - In edit mode, request type is disabled (prevents type change)
+  - Used `useCurrentUser()` hook to check role
+- **Result:** Regular users cannot create Emergency projects; Admin can
+- **Commit:** dcf8963
+
+### Branch 3: Form Lifecycle Automation ✅
+- **Branch:** `feature/form-lifecycle-automation`
+- **Files:** `CreateProjectModal.tsx`, `project.controller.ts`
+- **Changes:**
+  - Removed Year ("שנה") and Half-Year ("חציון") input fields from UI entirely
+  - Server auto-derives `year` = current year and `median` = H1 (Jan–May) or H2 (Jun–Dec) based on creation timestamp
+  - Removed validation checks for year/median in client; server derives them server-side
+  - Schema fields remain as optional but are now system-populated
+- **Why:** Eliminates manual entry error, ensures date consistency, improves UX
+- **Commit:** f4a8dd6
+
+### Branch 4: Form Cluster Relocation ✅
+- **Branch:** `feature/form-cluster-relocation`
+- **Files:** `CreateProjectModal.tsx`
+- **Changes:**
+  - Made project-level cluster field optional (removed required asterisk)
+  - Added per-demand `standaloneCluster` field visible in inline demand rows when location is not overridden
+  - Cluster select filters by project's network + base + environment
+  - Updated demand payload logic to use cluster from either override cascade or standalone field
+- **UX:** Project cluster is now optional; each inline demand can have its own cluster without overriding full location
+- **Commit:** ebce032
+
+### Branch 5: Form America Field ✅
+- **Branch:** `feature/form-america-field`
+- **Files:** `schema.prisma`, migration, `CreateProjectModal.tsx`, `project.controller.ts`, `project.service.ts`, i18n
+- **Changes:**
+  - Added `americaSystemName` field to Project model (optional string)
+  - Created migration: `20260617_add_america_system_name`
+  - Added text input field in form (after trackOrApp)
+  - Placeholder: `"שם הפרויקט שקיים כיום באמריקה"`
+  - Updated create/update handlers and service signatures to accept and persist field
+  - Added i18n: `projects.createProject.americaSystem` → "מערכת אמריקה" / "America System"
+- **Purpose:** Legacy system reference field for tracking existing America projects
+- **Commit:** 00057ac
+
+### Branch 6: UX Demand Location Tooltip ✅
+- **Branch:** `ux/demand-location-tooltip`
+- **Files:** `CreateProjectModal.tsx`, i18n
+- **Changes:**
+  - Removed project name placeholder entirely (clean input)
+  - Changed inline demand location toggle from icon-only button to labeled button with icon + text
+  - Button now shows: "החרג מיקום ממיקום הפרויקט" (Override from project location)
+  - Added MdInfo icon next to toggle with hover tooltip: "המיקום נגזר ממיקום הפרויקט כל עוד לא ביקשתם לשנות מיקום"
+  - Added i18n keys under `project.inlineRequirements`: `overrideLocation`, `locationTooltip`
+- **Result:** Location toggle is now explicit, users understand location derivation
+- **Commit:** 96963ae
+
+---
+
+**Integration Complete:** All 6 branches merged to `dev`. TypeScript compilation verified on each branch before merge.
+
