@@ -54,7 +54,7 @@ export default function CreateProjectModal({
   const { t } = useTranslation();
   const { showToast } = useToast();
   const referenceData = useReferenceData();
-  const { currentUser } = useCurrentUser();
+  const currentUser = useCurrentUser();
   const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
