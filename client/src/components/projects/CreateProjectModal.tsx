@@ -7,6 +7,7 @@ import ConfirmDialog from '../common/ConfirmDialog';
 import Select from '../common/Select';
 import { useToast } from '../common/Toast';
 import { useReferenceData } from '../../hooks/useReferenceData';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { createDemand, fetchDemands, updateDemand as apiUpdateDemand, cancelDemand as apiCancelDemand } from '../../api/apiService';
 import type { Project, ProjectType, Median, Demand } from '../../types/domain';
 import type { CreateProjectPayload, UpdateProjectPayload, Priority, UpdateDemandPayload } from '../../api/types';
@@ -54,6 +55,7 @@ export default function CreateProjectModal({
   const { t } = useTranslation();
   const { showToast } = useToast();
   const referenceData = useReferenceData();
+  const { currentUser } = useCurrentUser();
   const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -273,7 +275,7 @@ export default function CreateProjectModal({
 
   // --- Other Options ---
 
-  const requestTypeOptions = (['Semiannual', 'Emergency'] as ProjectType[]).map(
+  const requestTypeOptions = (['Semiannual', ...(currentUser?.role === 'ADMIN' ? ['Emergency'] : [])] as ProjectType[]).map(
     (v) => ({ value: v, label: t(`projects.type.${v}`) })
   );
 
@@ -544,6 +546,7 @@ export default function CreateProjectModal({
               value={form.requestType}
               onChange={(v) => setField('requestType', v)}
               placeholder={placeholder}
+              disabled={isEditMode}
             />
           </div>
 
