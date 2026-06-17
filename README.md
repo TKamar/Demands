@@ -43,7 +43,8 @@ Keycloak admin credentials: `admin` / `admin`
 |-------|----------|----------|
 | admin | admin1, admin2 | admin123 |
 | moderator | mod1, mod2 | mod123 |
-| user | user1, user2, user3 | user123 |
+| user | user1, user2, user3 | user123 | 
+| center manager | cm1 | cm123 |
 
 ### Production
 
