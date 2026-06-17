@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAdminStats, type AdminStats } from '../../api/apiService';
+import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 
 const STATUS_LABELS: Record<string, string> = {
   Pending: 'בהמתנה',
@@ -9,18 +10,32 @@ const STATUS_LABELS: Record<string, string> = {
   PartiallyApproved: 'אושר חלקית',
   Rejected: 'דחה',
   Cancelled: 'בוטל',
+  AwaitingProcurement: 'מחכה לרכש',
+  HeldForEfficiency: 'מושהה – התייעלות',
+  ConditionalFootprintReduction: 'תנאי הורדת רגל',
+  InProgress: 'בתהליך',
+  TransferredTo810: 'הועבר ל-810',
+  WaitingOnPrerequisite: 'בהמתנה לתנאי מוקדם',
+  CenterManagerRejected: 'נדחה - מנהל מרכז',
   ApprovedAndAssigned: 'אושר וחילק',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  Pending: 'bg-yellow-100 text-yellow-800',
-  PendingCenterManager: 'bg-orange-100 text-orange-800',
-  Approved: 'bg-green-100 text-green-800',
-  ApprovedWithCondition: 'bg-blue-100 text-blue-800',
-  PartiallyApproved: 'bg-cyan-100 text-cyan-800',
-  Rejected: 'bg-red-100 text-red-800',
-  Cancelled: 'bg-gray-100 text-gray-800',
-  ApprovedAndAssigned: 'bg-emerald-100 text-emerald-800',
+  Pending: '#fbbf24',
+  PendingCenterManager: '#fb923c',
+  Approved: '#4ade80',
+  ApprovedWithCondition: '#60a5fa',
+  PartiallyApproved: '#06b6d4',
+  Rejected: '#ef4444',
+  Cancelled: '#9ca3af',
+  AwaitingProcurement: '#d946ef',
+  HeldForEfficiency: '#f59e0b',
+  ConditionalFootprintReduction: '#8b5cf6',
+  InProgress: '#3b82f6',
+  TransferredTo810: '#06b6d4',
+  WaitingOnPrerequisite: '#ec4899',
+  CenterManagerRejected: '#dc2626',
+  ApprovedAndAssigned: '#10b981',
 };
 
 interface MetricCardProps {
@@ -88,6 +103,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
     );
   }
 
+  // Prepare chart data for Pie chart
+  const pieChartData = Object.entries(stats.byStatus).map(([status, count]) => ({
+    name: STATUS_LABELS[status] || status,
+    value: count,
+  }));
+
+  // Prepare chart data for Bar chart (open conditional statuses)
+  const barChartData = Object.entries(stats.openConditional).map(([status, count]) => ({
+    name: STATUS_LABELS[status] || status,
+    count,
+  }));
+
+  const statusColors = Object.entries(stats.byStatus).map(([status]) =>
+    STATUS_COLORS[status] || '#9ca3af'
+  );
+
   return (
     <div className="flex-1 overflow-auto bg-bg-default p-6" dir="rtl">
       <div className="max-w-7xl mx-auto">
@@ -101,20 +132,72 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
           <MetricCard title="דרישות מאושרות" value={stats.approvedCount} />
         </div>
 
-        {/* Status Distribution */}
+        {/* Status Distribution Charts */}
         <div className="bg-bg-paper border border-divider rounded-lg p-6 mb-8">
-          <h2 className="text-lg font-semibold text-text-primary mb-4">התפלגות לפי סטטוס</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Object.entries(stats.byStatus).map(([status, count]) => (
-              <div key={status} className="flex flex-col gap-2">
-                <div className={`px-3 py-2 rounded text-sm font-medium ${STATUS_COLORS[status] || 'bg-gray-100 text-gray-800'}`}>
-                  {STATUS_LABELS[status] || status}
-                </div>
-                <div className="text-2xl font-bold text-text-primary text-center">{count}</div>
+          <h2 className="text-lg font-semibold text-text-primary mb-6">התפלגות לפי סטטוס</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Pie Chart */}
+            <div className="flex justify-center">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieChartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={Object.values(stats.byStatus)[index] ? STATUS_COLORS[Object.keys(stats.byStatus)[index]] || '#9ca3af' : '#9ca3af'}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => value} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Status Details Table */}
+            <div>
+              <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto">
+                {Object.entries(stats.byStatus).map(([status, count]) => (
+                  <div key={status} className="flex flex-col gap-1">
+                    <div className={`px-3 py-2 rounded text-sm font-medium ${
+                      Object.entries(STATUS_COLORS).find(([s]) => s === status)
+                        ? `text-white`
+                        : 'bg-gray-100 text-gray-800'
+                    }`}
+                    style={{ backgroundColor: STATUS_COLORS[status] || '#d1d5db', color: 'white' }}
+                    >
+                      {STATUS_LABELS[status] || status}
+                    </div>
+                    <div className="text-xl font-bold text-text-primary text-center">{count}</div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
+
+        {/* Open Conditional Statuses Bar Chart */}
+        {barChartData.length > 0 && (
+          <div className="bg-bg-paper border border-divider rounded-lg p-6 mb-8">
+            <h2 className="text-lg font-semibold text-text-primary mb-6">דרישות בהמתנה מותנות</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={barChartData} layout="horizontal" margin={{ top: 5, right: 30, left: 200, bottom: 5 }}>
+                <XAxis type="number" />
+                <YAxis dataKey="name" type="category" width={180} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {/* Center Breakdown */}
         <div className="bg-bg-paper border border-divider rounded-lg p-6 mb-8">

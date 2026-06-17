@@ -411,6 +411,7 @@ export interface AdminStats {
   byStatus: Record<string, number>;
   byCenter: { center: string; count: number }[];
   byService: { service: string; count: number }[];
+  openConditional: Record<string, number>;
 }
 
 export async function fetchAdminStats(centers?: string[]): Promise<AdminStats> {

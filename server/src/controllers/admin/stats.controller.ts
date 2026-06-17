@@ -33,6 +33,14 @@ export const statsController = {
         .filter(r => ['Approved', 'ApprovedWithCondition', 'PartiallyApproved'].includes(r.status))
         .reduce((sum, r) => sum + r._count.id, 0);
 
+      const openConditionalStatuses = ['AwaitingProcurement', 'HeldForEfficiency', 'ConditionalFootprintReduction', 'InProgress', 'TransferredTo810', 'WaitingOnPrerequisite'];
+      const openConditional: Record<string, number> = {};
+      byStatus.forEach(r => {
+        if (openConditionalStatuses.includes(r.status)) {
+          openConditional[r.status] = r._count.id;
+        }
+      });
+
       res.json({
         totalDemands,
         totalProjects,
@@ -41,6 +49,7 @@ export const statsController = {
         byStatus: Object.fromEntries(byStatus.map(r => [r.status, r._count.id])),
         byCenter: byCenter.map(r => ({ center: r.centerName, count: r._count.id })),
         byService: byService.map(r => ({ service: r.serviceName, count: r._count.id })),
+        openConditional,
       });
     } catch (error) {
       console.error('statsController.getDashboardStats error:', error);
