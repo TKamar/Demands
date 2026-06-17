@@ -12,7 +12,10 @@ interface ModalProps {
 
 export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      document.body.style.overflow = '';
+      return;
+    }
 
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -23,7 +26,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
     document.addEventListener('keydown', handleKey);
 
     return () => {
-      document.body.style.overflow = prev;
+      document.body.style.overflow = prev || '';
       document.removeEventListener('keydown', handleKey);
     };
   }, [isOpen, onClose]);
@@ -54,7 +57,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
               <MdClose size={22} />
             </button>
           </div>
-          <div className="p-6 overflow-y-auto overflow-x-hidden flex-1 min-h-0">{children}</div>
+          <div className="p-6 overflow-y-auto overflow-x-hidden flex-1">{children}</div>
         </div>
       </div>
     </div>,

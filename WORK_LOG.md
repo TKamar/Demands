@@ -1499,3 +1499,45 @@ Both scripts are production-ready and tested for structural correctness (syntax 
 - Performance optimization for large openConditional datasets in charts
 
 **Session Complete.** All work logged to WORK_LOG.md.
+
+---
+
+## Session 5: Dialog Synchronization, Multi-Project Decisions, Sizing Bounds (2026-06-17)
+
+**Objective:** Fix regressions in decision modals, enable cross-service bulk decisions for projects, fix UI layout issues (pie chart labels, modal overflow, table scrolling).
+
+### Branch 1: bugfix/dialog-synchronization ✅
+- **Files:**
+  - NEW `client/src/constants/demandDecisionOptions.ts` — shared SUB_DECISIONS array (10 options) and SubDecisionOption interface
+  - `client/src/components/management/DecisionModal.tsx` — import SUB_DECISIONS from constants
+  - `client/src/components/management/ServiceDecisionModal.tsx` — extended DemandDecision interface to include all 10 sub-decision fields (subDecision, approvedValue, reason, procurementDate, assignedToUser); rebuilt per-demand form section with dynamic fields for requiresQuantity, requiresDate, requiresUser, requiresReason; updated submit logic to route through new unified payload
+  - `client/src/components/main/panels/ApprovalRequestsPanel.tsx` — removed "New Project" button from Approval Requests tab (kept only in My Requests tab)
+- **Problem fixed:** ServiceDecisionModal only showed 3 options (Approved/Rejected/ApprovedWithCondition), while DecisionModal had 10. Now both share the same decision options.
+- **Commit:** 8c004ac
+
+### Branch 2: ux/bulk-project-demands ✅
+- **Files:**
+  - `client/src/api/apiService.ts` — added `fetchDemandsByProjectName(projectName)` helper to fetch Pending demands for a project
+  - `client/src/components/main/ProjectsAccordion.tsx` — added 3 new states: isBulkDecisionModalOpen, bulkDecisionDemands, isBulkDecisionLoading; added handleOpenBulkDecision async handler to fetch demands via Promise.all(); added "קבלת החלטה" (Make Decision) button in batch action bar; mounted HierarchicalBulkDecisionModal with onSubmit calling approveDemandMatrix
+- **Problem fixed:** Selecting 2+ projects had only a "Delete Selected" action. Now moderators can make bulk decisions on all nested demands in one hierarchical modal.
+- **Commits:** a3e5239 (API), 6eb8772 (UI)
+
+### Branch 3: ui/strict-component-bounds ✅
+- **Files:**
+  - `client/src/components/admin/AdminDashboard.tsx` — removed `labelLine={false}` and inline `label` prop from Pie chart; increased outerRadius from 80 to 110; added `<Legend />` to PieChart to replace inline labels
+  - `client/src/components/common/Modal.tsx` — added `flex flex-col max-h-[90vh]` to dialog panel; added `shrink-0` to header div; changed content div from `p-6` to `p-6 overflow-y-auto overflow-x-hidden flex-1 min-h-0` to enable internal scrolling
+  - `client/src/components/main/MyApprovalRequests.tsx` — wrapped `<table>` in `<div className="overflow-x-auto">` to enable horizontal scrolling
+- **Problems fixed:**
+  - Pie chart labels (long Hebrew status names) overlapped when rendering all 15+ statuses
+  - Modal content grew unbounded; no height cap or internal scroll
+  - MyApprovalRequests table was clipped by card's overflow-hidden
+- **Commit:** 9288c34
+
+---
+
+**Summary:** 
+- All 3 branches merged to `dev` with 7 commits total
+- TypeScript compilation verified on client side (server not modified in this session)
+- Decision modal logic is now unified across both demand views
+- Multi-project bulk decisions now available from ProjectsAccordion
+- Strict layout boundaries applied to modals and data tables — no more fluid resizing or overlapping labels

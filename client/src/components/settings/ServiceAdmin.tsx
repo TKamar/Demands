@@ -99,7 +99,7 @@ export const ServiceAdmin = () => {
       )}
 
       <div className="overflow-x-auto border rounded">
-        <table className="w-full">
+        <table className="w-full min-w-full">
           <thead>
             <tr className="bg-gray-100 border-b">
               <th className="p-3 text-left font-medium">Service</th>

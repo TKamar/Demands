@@ -196,7 +196,7 @@ export const UserManagement: React.FC = () => {
       {/* Table card */}
       <div className="bg-bg-paper rounded-xl shadow-sm border border-divider overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-start">
+          <table className="w-full text-sm text-start min-w-full">
             <thead className="text-xs text-text-secondary uppercase bg-gray-50 border-b border-divider">
               <tr>
                 <th className="p-2 border text-center w-12">
