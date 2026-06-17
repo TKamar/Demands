@@ -1397,3 +1397,50 @@ Both scripts are production-ready and tested for structural correctness (syntax 
 **Remaining work:** 
 - **Branch 3:** Add 5 new `DemandStatus` enum values, 2 new `Demand` fields, rebuild `DecisionModal` with 10 sub-decision options with dynamic form fields
 - **Branch 4:** Install Recharts, add Pie/Bar charts to `AdminDashboard`, enhance `GET /api/admin/stats` with `openConditional` breakdown
+
+### Branch 3: Conditional Approval States (10-Option Decision Modal) ✅
+- **Branch:** `feature/conditional-approval-states`
+- **Schema Changes:**
+  - Added 5 new `DemandStatus` enum values:
+    - `AwaitingProcurement` — procurement hold
+    - `HeldForEfficiency` — efficiency condition hold
+    - `ConditionalFootprintReduction` — footprint reduction condition
+    - `InProgress` — general in-progress state (reused for 3 variants)
+    - `TransferredTo810` — Section 810 escalation
+  - Added 2 new `Demand` model fields:
+    - `assignedToUser String?` — for user-specific forwarding
+    - `procurementDate DateTime?` — for procurement/DC timeline tracking
+  - Created migration SQL in `server/prisma/migrations/20260617_add_conditional_approval_states/migration.sql`
+  - Updated client-side `DemandStatus` type union in `domain.ts`
+- **DecisionModal Rebuild:**
+  - Completely replaced 3-option (Approved/Rejected/ApprovedWithCondition) UI with 10-option dropdown
+  - 10 sub-decision options with conditional form fields:
+    1. אישור (Approved) — no extra fields
+    2. דחייה (Rejected) — reason required
+    3. רכש (AwaitingProcurement) — date picker required
+    4. מושהה תלוי בהתייעלות (HeldForEfficiency) — reason required
+    5. מאושר בתנאי הורדת רגל (ConditionalFootprintReduction) — reason required
+    6. כמות חלקית (PartiallyApproved) — approved qty required
+    7. מחכה להתייחסות מפקד (InProgress with user) — reason + user picker required
+    8. בתהליך הועבר ל-810 (TransferredTo810) — reason required
+    9. מחכה להתקנה ב-DC (InProgress with date) — reason + date picker required
+    10. מחכה לשורת תקציב (InProgress with user) — reason + user picker required
+  - Dynamic form fields appear based on selected option
+  - All required fields validated before submit
+  - Submit payload includes new fields: `procurementDate`, `assignedToUser`
+- **Backend Updates:**
+  - `demand.controller.ts` approve handler: expanded validations per sub-decision type
+  - `demand.service.ts` approve method: accepts new status values and fields, skips `approvedDate` for OPEN states
+  - Notification message updated with all new status labels
+- **API Type Updates:**
+  - `ApproveDemandPayload` extended with `procurementDate?: string` and `assignedToUser?: string`
+  - `ApprovalStatus` type expanded to include all 8+ valid statuses
+- **Result:** Users can now make nuanced conditional approval decisions with proper lifecycle tracking
+- **Commits:** f1054f3 (schema foundation), 8bf1ec0 (DecisionModal + handlers)
+
+---
+
+**Current Status:** Branches 1, 2, & 3 complete and merged to dev. TypeScript verified on both client and server.
+
+**Remaining work:** 
+- **Branch 4:** Install Recharts, add Pie/Bar charts to `AdminDashboard`, enhance `GET /api/admin/stats` with `openConditional` breakdown
