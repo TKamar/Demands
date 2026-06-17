@@ -226,12 +226,14 @@ export interface UpdateWalletPayload {
   value: number;
 }
 
-export type ApprovalStatus = 'Approved' | 'PartiallyApproved' | 'ApprovedWithCondition';
+export type ApprovalStatus = 'Approved' | 'PartiallyApproved' | 'ApprovedWithCondition' | 'AwaitingProcurement' | 'HeldForEfficiency' | 'ConditionalFootprintReduction' | 'InProgress' | 'TransferredTo810';
 
 export interface ApproveDemandPayload {
   status: ApprovalStatus;
   approvedValue?: number;
   reason?: string;
+  procurementDate?: string;
+  assignedToUser?: string;
 }
 
 export interface RejectDemandPayload {

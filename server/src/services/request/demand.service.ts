@@ -378,24 +378,28 @@ export const demandService = {
   approve: async (
     id: number,
     data: {
-      status: "Approved" | "PartiallyApproved" | "ApprovedWithCondition";
+      status: string;
       approvedValue?: number;
       reason?: string;
+      procurementDate?: Date;
+      assignedToUser?: string;
     }
   ) => {
+    const openStatuses = ['AwaitingProcurement', 'HeldForEfficiency', 'ConditionalFootprintReduction', 'InProgress', 'TransferredTo810'];
     const demand = await prisma.$transaction(async (tx) => {
       const updated = await tx.demand.update({
         where: { id },
         data: {
-          status: data.status,
+          status: data.status as any,
           approvedValue: data.approvedValue,
-          approvedDate: new Date(),
+          approvedDate: openStatuses.includes(data.status) ? undefined : new Date(),
           reason: data.reason,
-        },
+          procurementDate: data.procurementDate as any,
+          assignedToUser: data.assignedToUser,
+        } as any,
         include: {
           project: true,
           service: true,
-          resource: true,
           location: true,
         },
       });
@@ -415,6 +419,11 @@ export const demandService = {
         Approved: "approved",
         PartiallyApproved: "partially approved",
         ApprovedWithCondition: "approved with condition",
+        AwaitingProcurement: "awaiting procurement",
+        HeldForEfficiency: "held for efficiency",
+        ConditionalFootprintReduction: "approved with footprint condition",
+        InProgress: "in progress",
+        TransferredTo810: "transferred to 810",
       };
       const label = statusLabel[demand.status] ?? demand.status;
       setImmediate(async () => {
@@ -422,7 +431,7 @@ export const demandService = {
           await notificationService.createForUser(demand.createdBy!, {
             type: "DemandDecision",
             title: "Decision Received on Your Demand",
-            message: `Your demand for ${demand.resourceName} in project "${demand.projectName}" was ${label}.${demand.approvedValue != null ? ` Approved value: ${demand.approvedValue} ${demand.resource?.unit ?? ""}.` : ""}`,
+            message: `Your demand for ${demand.resourceName} in project "${demand.projectName}" was ${label}.${demand.approvedValue != null ? ` Approved value: ${demand.approvedValue}.` : ""}`,
             demandId: demand.id,
             projectName: demand.projectName,
           });

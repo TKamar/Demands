@@ -645,31 +645,56 @@ export const demandController = {
 
   approve: async (req: Request, res: Response) => {
     try {
-      const { status, approvedValue, reason } = req.body;
+      const { status, approvedValue, reason, procurementDate, assignedToUser } = req.body;
 
-      const validStatuses = [DemandStatus.Approved, DemandStatus.PartiallyApproved, DemandStatus.ApprovedWithCondition];
+      const validStatuses = [
+        'Approved',
+        'PartiallyApproved',
+        'ApprovedWithCondition',
+        'AwaitingProcurement',
+        'HeldForEfficiency',
+        'ConditionalFootprintReduction',
+        'InProgress',
+        'TransferredTo810',
+      ] as const;
 
-      // Validate status
       if (!validStatuses.includes(status)) {
-        return res.status(400).json({ error: "status must be Approved, PartiallyApproved, or ApprovedWithCondition" });
+        return res.status(400).json({ error: "Invalid approval status" });
       }
 
-      const requiresValueAndReason = status === DemandStatus.PartiallyApproved || status === DemandStatus.ApprovedWithCondition;
-
-      // Validate: approvedValue is required for PartiallyApproved and ApprovedWithCondition
-      if (requiresValueAndReason && (approvedValue === undefined || approvedValue === null)) {
-        return res.status(400).json({ error: "approvedValue is required for PartiallyApproved and ApprovedWithCondition status" });
+      // Validation per status
+      if (status === 'PartiallyApproved') {
+        if (approvedValue === undefined || approvedValue === null) {
+          return res.status(400).json({ error: "approvedValue is required for PartiallyApproved" });
+        }
       }
-
-      // Validate: reason is required for PartiallyApproved and ApprovedWithCondition
-      if (requiresValueAndReason && (!reason || typeof reason !== 'string' || reason.trim() === '')) {
-        return res.status(400).json({ error: "reason is required for PartiallyApproved and ApprovedWithCondition status" });
+      if (['ApprovedWithCondition', 'PartiallyApproved'].includes(status)) {
+        if (!reason || typeof reason !== 'string' || reason.trim() === '') {
+          return res.status(400).json({ error: "reason is required" });
+        }
+      }
+      if (status === 'AwaitingProcurement') {
+        if (!procurementDate) {
+          return res.status(400).json({ error: "procurementDate is required" });
+        }
+      }
+      if (['HeldForEfficiency', 'ConditionalFootprintReduction', 'TransferredTo810'].includes(status)) {
+        if (!reason || typeof reason !== 'string' || reason.trim() === '') {
+          return res.status(400).json({ error: "reason is required" });
+        }
+      }
+      if (status === 'InProgress') {
+        if (!reason || typeof reason !== 'string' || reason.trim() === '') {
+          return res.status(400).json({ error: "reason is required" });
+        }
       }
 
       const demand = await demandService.approve(Number(req.params.id), {
-        status,
-        approvedValue: requiresValueAndReason ? approvedValue : undefined,
-        reason: requiresValueAndReason ? reason.trim() : undefined,
+        status: status as any,
+        approvedValue: ['PartiallyApproved', 'ApprovedWithCondition'].includes(status) ? approvedValue : undefined,
+        reason,
+        procurementDate: procurementDate ? new Date(procurementDate) : undefined,
+        assignedToUser,
       });
       res.json(demand);
     } catch (error) {
