@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdAdd, MdDelete, MdLocationOn } from 'react-icons/md';
+import { MdAdd, MdDelete, MdLocationOn, MdInfo } from 'react-icons/md';
 import Modal from '../common/Modal';
 import CreateDemandModal from './CreateDemandModal';
 import ConfirmDialog from '../common/ConfirmDialog';
@@ -474,7 +474,6 @@ export default function CreateProjectModal({
               required
               value={form.name}
               onChange={handleChange}
-              placeholder={t('projects.createProject.namePlaceholder')}
               className={isEditMode ? `${inputClass} bg-gray-50 text-text-secondary` : inputClass}
               readOnly={isEditMode}
               disabled={isEditMode}
@@ -856,15 +855,22 @@ export default function CreateProjectModal({
                       <button
                         type="button"
                         onClick={() => updateRequirementRow(idx, 'overrideLocation', !req.overrideLocation)}
-                        title={req.overrideLocation
-                          ? t('project.inlineRequirements.locationCustom', 'מיקום מותאם')
-                          : t('project.inlineRequirements.locationFromProject', 'מיקום מהפרויקט')}
-                        className={`transition-colors cursor-pointer bg-transparent border-none p-1 ${
-                          req.overrideLocation ? 'text-primary' : 'text-text-secondary hover:text-primary'
+                        className={`transition-colors cursor-pointer bg-transparent border-none px-2 py-1 rounded text-sm flex items-center gap-1 ${
+                          req.overrideLocation ? 'text-primary bg-primary/10' : 'text-text-secondary hover:text-text-primary'
                         }`}
                       >
-                        <MdLocationOn size={16} />
+                        <MdLocationOn size={14} />
+                        <span>{t('project.inlineRequirements.overrideLocation', 'החרג מיקום ממיקום הפרויקט')}</span>
                       </button>
+
+                      {/* Location info tooltip */}
+                      <span
+                        title={t('project.inlineRequirements.locationTooltip',
+                          'המיקום נגזר ממיקום הפרויקט כל עוד לא ביקשתם לשנות מיקום')}
+                        className="text-text-secondary hover:text-text-primary cursor-help"
+                      >
+                        <MdInfo size={16} />
+                      </span>
 
                       {/* Delete row button */}
                       <button

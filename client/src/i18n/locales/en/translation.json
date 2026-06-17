@@ -629,7 +629,9 @@
     "inlineRequirements": {
       "title": "Requirements (Optional)",
       "addRow": "Add Requirement",
-      "partialError": "{{succeeded}} requirements created, {{failed}} failed"
+      "partialError": "{{succeeded}} requirements created, {{failed}} failed",
+      "overrideLocation": "Override from project location",
+      "locationTooltip": "Location is derived from the project location unless you request a change"
     }
   },
   "service": {

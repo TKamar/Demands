@@ -629,7 +629,9 @@
     "inlineRequirements": {
       "title": "דרישות (אופציונלי)",
       "addRow": "הוסף דרישה",
-      "partialError": "{{succeeded}} דרישות נוצרו, {{failed}} נכשלו"
+      "partialError": "{{succeeded}} דרישות נוצרו, {{failed}} נכשלו",
+      "overrideLocation": "החרג מיקום ממיקום הפרויקט",
+      "locationTooltip": "המיקום נגזר ממיקום הפרויקט כל עוד לא ביקשתם לשנות מיקום"
     }
   },
   "service": {
