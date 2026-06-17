@@ -84,8 +84,6 @@ interface DemandsTableProps {
   // Bulk selection
   showBulkSelect?: boolean;
   selectedIds?: Set<number>;
-  lockedCenter?: string | null;
-  lockedResourceName?: string | null;
   onToggleSelect?: (demand: Demand) => void;
   onDeselectAll?: () => void;
 }
@@ -395,13 +393,9 @@ export default function DemandsTable({
                     <input
                       type="checkbox"
                       checked={selectedIds?.has(demand.id) ?? false}
-                      disabled={
-                        (lockedCenter != null && demand.centerName !== lockedCenter) ||
-                        (lockedResourceName != null && demand.resourceName !== lockedResourceName)
-                      }
                       onChange={() => onToggleSelect?.(demand)}
                       onClick={(e) => e.stopPropagation()}
-                      className="cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="cursor-pointer"
                     />
                   </td>
                 )}

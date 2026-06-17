@@ -83,8 +83,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
 
   // Bulk selection state
   const [selectedDemandIds, setSelectedDemandIds] = useState<Set<number>>(new Set());
-  const [lockedCenter, setLockedCenter] = useState<string | null>(null);
-  const [lockedResource, setLockedResource] = useState<string | null>(null);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   // Build the demand filter params used by useDemands. Center selection from the
@@ -340,15 +338,7 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
       const next = new Set(prev);
       if (next.has(demand.id)) {
         next.delete(demand.id);
-        if (next.size === 0) {
-          setLockedCenter(null);
-          setLockedResource(null);
-        }
       } else {
-        if (next.size === 0) {
-          setLockedCenter(demand.centerName ?? null);
-          setLockedResource(demand.resourceName ?? null);
-        }
         next.add(demand.id);
       }
       return next;
@@ -357,8 +347,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
 
   const clearSelection = useCallback(() => {
     setSelectedDemandIds(new Set());
-    setLockedCenter(null);
-    setLockedResource(null);
   }, []);
 
   const handleEditDemand = useCallback((demand: Demand) => {
@@ -489,8 +477,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
                 onColumnSort={handleColumnSort}
                 showBulkSelect={isModerator}
                 selectedIds={selectedDemandIds}
-                lockedCenter={lockedCenter}
-                lockedResourceName={lockedResource}
                 onToggleSelect={handleToggleSelect}
                 onDeselectAll={clearSelection}
               />
@@ -551,8 +537,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
         open={isBulkModalOpen}
         onClose={() => setIsBulkModalOpen(false)}
         selectedCount={selectedDemandIds.size}
-        lockedCenter={lockedCenter}
-        lockedResourceName={lockedResource}
         onApprove={async (payload) => {
           const ids = Array.from(selectedDemandIds);
           await bulkApproveDemands({ ids, status: payload.status, approvedValue: payload.approvedValue, reason: payload.reason });

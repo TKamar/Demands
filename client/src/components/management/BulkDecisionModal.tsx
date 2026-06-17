@@ -11,8 +11,6 @@ interface BulkDecisionModalProps {
   onReject: (payload: { reason: string }) => Promise<void>;
   selectedCount: number;
   isLoading?: boolean;
-  lockedCenter?: string | null;
-  lockedResourceName?: string | null;
 }
 
 export default function BulkDecisionModal({
@@ -22,8 +20,6 @@ export default function BulkDecisionModal({
   onReject,
   selectedCount,
   isLoading,
-  lockedCenter,
-  lockedResourceName,
 }: BulkDecisionModalProps) {
   const { t } = useTranslation();
 
@@ -85,12 +81,6 @@ export default function BulkDecisionModal({
           <span className="font-medium text-text-primary">
             {t('management.bulkDecision.summary', { count: selectedCount })}
           </span>
-          {lockedCenter && (
-            <span>{t('bulk.centerInfo', 'פיקוד: {{center}}', { center: lockedCenter })}</span>
-          )}
-          {lockedResourceName && (
-            <span>{t('bulk.resourceInfo', 'משאב: {{resource}}', { resource: lockedResourceName })}</span>
-          )}
         </div>
 
         {/* Decision Type dropdown */}
