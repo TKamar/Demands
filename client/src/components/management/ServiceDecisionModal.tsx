@@ -4,16 +4,18 @@ import Modal from '../common/Modal';
 import { useToast } from '../common/Toast';
 import { useReferenceData } from '../../hooks/useReferenceData';
 import { transferDemand } from '../../api/apiService';
+import { SUB_DECISIONS } from '../../constants/demandDecisionOptions';
 import type { Demand } from '../../types/domain';
 import type { ApproveDemandPayload, RejectDemandPayload } from '../../api/types';
 
 type DecisionPath = 'select' | 'manual' | 'transfer';
-type DemandAction = '' | 'Approved' | 'Rejected' | 'ApprovedWithCondition';
 
 interface DemandDecision {
-  action: DemandAction;
+  subDecision: string;
   approvedValue?: number;
   reason?: string;
+  procurementDate?: string;
+  assignedToUser?: string;
 }
 
 interface ServiceDecisionModalProps {
@@ -66,28 +68,33 @@ export default function ServiceDecisionModal({
   ) => {
     setDecisions(prev => ({
       ...prev,
-      [demandId]: { ...((prev[demandId] ?? { action: '' }) as DemandDecision), [field]: value },
+      [demandId]: { ...((prev[demandId] ?? { subDecision: '' }) as DemandDecision), [field]: value },
     }));
   };
 
-  const actionableCount = demands.filter(d => decisions[d.id]?.action && decisions[d.id]?.action !== '').length;
+  const actionableCount = demands.filter(d => decisions[d.id]?.subDecision && decisions[d.id]?.subDecision !== '').length;
 
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (actionableCount === 0) return;
     setIsSubmitting(true);
     try {
-      const actionable = demands.filter(d => decisions[d.id]?.action && decisions[d.id]?.action !== '');
+      const actionable = demands.filter(d => decisions[d.id]?.subDecision && decisions[d.id]?.subDecision !== '');
       await Promise.allSettled(
         actionable.map(d => {
           const dec = decisions[d.id];
-          if (dec.action === 'Rejected') {
+          const option = SUB_DECISIONS.find(o => o.value === dec.subDecision);
+          if (!option) return Promise.resolve();
+
+          if (option.status === 'Rejected') {
             return onReject(d.id, { reason: dec.reason ?? '' });
           }
           return onApprove(d.id, {
-            status: dec.action as 'Approved' | 'ApprovedWithCondition',
+            status: option.status,
             approvedValue: dec.approvedValue,
             reason: dec.reason,
+            procurementDate: dec.procurementDate,
+            assignedToUser: dec.assignedToUser,
           });
         })
       );
@@ -198,54 +205,72 @@ export default function ServiceDecisionModal({
       )}
 
       {path === 'manual' && (
-        <form onSubmit={handleManualSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleManualSubmit} className="flex flex-col gap-4 max-h-[60vh] overflow-y-auto">
           <div className="flex flex-col gap-3" dir="rtl">
             {demands.map(demand => {
-              const dec = decisions[demand.id] ?? { action: '' as DemandAction };
-              const showValueInput = dec.action === 'Approved' || dec.action === 'ApprovedWithCondition';
-              const showReasonInput = dec.action !== '';
+              const dec = decisions[demand.id] ?? { subDecision: '' };
+              const option = SUB_DECISIONS.find(o => o.value === dec.subDecision);
               return (
                 <div key={demand.id} className="border border-divider rounded-xl p-3 flex flex-col gap-2">
                   <div className="flex items-center gap-3 text-sm">
                     <span className="font-medium text-text-primary flex-1">{demand.resourceName}</span>
                     <span className="text-text-secondary">{demand.value} {demand.unit}</span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col gap-2">
                     <select
-                      value={dec.action}
-                      onChange={e => setDecisionField(demand.id, 'action', e.target.value as DemandAction)}
-                      className="flex-1 px-3 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                      value={dec.subDecision}
+                      onChange={e => setDecisionField(demand.id, 'subDecision', e.target.value)}
+                      className="w-full px-3 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
                       dir="rtl"
                     >
                       <option value="">{t('decision.selectPlaceholder', 'בחר החלטה')}</option>
-                      <option value="Approved">{t('decision.approve', 'אישור')}</option>
-                      <option value="Rejected">{t('decision.reject', 'דחיה')}</option>
-                      <option value="ApprovedWithCondition">{t('decision.conditionalApproval', 'אישור מותנה')}</option>
+                      {SUB_DECISIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
                     </select>
-                    {showValueInput && (
-                      <div className="flex items-center gap-1">
+                    {option?.requiresQuantity && (
+                      <div className="flex items-center gap-2">
                         <input
                           type="number"
                           min={0}
                           value={dec.approvedValue ?? ''}
                           onChange={e => setDecisionField(demand.id, 'approvedValue', e.target.value ? Number(e.target.value) : undefined)}
                           placeholder={String(demand.value)}
-                          className="w-24 px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                          className="flex-1 px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
                         />
                         <span className="text-xs text-text-secondary">{demand.unit}</span>
                       </div>
                     )}
+                    {option?.requiresDate && (
+                      <input
+                        type="date"
+                        value={dec.procurementDate ?? ''}
+                        onChange={e => setDecisionField(demand.id, 'procurementDate', e.target.value)}
+                        className="w-full px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                        dir="ltr"
+                      />
+                    )}
+                    {option?.requiresUser && (
+                      <input
+                        type="text"
+                        value={dec.assignedToUser ?? ''}
+                        onChange={e => setDecisionField(demand.id, 'assignedToUser', e.target.value)}
+                        placeholder={t('decision.assignedUserPlaceholder', 'שם משתמש')}
+                        className="w-full px-2 py-1.5 text-sm border border-divider rounded-lg bg-bg-default"
+                        dir="rtl"
+                      />
+                    )}
+                    {option?.requiresReason && (
+                      <textarea
+                        value={dec.reason ?? ''}
+                        onChange={e => setDecisionField(demand.id, 'reason', e.target.value)}
+                        rows={2}
+                        className="w-full px-3 py-1.5 text-sm border border-divider rounded-lg bg-bg-default resize-none"
+                        dir="rtl"
+                        placeholder={t('decision.reasonPlaceholder', 'הזן סיבה...')}
+                      />
+                    )}
                   </div>
-                  {showReasonInput && (
-                    <textarea
-                      value={dec.reason ?? ''}
-                      onChange={e => setDecisionField(demand.id, 'reason', e.target.value)}
-                      rows={2}
-                      className="w-full px-3 py-1.5 text-sm border border-divider rounded-lg bg-bg-default resize-none"
-                      dir="rtl"
-                      placeholder={t('decision.reasonPlaceholder', 'הזן סיבה...')}
-                    />
-                  )}
                 </div>
               );
             })}

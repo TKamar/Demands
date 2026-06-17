@@ -70,16 +70,7 @@ export default function ApprovalRequestsPanel({
             <MdSearch size={16} className="text-text-secondary" />
             <span className="text-sm text-text-secondary">{t('main.search.placeholder', 'Search...')}</span>
           </div>
-          <div className="flex items-center gap-3 ms-auto">
-            <ExcelToolbar selectedCenters={selectedCenters} showImport={false} />
-            <button
-              onClick={() => openModal('project')}
-              className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap"
-            >
-              <MdAdd size={16} />
-              {t('main.actions.newProject', 'New Project')}
-            </button>
-          </div>
+          <ExcelToolbar selectedCenters={selectedCenters} showImport={false} className="ms-auto" />
         </div>
       )}
 
