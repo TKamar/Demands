@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Modal from '../common/Modal';
 import type { Demand } from '../../types/domain';
@@ -46,10 +46,13 @@ export default function HierarchicalBulkDecisionModal({
   // Set initial active tab
   const projectNames = useMemo(() => Object.keys(demandsByProject).sort(), [demandsByProject]);
 
-  // Initialize activeProjectTab on modal open
-  if (open && !activeProjectTab && projectNames.length > 0) {
-    setActiveProjectTab(projectNames[0]);
-  }
+  // Initialize activeProjectTab on modal open using useEffect
+  useEffect(() => {
+    if (open && projectNames.length > 0) {
+      setActiveProjectTab(projectNames[0]);
+      setApprovalInputs({});
+    }
+  }, [open, projectNames]);
 
   const currentProjectDemands = useMemo(() => {
     if (!activeProjectTab) return {};
@@ -102,27 +105,33 @@ export default function HierarchicalBulkDecisionModal({
       title={t('bulk.hierarchicalTitle', 'קבלת החלטה מרובה')}
     >
       <div className="flex flex-col gap-4" dir="rtl">
-        {/* Project tabs */}
-        {projectNames.length > 1 && (
-          <div className="flex gap-2 border-b border-divider">
-            {projectNames.map((projectName) => (
-              <button
-                key={projectName}
-                onClick={() => setActiveProjectTab(projectName)}
-                className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  activeProjectTab === projectName
-                    ? 'border-b-2 border-primary text-primary'
-                    : 'text-text-secondary hover:text-text-primary'
-                }`}
-              >
-                {projectName}
-              </button>
-            ))}
+        {demands.length === 0 ? (
+          <div className="py-8 text-center text-sm text-text-secondary">
+            {t('bulk.noDemands', 'No demands available for approval')}
           </div>
-        )}
+        ) : (
+          <>
+            {/* Project tabs */}
+            {projectNames.length > 1 && (
+              <div className="flex gap-2 border-b border-divider">
+                {projectNames.map((projectName) => (
+                  <button
+                    key={projectName}
+                    onClick={() => setActiveProjectTab(projectName)}
+                    className={`px-4 py-2 text-sm font-medium transition-colors ${
+                      activeProjectTab === projectName
+                        ? 'border-b-2 border-primary text-primary'
+                        : 'text-text-secondary hover:text-text-primary'
+                    }`}
+                  >
+                    {projectName}
+                  </button>
+                ))}
+              </div>
+            )}
 
-        {/* Service blocks for current project */}
-        <div className="max-h-96 overflow-y-auto space-y-6">
+            {/* Service blocks for current project */}
+            <div className="max-h-96 overflow-y-auto space-y-6">
           {Object.entries(currentProjectDemands).map(([serviceName, serviceDemands]) => (
             <div key={serviceName} className="border border-divider rounded-lg p-4">
               <h3 className="text-sm font-semibold text-text-primary mb-3">{serviceName}</h3>
@@ -181,25 +190,29 @@ export default function HierarchicalBulkDecisionModal({
               </div>
             </div>
           ))}
-        </div>
+            </div>
+          </>
+        )}
 
         {/* Action buttons */}
-        <div className="flex gap-2 justify-end border-t border-divider pt-4">
-          <button
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="px-4 py-2 rounded-lg bg-transparent border border-text-secondary text-text-secondary hover:border-text-primary hover:text-text-primary transition-colors cursor-pointer text-sm font-medium disabled:opacity-50"
-          >
-            {t('common.cancel', 'ביטול')}
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || Object.keys(approvalInputs).length === 0}
-            className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors cursor-pointer text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? t('common.saving', 'שומר...') : t('bulk.submitAndApprove', 'שמור ואשר הכל')}
-          </button>
-        </div>
+        {demands.length > 0 && (
+          <div className="flex gap-2 justify-end border-t border-divider pt-4">
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="px-4 py-2 rounded-lg bg-transparent border border-text-secondary text-text-secondary hover:border-text-primary hover:text-text-primary transition-colors cursor-pointer text-sm font-medium disabled:opacity-50"
+            >
+              {t('common.cancel', 'ביטול')}
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting || Object.keys(approvalInputs).length === 0}
+              className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors cursor-pointer text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? t('common.saving', 'שומר...') : t('bulk.submitAndApprove', 'שמור ואשר הכל')}
+            </button>
+          </div>
+        )}
       </div>
     </Modal>
   );
