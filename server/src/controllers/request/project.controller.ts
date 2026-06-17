@@ -89,20 +89,15 @@ export const projectController = {
   create: async (req: Request, res: Response) => {
     try {
       const { username, fullName } = getUserContext(req);
-      const { name, purpose, relatedTo, type, kind, locationId, year, median, emergencyOption, centerName, branchName, sectionName } = req.body;
+      const { name, purpose, relatedTo, type, kind, locationId, emergencyOption, centerName, branchName, sectionName } = req.body;
 
-      // Validate: year and median are required if type is Semiannual
+      // Auto-derive year and median for Semiannual projects
+      let year: number | undefined;
+      let median: 'H1' | 'H2' | undefined;
       if (type === ProjectType.Semiannual) {
-        if (year === undefined || year === null) {
-          return res
-            .status(400)
-            .json({ error: "year is required for Semiannual projects" });
-        }
-        if (!median) {
-          return res
-            .status(400)
-            .json({ error: "median is required for Semiannual projects" });
-        }
+        const now = new Date();
+        year = now.getFullYear();
+        median = (now.getMonth() < 6 ? 'H1' : 'H2') as 'H1' | 'H2';
       }
 
       // Validate: emergencyOption is required if type is Emergency

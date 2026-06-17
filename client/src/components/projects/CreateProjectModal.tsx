@@ -38,8 +38,6 @@ const initialForm = {
   base: '',
   cluster: '',
   purpose: '',
-  median: '',
-  year: '' as unknown as number,
   emergencyOption: '',
 };
 
@@ -362,11 +360,6 @@ export default function CreateProjectModal({
       priority: form.priority as Priority,
     };
 
-    if (form.requestType === 'Semiannual') {
-      if (form.year) payload.year = Number(form.year);
-      if (form.median) payload.median = form.median as Median;
-    }
-
     if (form.requestType === 'Emergency' && form.emergencyOption) {
       payload.emergencyOption = form.emergencyOption;
     }
@@ -575,36 +568,6 @@ export default function CreateProjectModal({
               placeholder={placeholder}
             />
           </div>
-
-          {/* Semiannual Fields */}
-          {isSemiannual && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-1.5">
-                  {t('projects.createProject.year')} <span className="text-danger">*</span>
-                </label>
-                <input
-                  type="number"
-                  name="year"
-                  value={form.year}
-                  onChange={handleChange}
-                  placeholder="202X"
-                  className={inputClass}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-1.5">
-                  {t('projects.createProject.median')} <span className="text-danger">*</span>
-                </label>
-                <Select
-                  options={medianOptions}
-                  value={form.median}
-                  onChange={(v) => setField('median', v)}
-                  placeholder={placeholder}
-                />
-              </div>
-            </>
-          )}
 
           {/* Emergency Fields */}
           {isEmergency && (
