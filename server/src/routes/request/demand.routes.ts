@@ -14,6 +14,7 @@ router.get("/center/pending", authenticate, requireAuth, requireCenterManager, d
 router.get("/history", authenticate, requireAuth, demandController.getHistory);
 router.patch("/bulk/approve", authenticate, requireModerator, demandController.bulkApprove);
 router.patch("/bulk/reject", authenticate, requireModerator, demandController.bulkReject);
+router.patch("/bulk/approve-matrix", authenticate, requireModerator, demandController.approveMatrix);
 router.post("/group", authenticate, requireAuth, demandController.createGroup);
 router.get("/:id", authenticate, requireAuth, demandController.getById);
 router.post("/", authenticate, requireAuth, demandController.create);

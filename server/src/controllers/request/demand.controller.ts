@@ -811,4 +811,30 @@ export const demandController = {
       res.status(500).json({ error: 'Failed to transfer demand' });
     }
   },
+
+  approveMatrix: async (req: Request, res: Response) => {
+    try {
+      const { decisions } = req.body;
+
+      if (!Array.isArray(decisions) || decisions.length === 0) {
+        return res.status(400).json({ error: 'decisions array is required and must not be empty' });
+      }
+
+      // Validate decision structure
+      for (const decision of decisions) {
+        if (!decision.id || decision.approvedValue === undefined || !decision.status) {
+          return res.status(400).json({ error: 'Each decision must have id, approvedValue, and status' });
+        }
+        if (!['Approved', 'PartiallyApproved'].includes(decision.status)) {
+          return res.status(400).json({ error: 'status must be Approved or PartiallyApproved' });
+        }
+      }
+
+      const result = await demandService.approveMatrix(decisions);
+      res.json(result);
+    } catch (error) {
+      console.error('demandController.approveMatrix error:', error);
+      res.status(500).json({ error: 'Failed to approve demands' });
+    }
+  },
 };

@@ -9,9 +9,11 @@ import { FilterSort } from '../common/filters';
 import CreateDemandModal from '../projects/CreateDemandModal';
 import DecisionModal from '../management/DecisionModal';
 import BulkDecisionModal from '../management/BulkDecisionModal';
+import HierarchicalBulkDecisionModal, { type MatrixDecision } from '../management/HierarchicalBulkDecisionModal';
 import { useDemands } from '../../hooks/useDemands';
 import { useCachedProjects } from '../../hooks/useCachedProjects';
 import { useReferenceData } from '../../hooks/useReferenceData';
+import { approveDemandMatrix } from '../../api/apiService';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useDelayedLoading } from '../../hooks/useDelayedLoading';
 import { useToast } from '../common/Toast';
@@ -533,21 +535,21 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
         onSuccess={() => { setDecisionDemand(null); setCurrentPage(1); setAccumulatedDemands([]); }}
       />
 
-      <BulkDecisionModal
+      <HierarchicalBulkDecisionModal
         open={isBulkModalOpen}
         onClose={() => setIsBulkModalOpen(false)}
-        selectedCount={selectedDemandIds.size}
-        onApprove={async (payload) => {
-          const ids = Array.from(selectedDemandIds);
-          await bulkApproveDemands({ ids, status: payload.status, approvedValue: payload.approvedValue, reason: payload.reason });
-          clearSelection();
-          setIsBulkModalOpen(false);
-        }}
-        onReject={async (payload) => {
-          const ids = Array.from(selectedDemandIds);
-          await bulkRejectDemands({ ids, reason: payload.reason });
-          clearSelection();
-          setIsBulkModalOpen(false);
+        demands={accumulatedDemands.filter((d) => selectedDemandIds.has(d.id))}
+        onSubmit={async (decisions: MatrixDecision[]) => {
+          try {
+            await approveDemandMatrix({ decisions });
+            showToast(t('management.success.approved'), 'success');
+            clearSelection();
+            setIsBulkModalOpen(false);
+            setAccumulatedDemands([]);
+            setCurrentPage(1);
+          } catch (error) {
+            showToast(t('management.error.approveFailed'), 'error');
+          }
         }}
       />
     </div>

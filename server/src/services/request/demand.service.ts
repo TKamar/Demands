@@ -640,4 +640,22 @@ export const demandService = {
 
     return result;
   },
+
+  approveMatrix: async (decisions: Array<{ id: number; approvedValue: number; status: 'Approved' | 'PartiallyApproved' }>) => {
+    const updates = decisions.map((decision) =>
+      prisma.demand.updateMany({
+        where: { id: decision.id, status: 'Pending' },
+        data: {
+          status: decision.status,
+          approvedValue: decision.approvedValue,
+          approvedDate: new Date(),
+        },
+      })
+    );
+
+    const results = await Promise.all(updates);
+    const count = results.reduce((acc, result) => acc + result.count, 0);
+
+    return { count };
+  },
 };
