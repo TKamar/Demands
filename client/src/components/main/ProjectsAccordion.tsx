@@ -21,10 +21,12 @@ import ProjectDetailSidebar from '../projects/ProjectDetailSidebar';
 import CreateProjectModal from '../projects/CreateProjectModal';
 import DuplicateProjectModal from '../projects/DuplicateProjectModal';
 import BulkProjectActionModal from '../management/BulkProjectActionModal';
+import HierarchicalBulkDecisionModal from '../management/HierarchicalBulkDecisionModal';
 import { useClientInfiniteScroll } from '../../hooks/useClientInfiniteScroll';
 import { InfiniteScrollSentinel } from '../common/InfiniteScrollSentinel';
 import { useToast } from '../common/Toast';
-import type { Project, Priority } from '../../types/domain';
+import { approveDemandMatrix, fetchDemandsByProjectName } from '../../api/apiService';
+import type { Project, Priority, Demand } from '../../types/domain';
 import type {
   CreateProjectPayload,
   UpdateProjectPayload,
@@ -158,6 +160,9 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
   const [duplicatingProject, setDuplicatingProject] = useState<Project | null>(null);
   const [selectedProjectNames, setSelectedProjectNames] = useState<Set<string>>(new Set());
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isBulkDecisionModalOpen, setIsBulkDecisionModalOpen] = useState(false);
+  const [bulkDecisionDemands, setBulkDecisionDemands] = useState<Demand[]>([]);
+  const [isBulkDecisionLoading, setIsBulkDecisionLoading] = useState(false);
 
   // Client-side column filters
   const [columnFilters, setColumnFilters] = useState<Record<string, string[]>>({
@@ -267,6 +272,21 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
   const clearSelection = useCallback(() => {
     setSelectedProjectNames(new Set());
   }, []);
+
+  const handleOpenBulkDecision = useCallback(async () => {
+    setIsBulkDecisionLoading(true);
+    try {
+      const results = await Promise.all(
+        Array.from(selectedProjectNames).map(name => fetchDemandsByProjectName(name))
+      );
+      setBulkDecisionDemands(results.flat());
+      setIsBulkDecisionModalOpen(true);
+    } catch (err) {
+      showToast(t('error.failed', 'Failed to load demands'), 'error');
+    } finally {
+      setIsBulkDecisionLoading(false);
+    }
+  }, [selectedProjectNames, showToast, t]);
 
   const handleDeleteProject = useCallback(
     async (project: Project) => {
@@ -383,12 +403,21 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
               {t('common.clearSelection', 'Clear')}
             </button>
             {(canDecide) && (
-              <button
-                onClick={() => setIsBulkModalOpen(true)}
-                className="text-sm px-3 py-1 rounded bg-danger/10 border border-danger text-danger hover:bg-danger/20 transition-colors cursor-pointer ml-auto"
-              >
-                {t('project.bulkDelete', 'Delete Selected')}
-              </button>
+              <>
+                <button
+                  onClick={handleOpenBulkDecision}
+                  disabled={isBulkDecisionLoading}
+                  className="text-sm px-3 py-1 rounded bg-primary/10 border border-primary text-primary hover:bg-primary/20 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isBulkDecisionLoading ? '...' : t('bulk.makeDecision', 'קבלת החלטה')}
+                </button>
+                <button
+                  onClick={() => setIsBulkModalOpen(true)}
+                  className="text-sm px-3 py-1 rounded bg-danger/10 border border-danger text-danger hover:bg-danger/20 transition-colors cursor-pointer ml-auto"
+                >
+                  {t('project.bulkDelete', 'Delete Selected')}
+                </button>
+              </>
             )}
           </div>
         )}
@@ -564,6 +593,22 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
             showToast(t('project.bulkDeleted', 'Projects deleted'), 'success');
           } catch {
             showToast(t('project.bulkDeleteError', 'Failed to delete projects'), 'error');
+          }
+        }}
+      />
+
+      <HierarchicalBulkDecisionModal
+        open={isBulkDecisionModalOpen}
+        onClose={() => { setIsBulkDecisionModalOpen(false); clearSelection(); }}
+        demands={bulkDecisionDemands}
+        onSubmit={async (decisions) => {
+          try {
+            await approveDemandMatrix({ decisions });
+            showToast(t('management.success.approved'), 'success');
+            setIsBulkDecisionModalOpen(false);
+            clearSelection();
+          } catch {
+            showToast(t('error.failed', 'Failed to approve demands'), 'error');
           }
         }}
       />
