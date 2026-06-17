@@ -1349,3 +1349,51 @@ Both scripts are production-ready and tested for structural correctness (syntax 
 
 **Integration Complete:** All 6 branches merged to `dev`. TypeScript compilation verified on each branch before merge.
 
+
+---
+
+## Session 4: Advanced Bulk Decisions Matrix, Conditional Approval States, Analytics (2026-06-17)
+
+**Objective:** Implement unrestricted cross-service bulk selection, hierarchical bulk decision matrix with per-demand quantity control, 10-option conditional approval state machine, and Recharts-based analytics dashboard.
+
+### Branch 1: Unrestricted Bulk Selection ✅
+- **Branch:** `feature/bulk-select-unrestricted`
+- **Files:** `RequirementsView.tsx`, `DemandsTable.tsx`, `BulkDecisionModal.tsx`
+- **Changes:**
+  - Removed `lockedCenter` and `lockedResource` state entirely
+  - Simplified `handleToggleSelect` to just toggle IDs in/out of `selectedDemandIds`
+  - Removed checkbox `disabled` condition in `DemandsTable` — all rows selectable
+  - Removed locked info display section from `BulkDecisionModal`
+- **Result:** Users can now select any arbitrary combination of demands across any services/resources
+- **Commit:** 098b241
+
+### Branch 2: Hierarchical Bulk Decision Modal ✅
+- **Branch:** `feature/hierarchical-bulk-decision`
+- **Files:** NEW `HierarchicalBulkDecisionModal.tsx`, `RequirementsView.tsx`, `apiService.ts`, `api/types.ts`, `demand.controller.ts`, `demand.service.ts`, `demand.routes.ts`
+- **Implementation:**
+  - Created `HierarchicalBulkDecisionModal` component with:
+    - Project-level tabs (one per distinct project in selection)
+    - Service blocks within each project tab
+    - Per-demand rows with requested qty and editable approval qty inputs
+    - Auto-computed approval percentage
+  - Added `MatrixDecision` type and `BulkApproveMatrixPayload` to `api/types.ts`
+  - Added `approveDemandMatrix()` API function in `apiService.ts`
+  - Backend `approveMatrix` handler:
+    - Route: `PATCH /api/demands/bulk/approve-matrix`
+    - Validates decision structure and statuses
+    - Runs `updateMany` per decision in parallel (only updates Pending demands)
+    - Returns total count of updated demands
+  - Service method `approveMatrix` uses transactional updates via `Promise.all`
+  - Wired modal into `RequirementsView`, replacing old `BulkDecisionModal`
+  - Passes selected demands filtered from `accumulatedDemands` to modal
+  - onSubmit calls `approveDemandMatrix()`, resets state and pagination
+- **Result:** Moderators can now approve multiple cross-service demands with individual quantity controls in a single hierarchical dialog
+- **Commits:** 0c7c37c (client), 8560a2f (server + integration)
+
+---
+
+**Current Status:** Branches 1 & 2 complete and merged to dev. TypeScript verified.
+
+**Remaining work:** 
+- **Branch 3:** Add 5 new `DemandStatus` enum values, 2 new `Demand` fields, rebuild `DecisionModal` with 10 sub-decision options with dynamic form fields
+- **Branch 4:** Install Recharts, add Pie/Bar charts to `AdminDashboard`, enhance `GET /api/admin/stats` with `openConditional` breakdown
