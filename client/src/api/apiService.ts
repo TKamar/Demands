@@ -486,10 +486,10 @@ export const apiService = {
 // ── Cloud Monitor ──────────────────────────────────────────────────────────
 
 export const getCloudMonitor = (): Promise<CloudMonitorData> =>
-  api.get('/cloud-monitor').then((r) => r.data);
+  api.get('/api/cloud-monitor').then((r) => r.data);
 
 export const updateCloudMonitorStatus = (
   id: number,
   data: { status: string; reason: string; tag: string }
 ): Promise<CloudResourceStatusEntry> =>
-  api.put(`/cloud-monitor/${id}`, data).then((r) => r.data);
+  api.put(`/api/cloud-monitor/${id}`, data).then((r) => r.data);
