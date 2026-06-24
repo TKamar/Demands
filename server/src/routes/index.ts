@@ -40,6 +40,9 @@ import emergencyOptionRoutes from "./request/emergencyOption.routes";
 // Notification routes
 import notificationRoutes from "./notification/notification.routes";
 
+// Cloud Monitor routes
+import cloudMonitorRoutes from "./cloud-monitor/cloudMonitor.routes";
+
 // Excel routes
 import { excelController, upload } from "../controllers/excel/excel.controller";
 
@@ -109,6 +112,9 @@ router.use("/emergency-options", emergencyOptionRoutes);
 
 // Notification endpoints
 router.use("/notifications", notificationRoutes);
+
+// Cloud Monitor endpoints
+router.use("/cloud-monitor", cloudMonitorRoutes);
 
 // Admin stats endpoint
 router.get('/admin/stats', authenticate, requireAuth, (req, res) =>

@@ -29,6 +29,13 @@
 - 72 CloudResourceStatus rows seeded (already present from migration)
 - Next: Backend controller + routes (Task 4)
 
+### Task 4: Backend Controller & Routes ✅
+- cloudMonitor.controller.ts: getAll (nested tree) + update (validated upsert)
+- cloudMonitor.routes.ts: GET (requireAuth) + PUT (requireModerator)
+- Registered at /api/cloud-monitor in routes/index.ts
+- TypeScript compiles cleanly
+- Next: Frontend types + API service (Task 5)
+
 ---
 
 ## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)
