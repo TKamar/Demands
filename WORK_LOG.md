@@ -17,6 +17,12 @@
 - Design doc and plan committed
 - Next: Prisma schema migration (Task 2)
 
+### Task 2: Prisma Schema Migration ✅
+- CloudResourceStatus model added with FK relations to Base, Network, Cluster
+- Reverse relations added to Base, Network, Cluster models
+- Migration applied successfully (20260624112748_add_cloud_resource_status)
+- Next: Seed data (Task 3)
+
 ---
 
 ## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)

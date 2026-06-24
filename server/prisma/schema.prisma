@@ -59,12 +59,13 @@ model Section {
 // ============================================
 
 model Base {
-  name        String     @id
-  displayName String?
-  isActive    Boolean    @default(true)
-  locations   Location[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  name           String                   @id
+  displayName    String?
+  isActive       Boolean                  @default(true)
+  locations      Location[]
+  cloudStatuses  CloudResourceStatus[]
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
 }
 
 model Environment {
@@ -77,21 +78,23 @@ model Environment {
 }
 
 model Network {
-  name        String     @id
-  displayName String?
-  isActive    Boolean    @default(true)
-  locations   Location[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  name           String                   @id
+  displayName    String?
+  isActive       Boolean                  @default(true)
+  locations      Location[]
+  cloudStatuses  CloudResourceStatus[]
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
 }
 
 model Cluster {
-  name        String     @id
-  displayName String?
-  isActive    Boolean    @default(true)
-  locations   Location[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  name           String                   @id
+  displayName    String?
+  isActive       Boolean                  @default(true)
+  locations      Location[]
+  cloudStatuses  CloudResourceStatus[]
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
 }
 
 model Location {
@@ -360,4 +363,23 @@ model Notification {
 
   @@index([recipientUsername, createdAt(sort: Desc)])
   @@index([isAdminBroadcast, createdAt(sort: Desc)])
+}
+
+model CloudResourceStatus {
+  id          Int      @id @default(autoincrement())
+  baseName    String
+  networkName String
+  clusterName String
+  service     String
+  status      String
+  reason      String
+  tag         String
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+
+  base    Base    @relation(fields: [baseName],    references: [name])
+  network Network @relation(fields: [networkName], references: [name])
+  cluster Cluster @relation(fields: [clusterName], references: [name])
+
+  @@unique([baseName, networkName, clusterName, service])
 }
