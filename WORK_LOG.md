@@ -69,6 +69,19 @@
 - TypeScript clean, no compiler errors
 - Branch ready for PR to dev
 
+## Critical Bug Fix: Migration SQL & Defensive Frontend (2026-06-25)
+
+**Root Cause:** Migration file `20260624112748_add_cloud_resource_status/migration.sql` contained wrong DDL (AlterEnum instead of CREATE TABLE), causing server crash on startup with P2021 "table does not exist" error.
+
+**Fixes Applied:**
+1. Corrected migration SQL file with proper CREATE TABLE "CloudResourceStatus" DDL
+2. Created new migration `20260625000001_create_cloud_resource_status_table` with idempotent table creation
+3. Added defensive error state to CloudMonitorPanel: error message + retry button on fetch failure
+4. Added empty-data guards in CustomerView and OpsTree components
+5. Restarting server container to apply migrations and seed data
+
+**Status:** Ready for container restart.
+
 ---
 
 ## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)

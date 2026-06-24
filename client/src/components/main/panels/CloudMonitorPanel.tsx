@@ -91,6 +91,9 @@ interface ViewProps {
 }
 
 function CustomerView({ data, editMode, onEdit }: ViewProps) {
+  if (Object.keys(data).length === 0) {
+    return <div className="flex items-center justify-center p-12 text-text-secondary text-sm">אין נתונים להצגה</div>;
+  }
   return (
     <div className="overflow-x-auto" dir="rtl">
       <table className="w-full text-sm border-collapse">
@@ -165,6 +168,10 @@ function OpsTree({ data, editMode, onEdit }: ViewProps) {
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const isOpen = (key: string) => open[key] !== false;
   const toggle = (key: string) => setOpen((prev) => ({ ...prev, [key]: !isOpen(key) }));
+
+  if (Object.keys(data).length === 0) {
+    return <div className="flex items-center justify-center p-12 text-text-secondary text-sm">אין נתונים להצגה</div>;
+  }
 
   return (
     <div className="space-y-2 p-4" dir="rtl">
@@ -328,16 +335,19 @@ export default function CloudMonitorPanel() {
 
   const [data,     setData]     = useState<CloudMonitorData>({});
   const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState<string | null>(null);
   const [view,     setView]     = useState<'customer' | 'ops'>('customer');
   const [editMode, setEditMode] = useState(false);
   const [popover,  setPopover]  = useState<PopoverState | null>(null);
 
   const fetchData = useCallback(async () => {
+    setError(null);
     try {
       const result = await getCloudMonitor();
       setData(result);
     } catch (err) {
       console.error('Failed to fetch cloud monitor data', err);
+      setError('שגיאה בטעינת נתוני הזמינות. אנא נסה שוב.');
     } finally {
       setLoading(false);
     }
@@ -363,6 +373,20 @@ export default function CloudMonitorPanel() {
     return (
       <div className="flex items-center justify-center h-full text-text-secondary text-sm">
         טוען נתוני זמינות...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center space-y-2">
+          <p className="text-red-600 text-sm">{error}</p>
+          <button onClick={fetchData}
+            className="px-3 py-1.5 text-xs border border-divider rounded-lg text-text-secondary hover:bg-bg-paper">
+            נסה שוב
+          </button>
+        </div>
       </div>
     );
   }
