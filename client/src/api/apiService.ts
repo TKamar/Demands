@@ -1,5 +1,5 @@
 import api from './axiosInstance';
-import type { Demand, Project, AppUser } from '../types/domain';
+import type { Demand, Project, AppUser, CloudMonitorData, CloudResourceStatusEntry } from '../types/domain';
 
 import type {
   ReferenceItem,
@@ -482,3 +482,14 @@ export const apiService = {
   getAllServices,
   getUsers: fetchUsers,
 };
+
+// ── Cloud Monitor ──────────────────────────────────────────────────────────
+
+export const getCloudMonitor = (): Promise<CloudMonitorData> =>
+  api.get('/cloud-monitor').then((r) => r.data);
+
+export const updateCloudMonitorStatus = (
+  id: number,
+  data: { status: string; reason: string; tag: string }
+): Promise<CloudResourceStatusEntry> =>
+  api.put(`/cloud-monitor/${id}`, data).then((r) => r.data);

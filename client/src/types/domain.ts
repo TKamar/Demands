@@ -82,3 +82,22 @@ export interface Demand {
   prerequisiteDemandId?: number;
   isInternalTicket?: boolean;
 }
+
+// ── Cloud Monitor ──────────────────────────────────────────────────────────
+
+export type CloudStatus = 'green' | 'yellow' | 'red';
+export type CloudTag    = 'OK' | 'CAPACITY' | 'CLIENT_PROCESS' | 'MAINTENANCE';
+
+export interface CloudResourceStatusEntry {
+  id:        number;
+  status:    CloudStatus;
+  reason:    string;
+  tag:       CloudTag;
+  updatedAt: string;
+  updatedBy: string | null;
+}
+
+export type CloudMonitorCluster = Record<string, CloudResourceStatusEntry>;
+export type CloudMonitorNetwork = { clusters: Record<string, CloudMonitorCluster> };
+export type CloudMonitorSite    = { networks: Record<string, CloudMonitorNetwork> };
+export type CloudMonitorData    = Record<string, CloudMonitorSite>;

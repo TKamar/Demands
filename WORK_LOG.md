@@ -36,6 +36,13 @@
 - TypeScript compiles cleanly
 - Next: Frontend types + API service (Task 5)
 
+### Task 5: Frontend Types & API Service ✅
+- CloudResourceStatusEntry, CloudMonitorData, CloudMonitorSite/Network/Cluster types added to domain.ts
+- getCloudMonitor() and updateCloudMonitorStatus() added to apiService.ts
+- Imports updated
+- TypeScript compiles without errors
+- Next: Tab registration (Task 6)
+
 ---
 
 ## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)
