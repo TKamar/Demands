@@ -511,8 +511,19 @@
     "username": "שם משתמש",
     "fullName": "שם מלא",
     "role": "תפקיד",
-    "center": "מרכז",
-    "selectCenter": "-- בחר מרכז --"
+    "center": "מרכז משויך",
+    "selectCenter": "-- בחר מרכז --",
+    "editUser": "עריכת משתמש",
+    "updateSuccess": "המשתמש עודכן בהצלחה",
+    "updateError": "עדכון המשתמש נכשל",
+    "managedServices": "שירותים מנוהלים",
+    "centerOrServices": "מרכז / שירותים",
+    "roles": {
+      "ADMIN": "מנהל",
+      "MODERATOR": "רפרנט",
+      "CENTER_MANAGER": "מנהל מרכז",
+      "REGULAR_USER": "משתמש רגיל"
+    }
   },
   "status": {
     "PendingCenterManager": "ממתין לאישור מנהל מרכז",

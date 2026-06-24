@@ -6,7 +6,7 @@ import { fetchUsers, updateUser, fetchCenters, fetchServices } from '../../api/a
 import Modal from '../common/Modal';
 import { useToast } from '../common/Toast';
 
-interface ReferenceItem { name: string; }
+interface ReferenceItem { name: string; displayName?: string; isActive?: boolean; }
 
 const ROLES: UserRole[] = ['ADMIN', 'MODERATOR', 'CENTER_MANAGER', 'REGULAR_USER'];
 
@@ -15,6 +15,13 @@ const ROLE_BADGE: Record<UserRole, string> = {
   MODERATOR: 'bg-blue-100 text-blue-700',
   CENTER_MANAGER: 'bg-green-100 text-green-700',
   REGULAR_USER: 'bg-gray-100 text-gray-600',
+};
+
+const ROLE_LABEL_DEFAULTS: Record<UserRole, string> = {
+  ADMIN: 'מנהל',
+  MODERATOR: 'רפרנט',
+  CENTER_MANAGER: 'מנהל מרכז',
+  REGULAR_USER: 'משתמש רגיל',
 };
 
 export const UserManagement: React.FC = () => {
@@ -40,7 +47,7 @@ export const UserManagement: React.FC = () => {
     Promise.all([fetchUsers(), fetchCenters(), fetchServices()])
       .then(([u, c, s]) => {
         setUsers(u);
-        setCenters(c);
+        setCenters(c.filter(x => x.isActive !== false));
         setServices(s);
       })
       .finally(() => setIsLoading(false));
@@ -172,12 +179,6 @@ export const UserManagement: React.FC = () => {
               Set Role → Moderator
             </button>
             <button
-              onClick={() => handleBulkRoleChange('CENTER_MANAGER')}
-              className="px-3 py-2 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition"
-            >
-              Set Role → Center Manager
-            </button>
-            <button
               onClick={() => handleBulkRoleChange('REGULAR_USER')}
               className="px-3 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition"
             >
@@ -306,7 +307,7 @@ export const UserManagement: React.FC = () => {
               className="px-4 py-2 border border-divider rounded-xl outline-none focus:border-primary transition-colors bg-bg-paper text-text-primary text-sm w-full"
             >
               {ROLES.map(r => (
-                <option key={r} value={r}>{r}</option>
+                <option key={r} value={r}>{t(`users.roles.${r}`, ROLE_LABEL_DEFAULTS[r])}</option>
               ))}
             </select>
           </div>
@@ -324,7 +325,7 @@ export const UserManagement: React.FC = () => {
               >
                 <option value="">{t('users.selectCenter')}</option>
                 {centers.map(c => (
-                  <option key={c.name} value={c.name}>{c.name}</option>
+                  <option key={c.name} value={c.name}>{c.displayName ?? c.name}</option>
                 ))}
               </select>
             </div>
@@ -361,8 +362,8 @@ export const UserManagement: React.FC = () => {
             </button>
             <button
               onClick={handleSave}
-              disabled={isSaving}
-              className={`px-4 py-2 bg-text-primary text-bg-paper rounded-xl hover:bg-black transition-colors border-none cursor-pointer font-medium${isSaving ? ' opacity-70 cursor-not-allowed' : ''}`}
+              disabled={isSaving || (draftRole === 'CENTER_MANAGER' && !draftCenter)}
+              className={`px-4 py-2 bg-text-primary text-bg-paper rounded-xl hover:bg-black transition-colors border-none cursor-pointer font-medium${isSaving || (draftRole === 'CENTER_MANAGER' && !draftCenter) ? ' opacity-70 cursor-not-allowed' : ''}`}
             >
               {isSaving ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
             </button>

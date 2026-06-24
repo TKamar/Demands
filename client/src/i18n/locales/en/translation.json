@@ -512,7 +512,18 @@
     "fullName": "Full Name",
     "role": "Role",
     "center": "Center",
-    "selectCenter": "-- Select Center --"
+    "selectCenter": "-- Select Center --",
+    "editUser": "Edit User",
+    "updateSuccess": "User updated successfully",
+    "updateError": "Failed to update user",
+    "managedServices": "Managed Services",
+    "centerOrServices": "Center / Services",
+    "roles": {
+      "ADMIN": "Admin",
+      "MODERATOR": "Moderator",
+      "CENTER_MANAGER": "Center Manager",
+      "REGULAR_USER": "Regular User"
+    }
   },
   "status": {
     "PendingCenterManager": "Pending CM Approval",

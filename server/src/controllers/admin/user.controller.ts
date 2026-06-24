@@ -29,6 +29,9 @@ export const userController = {
     ) {
       return res.status(400).json({ message: 'managedServices must be an array of strings' });
     }
+    if (role === UserRole.CENTER_MANAGER && (!centerName || typeof centerName !== 'string')) {
+      return res.status(400).json({ message: 'centerName is required for CENTER_MANAGER role' });
+    }
     try {
       const updated = await userService.updateRoleAndCenter(
         username,

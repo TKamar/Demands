@@ -1540,4 +1540,56 @@ Both scripts are production-ready and tested for structural correctness (syntax 
 - TypeScript compilation verified on client side (server not modified in this session)
 - Decision modal logic is now unified across both demand views
 - Multi-project bulk decisions now available from ProjectsAccordion
+
+---
+
+## Session N: Admin User Management — Center Manager Role Assignment & Dynamic Scoping (2026-06-24)
+
+**Branch:** `feature/admin-assign-center-manager`
+**Objective:** Complete the Center Manager role assignment feature by adding save guards, filtering inactive centers, removing broken bulk actions, adding Hebrew labels, and backend validation.
+
+### Implementation Summary
+
+**Files Modified:**
+
+1. **`client/src/components/settings/UserManagement.tsx`**
+   - Extended local `ReferenceItem` interface to include `displayName` and `isActive` fields
+   - Filter out inactive centers on mount: `setCenters(c.filter(x => x.isActive !== false))`
+   - Center dropdown now displays `displayName ?? name` instead of raw `name`
+   - Added `ROLE_LABEL_DEFAULTS` map with Hebrew labels for all roles
+   - Updated role `<select>` to render translated role names: `t('users.roles.${r}', ROLE_LABEL_DEFAULTS[r])`
+   - Disabled Save button when role is CENTER_MANAGER and no center is selected: `disabled={isSaving || (draftRole === 'CENTER_MANAGER' && !draftCenter)}`
+   - Removed broken "Set Role → Center Manager" button from bulk toolbar (bulk CM assignment requires individual center selection)
+
+2. **`server/src/controllers/admin/user.controller.ts`**
+   - Added explicit guard before service call: if `role === CENTER_MANAGER && (!centerName || typeof centerName !== 'string')`, return `400 { message: 'centerName is required for CENTER_MANAGER role' }`
+   - Prevents orphaned manager states and provides clear UX feedback
+
+3. **`client/src/i18n/locales/he/translation.json`**
+   - Updated `users.center` from "מרכז" to "מרכז משויך" (bound center)
+   - Added missing keys: `editUser`, `updateSuccess`, `updateError`, `managedServices`, `centerOrServices`
+   - Added `users.roles` object with Hebrew translations: ADMIN → "מנהל", MODERATOR → "רפרנט", CENTER_MANAGER → "מנהל מרכז", REGULAR_USER → "משתמש רגיל"
+
+4. **`client/src/i18n/locales/en/translation.json`**
+   - Added missing keys: `editUser`, `updateSuccess`, `updateError`, `managedServices`, `centerOrServices`
+   - Added `users.roles` object with English translations
+
+### Verification Checklist
+
+✅ Frontend:
+- Center Manager role displays as "מנהל מרכז" in dropdown
+- "מרכז משויך" label appears above center selection field
+- Center dropdown shows only active centers with displayName rendering
+- Save button is disabled until center is selected for CM role
+- Role changes clear unrelated fields (center clears for non-CM roles)
+- Bulk toolbar has no CM button (individual assignment required)
+
+✅ Backend:
+- PATCH /api/users/:username with role=CENTER_MANAGER + no centerName → 400 with clear message
+- PATCH /api/users/:username with role=CENTER_MANAGER + centerName → 200, user.centerName updated
+- Service layer: centerName required for CM, cleared for other roles, transaction-safe
+
+✅ i18n:
+- All modal labels and messages use translation keys with Hebrew fallbacks
+- All role names display in user's selected language
 - Strict layout boundaries applied to modals and data tables — no more fluid resizing or overlapping labels
