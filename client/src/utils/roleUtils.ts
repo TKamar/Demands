@@ -7,8 +7,8 @@ export const getDefaultTab = (role: UserRole): TopNavTabId =>
   role === 'REGULAR_USER' ? 'myRequests' : 'approvalRequests';
 
 export const getAvailableTabs = (role: UserRole): TopNavTabId[] => {
-  if (role === 'REGULAR_USER') return ['myRequests', 'history'];
-  const base: TopNavTabId[] = ['approvalRequests', 'myRequests', 'history'];
+  if (role === 'REGULAR_USER') return ['myRequests', 'history', 'cloudMonitor'];
+  const base: TopNavTabId[] = ['approvalRequests', 'myRequests', 'history', 'cloudMonitor'];
   if (role === 'ADMIN') return [...base, 'dashboard'];
   return base;
 };

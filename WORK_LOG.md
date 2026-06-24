@@ -43,6 +43,14 @@
 - TypeScript compiles without errors
 - Next: Tab registration (Task 6)
 
+### Task 6: Tab Registration ✅
+- TopNavTabId union expanded with 'cloudMonitor'
+- getAvailableTabs: 'cloudMonitor' added for ALL roles
+- i18n: "זמינות משאבים" / "Resource Availability" added to both locales
+- MainPage.tsx: DEFAULT_SUBVIEWS updated, CloudMonitorPanel stub mounted
+- TypeScript compiles cleanly
+- Next: CloudMonitorPanel full implementation (Task 7)
+
 ---
 
 ## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)

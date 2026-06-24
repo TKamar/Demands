@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { UserRole } from '../../types/domain';
 import { getAvailableTabs } from '../../utils/roleUtils';
 
-export type TopNavTabId = 'approvalRequests' | 'myRequests' | 'history' | 'dashboard';
+export type TopNavTabId = 'approvalRequests' | 'myRequests' | 'history' | 'dashboard' | 'cloudMonitor';
 
 interface TopNavTabsProps {
   activeTab: TopNavTabId;
@@ -19,6 +19,7 @@ export const TopNavTabs: React.FC<TopNavTabsProps> = ({ activeTab, onTabChange, 
     myRequests: t('tabs.requestsIOpened'),
     history: t('tabs.requestHistory'),
     dashboard: 'דאשבוארד',
+    cloudMonitor: t('tabs.resourceAvailability'),
   };
 
   const availableTabs = getAvailableTabs(role);

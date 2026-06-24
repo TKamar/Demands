@@ -543,7 +543,8 @@
   "tabs": {
     "myApprovalRequests": "בקשות לאישור שלי",
     "requestsIOpened": "הבקשות שפתחתי",
-    "requestHistory": "היסטוריית דרישות"
+    "requestHistory": "היסטוריית דרישות",
+    "resourceAvailability": "זמינות משאבים"
   },
   "approvalRequests": { "empty": "אין בקשות ממתינות לאישור" },
   "myRequests": { "empty": "לא פתחת בקשות עדיין" },

@@ -5,6 +5,7 @@ import ApprovalRequestsPanel from '../components/main/panels/ApprovalRequestsPan
 import MyRequestsPanel from '../components/main/panels/MyRequestsPanel';
 import HistoryPanel from '../components/main/panels/HistoryPanel';
 import AdminDashboard from '../components/admin/AdminDashboard';
+import CloudMonitorPanel from '../components/main/panels/CloudMonitorPanel';
 import CenterFilter from '../components/main/CenterFilter';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { getDefaultTab, isModeratorOrAdmin } from '../utils/roleUtils';
@@ -18,6 +19,7 @@ const DEFAULT_SUBVIEWS: Record<TopNavTabId, SubViewId> = {
   myRequests: 'projects',
   history: 'requirements',
   dashboard: 'projects' as SubViewId,
+  cloudMonitor: 'projects' as SubViewId,
 };
 
 export default function MainPage() {
@@ -85,6 +87,7 @@ export default function MainPage() {
             />
           )}
           {topNavTab === 'dashboard' && <AdminDashboard selectedCenters={selectedCenters} />}
+          {topNavTab === 'cloudMonitor' && <CloudMonitorPanel />}
         </div>
       </div>
     </NavigationContext.Provider>
