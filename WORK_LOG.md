@@ -6,6 +6,19 @@
 
 ---
 
+## Cloud Monitor Integration (2026-06-24)
+
+**Objective:** Integrate Cloud/Ops Resource Monitor Dashboard with Prisma persistence and RBAC controls.
+**Branch:** `feature/cloud-monitor-integration`
+
+### Task 1: Git Setup & Docs Structure ✅
+- Branch created: feature/cloud-monitor-integration
+- Docs structure created: docs/superpowers/specs/ and docs/superpowers/plans/
+- Design doc and plan committed
+- Next: Prisma schema migration (Task 2)
+
+---
+
 ## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)
 
 **Objective:** Fix UI regressions, improve navigation defaults, implement role-aware history visibility, and standardize table sorting/filtering across all views.
