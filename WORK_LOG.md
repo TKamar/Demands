@@ -23,6 +23,12 @@
 - Migration applied successfully (20260624112748_add_cloud_resource_status)
 - Next: Seed data (Task 3)
 
+### Task 3: Seed Data ✅
+- seedCloudMonitor() added to seed.ts with 72 Hebrew entries (4 sites, 3 networks, 2 clusters, 8 services)
+- Hebrew Base/Network/Cluster reference records upserted in seed function
+- 72 CloudResourceStatus rows seeded (already present from migration)
+- Next: Backend controller + routes (Task 4)
+
 ---
 
 ## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)

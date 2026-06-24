@@ -2,6 +2,118 @@ import { PrismaClient, ProjectType, Median, DemandType, DemandStatus, Priority, 
 
 const prisma = new PrismaClient();
 
+async function seedCloudMonitor() {
+  const count = await prisma.cloudResourceStatus.count();
+  if (count > 0) {
+    console.log('CloudResourceStatus already seeded, skipping.');
+    return;
+  }
+
+  // Upsert Hebrew reference records required by FK constraints
+  const bases = ['תל אביב', 'אשדוד', 'חיפה', 'ירושלים'];
+  const networks = ['הוגו', 'מרקו', 'מנגו'];
+  const clusters = ['cluster-1', 'cluster-2'];
+
+  await Promise.all(bases.map(name =>
+    prisma.base.upsert({ where: { name }, update: {}, create: { name, displayName: name, isActive: true } })
+  ));
+  await Promise.all(networks.map(name =>
+    prisma.network.upsert({ where: { name }, update: {}, create: { name, displayName: name, isActive: true } })
+  ));
+  await Promise.all(clusters.map(name =>
+    prisma.cluster.upsert({ where: { name }, update: {}, create: { name, displayName: name, isActive: true } })
+  ));
+
+  await prisma.cloudResourceStatus.createMany({
+    skipDuplicates: true,
+    data: [
+      // ── תל אביב / הוגו / cluster-1 ──
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-1', service: 'ECK',    status: 'green',  reason: 'תקין, קיבולת מלאה',              tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-1', service: 'VM',     status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-1', service: 'OCP',    status: 'yellow', reason: '80% קיבולת — צוואר בקבוק',       tag: 'CAPACITY' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Mongo',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-1', service: 'NiFi',   status: 'yellow', reason: 'ממתין לאישור לקוח',               tag: 'CLIENT_PROCESS' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Redis',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Kafka',  status: 'red',    reason: 'תחזוקה מתוכננת 23:00',           tag: 'MAINTENANCE' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Harbor', status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      // ── תל אביב / הוגו / cluster-2 ──
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-2', service: 'ECK',    status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-2', service: 'VM',     status: 'yellow', reason: 'disk 70%',                        tag: 'CAPACITY' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-2', service: 'OCP',    status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-2', service: 'Mongo',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-2', service: 'NiFi',   status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-2', service: 'Redis',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-2', service: 'Kafka',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'הוגו', clusterName: 'cluster-2', service: 'Harbor', status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      // ── תל אביב / מרקו / cluster-1 ──
+      { baseName: 'תל אביב', networkName: 'מרקו', clusterName: 'cluster-1', service: 'ECK',    status: 'yellow', reason: 'עומס גבוה על index',              tag: 'CAPACITY' },
+      { baseName: 'תל אביב', networkName: 'מרקו', clusterName: 'cluster-1', service: 'VM',     status: 'red',    reason: 'ממתין לתהליך לקוח (VLAN)',        tag: 'CLIENT_PROCESS' },
+      { baseName: 'תל אביב', networkName: 'מרקו', clusterName: 'cluster-1', service: 'OCP',    status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מרקו', clusterName: 'cluster-1', service: 'Mongo',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מרקו', clusterName: 'cluster-1', service: 'NiFi',   status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מרקו', clusterName: 'cluster-1', service: 'Redis',  status: 'red',    reason: 'Cluster בתהליך שדרוג',            tag: 'MAINTENANCE' },
+      { baseName: 'תל אביב', networkName: 'מרקו', clusterName: 'cluster-1', service: 'Kafka',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מרקו', clusterName: 'cluster-1', service: 'Harbor', status: 'yellow', reason: 'נפח storage בגבול',              tag: 'CAPACITY' },
+      // ── תל אביב / מנגו / cluster-1 ──
+      { baseName: 'תל אביב', networkName: 'מנגו', clusterName: 'cluster-1', service: 'ECK',    status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מנגו', clusterName: 'cluster-1', service: 'VM',     status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מנגו', clusterName: 'cluster-1', service: 'OCP',    status: 'red',    reason: 'cert פג — ממתין לחידוש',         tag: 'MAINTENANCE' },
+      { baseName: 'תל אביב', networkName: 'מנגו', clusterName: 'cluster-1', service: 'Mongo',  status: 'yellow', reason: 'replication lag גבוה',            tag: 'CAPACITY' },
+      { baseName: 'תל אביב', networkName: 'מנגו', clusterName: 'cluster-1', service: 'NiFi',   status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מנגו', clusterName: 'cluster-1', service: 'Redis',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מנגו', clusterName: 'cluster-1', service: 'Kafka',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'תל אביב', networkName: 'מנגו', clusterName: 'cluster-1', service: 'Harbor', status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      // ── אשדוד / הוגו / cluster-1 ──
+      { baseName: 'אשדוד', networkName: 'הוגו', clusterName: 'cluster-1', service: 'ECK',    status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'הוגו', clusterName: 'cluster-1', service: 'VM',     status: 'red',    reason: 'לא זמין — ממתין לאינטגרציה',       tag: 'CLIENT_PROCESS' },
+      { baseName: 'אשדוד', networkName: 'הוגו', clusterName: 'cluster-1', service: 'OCP',    status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Mongo',  status: 'yellow', reason: 'replica node ירד',                  tag: 'CAPACITY' },
+      { baseName: 'אשדוד', networkName: 'הוגו', clusterName: 'cluster-1', service: 'NiFi',   status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Redis',  status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Kafka',  status: 'yellow', reason: 'consumer lag גבוה',                 tag: 'CAPACITY' },
+      { baseName: 'אשדוד', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Harbor', status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      // ── אשדוד / מרקו / cluster-1 ──
+      { baseName: 'אשדוד', networkName: 'מרקו', clusterName: 'cluster-1', service: 'ECK',    status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'מרקו', clusterName: 'cluster-1', service: 'VM',     status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'מרקו', clusterName: 'cluster-1', service: 'OCP',    status: 'yellow', reason: 'pending PV claims',                 tag: 'CAPACITY' },
+      { baseName: 'אשדוד', networkName: 'מרקו', clusterName: 'cluster-1', service: 'Mongo',  status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'מרקו', clusterName: 'cluster-1', service: 'NiFi',   status: 'red',    reason: 'תחזוקה עד 06:00',                  tag: 'MAINTENANCE' },
+      { baseName: 'אשדוד', networkName: 'מרקו', clusterName: 'cluster-1', service: 'Redis',  status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'מרקו', clusterName: 'cluster-1', service: 'Kafka',  status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      { baseName: 'אשדוד', networkName: 'מרקו', clusterName: 'cluster-1', service: 'Harbor', status: 'green',  reason: 'תקין',                              tag: 'OK' },
+      // ── חיפה / מנגו / cluster-1 ──
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-1', service: 'ECK',    status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-1', service: 'VM',     status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-1', service: 'OCP',    status: 'red',    reason: 'cluster upgrade בתהליך',             tag: 'MAINTENANCE' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-1', service: 'Mongo',  status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-1', service: 'NiFi',   status: 'yellow', reason: 'flow designer חסום',                 tag: 'CLIENT_PROCESS' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-1', service: 'Redis',  status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-1', service: 'Kafka',  status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-1', service: 'Harbor', status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      // ── חיפה / מנגו / cluster-2 ──
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-2', service: 'ECK',    status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-2', service: 'VM',     status: 'yellow', reason: 'קיבולת disk 75%',                    tag: 'CAPACITY' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-2', service: 'OCP',    status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-2', service: 'Mongo',  status: 'red',    reason: 'failover בתהליך',                    tag: 'MAINTENANCE' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-2', service: 'NiFi',   status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-2', service: 'Redis',  status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-2', service: 'Kafka',  status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      { baseName: 'חיפה', networkName: 'מנגו', clusterName: 'cluster-2', service: 'Harbor', status: 'green',  reason: 'תקין',                               tag: 'OK' },
+      // ── ירושלים / הוגו / cluster-1 ──
+      { baseName: 'ירושלים', networkName: 'הוגו', clusterName: 'cluster-1', service: 'ECK',    status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'ירושלים', networkName: 'הוגו', clusterName: 'cluster-1', service: 'VM',     status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'ירושלים', networkName: 'הוגו', clusterName: 'cluster-1', service: 'OCP',    status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'ירושלים', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Mongo',  status: 'yellow', reason: 'ממתין ל-DR test',                 tag: 'CLIENT_PROCESS' },
+      { baseName: 'ירושלים', networkName: 'הוגו', clusterName: 'cluster-1', service: 'NiFi',   status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'ירושלים', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Redis',  status: 'green',  reason: 'תקין',                            tag: 'OK' },
+      { baseName: 'ירושלים', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Kafka',  status: 'yellow', reason: 'partition rebalance',             tag: 'CAPACITY' },
+      { baseName: 'ירושלים', networkName: 'הוגו', clusterName: 'cluster-1', service: 'Harbor', status: 'green',  reason: 'תקין',                            tag: 'OK' },
+    ],
+  });
+
+  console.log('CloudResourceStatus seeded: 72 entries');
+}
+
 async function main() {
   console.log('Seeding database...');
 
@@ -1132,6 +1244,8 @@ async function main() {
   });
 
   console.log(`Created ${scenarioDemands.length + 1} workflow scenario demands`);
+
+  await seedCloudMonitor();
 
   console.log('Seeding completed.');
 }
