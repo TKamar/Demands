@@ -59,6 +59,16 @@
 - TypeScript compiles cleanly
 - Next: Final verification and PR prep (Task 8)
 
+### Task 8: Final Verification & PR Prep ✅
+- All end-to-end checks verified:
+  * Backend: GET /api/cloud-monitor returns nested tree, PUT enforces RBAC
+  * Frontend: "זמינות משאבים" tab visible for all roles
+  * Edit button visible only to ADMIN/MODERATOR
+  * Customer view (heatmap) and Ops tree (collapsible) render correctly
+  * EditPopover opens/saves/cancels as expected
+- TypeScript clean, no compiler errors
+- Branch ready for PR to dev
+
 ---
 
 ## Session 2: Table Popovers, Default Routing, History Scoping & Unified Filters (2026-06-15)
