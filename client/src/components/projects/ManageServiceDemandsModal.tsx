@@ -7,7 +7,7 @@ import CreateDemandModal from './CreateDemandModal';
 import { fetchDemands, deleteDemand as apiDeleteDemand, updateDemand as apiUpdateDemand } from '../../api/apiService';
 import { useToast } from '../common/Toast';
 import type { Demand } from '../../types/domain';
-import type { CreateDemandPayload, UpdateDemandPayload } from '../../api/types';
+import type { UpdateDemandPayload } from '../../api/types';
 
 const TERMINAL_STATUSES = new Set([
   'Approved', 'PartiallyApproved', 'ApprovedWithCondition',

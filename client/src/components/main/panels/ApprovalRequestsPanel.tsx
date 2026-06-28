@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdAdd, MdSearch } from 'react-icons/md';
-import { useModal } from '../../../contexts/ModalContext';
+import { MdSearch } from 'react-icons/md';
 import ProjectsAccordion from '../ProjectsAccordion';
 import RequirementsView from '../RequirementsView';
 import { MyApprovalRequests } from '../MyApprovalRequests';
@@ -25,7 +24,6 @@ export default function ApprovalRequestsPanel({
   selectedCenters,
 }: ApprovalRequestsPanelProps) {
   const { t } = useTranslation();
-  const { openModal } = useModal();
   const [resourceSummaryOpen, setResourceSummaryOpen] = useState(false);
 
   const isCM = role === 'CENTER_MANAGER';
@@ -70,7 +68,9 @@ export default function ApprovalRequestsPanel({
             <MdSearch size={16} className="text-text-secondary" />
             <span className="text-sm text-text-secondary">{t('main.search.placeholder', 'Search...')}</span>
           </div>
-          <ExcelToolbar selectedCenters={selectedCenters} showImport={false} className="ms-auto" />
+          <div className="ms-auto">
+            <ExcelToolbar selectedCenters={selectedCenters} showImport={false} />
+          </div>
         </div>
       )}
 

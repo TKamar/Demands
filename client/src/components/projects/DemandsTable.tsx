@@ -360,9 +360,9 @@ export default function DemandsTable({
                   key={col.key}
                   label={t(col.label)}
                   sortKey={sortKey}
-                  currentSortKey={sortState?.field}
+                  currentSortKey={sortState?.field as string | undefined}
                   currentSortDir={sortState?.direction}
-                  onSort={onColumnSort}
+                  onSort={(key: string) => onColumnSort?.(key as DemandSortKey)}
                   className="bg-bg-default"
                 />
               ) : (

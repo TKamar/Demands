@@ -9,7 +9,7 @@ import { useToast } from '../common/Toast';
 import { useReferenceData } from '../../hooks/useReferenceData';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { createDemand, fetchDemands, updateDemand as apiUpdateDemand, cancelDemand as apiCancelDemand } from '../../api/apiService';
-import type { Project, ProjectType, Median, Demand } from '../../types/domain';
+import type { Project, ProjectType, Demand } from '../../types/domain';
 import type { CreateProjectPayload, UpdateProjectPayload, Priority, UpdateDemandPayload } from '../../api/types';
 
 interface CreateProjectModalProps {
@@ -39,6 +39,8 @@ const initialForm = {
   cluster: '',
   purpose: '',
   emergencyOption: '',
+  median: '',
+  year: '',
   americaSystemName: '',
 };
 
@@ -151,7 +153,7 @@ export default function CreateProjectModal({
         center: editingProject.centerName || '',
         branch: editingProject.branchName || '',
         section: editingProject.sectionName || '',
-        requestType: editingProject.type,
+        requestType: editingProject.type || 'Semiannual',
         priority: editingProject.priority || '',
         projectKind: editingProject.kind || '',
         environment: editingProject.location.environment,
@@ -160,8 +162,9 @@ export default function CreateProjectModal({
         cluster: editingProject.location.cluster,
         purpose: editingProject.purpose,
         median: editingProject.median || '',
-        year: editingProject.year || '' as unknown as number,
+        year: (editingProject.year || '').toString(),
         emergencyOption: editingProject.emergencyOption || '',
+        americaSystemName: '',
       });
     } else if (!editingProject && isOpen) {
       setForm(initialForm);
@@ -291,10 +294,6 @@ export default function CreateProjectModal({
       label: v.displayName || v.name,
     }));
 
-  const medianOptions = (['H1', 'H2'] as Median[]).map((m) => ({
-    value: m,
-    label: m,
-  }));
 
   const emergencyOptionOptions = referenceData.emergencyOptions
     .filter((v) => v.isActive !== false || v.name === form.emergencyOption)
@@ -360,7 +359,8 @@ export default function CreateProjectModal({
       branchName: form.branch,
       sectionName: form.section,
       priority: form.priority as Priority,
-      americaSystemName: form.americaSystemName.trim() || undefined,
+      median: form.median ? (form.median as any) : undefined,
+      year: form.year ? Number(form.year) : undefined,
     };
 
     if (form.requestType === 'Emergency' && form.emergencyOption) {
@@ -451,7 +451,6 @@ export default function CreateProjectModal({
   }
 
   const placeholder = t('projects.createProject.selectOption');
-  const isSemiannual = form.requestType === 'Semiannual';
   const isEmergency = form.requestType === 'Emergency';
 
   return (

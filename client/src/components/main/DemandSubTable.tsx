@@ -8,7 +8,7 @@ import ServiceDecisionModal from '../management/ServiceDecisionModal';
 import { useDemands } from '../../hooks/useDemands';
 import { useToast } from '../common/Toast';
 import type { Demand } from '../../types/domain';
-import type { ApproveDemandPayload, RejectDemandPayload } from '../../api/types';
+import type { ApproveDemandPayload } from '../../api/types';
 
 export const ACTIVE_STATUSES = new Set(['PendingCenterManager', 'Pending', 'WaitingOnPrerequisite']);
 export const TERMINAL_STATUSES = new Set(['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled']);

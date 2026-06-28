@@ -24,16 +24,6 @@ const INITIAL_FILTERS: Record<ApprovalFilterKey, string> = {
   projectName: '',
 };
 
-const SORTABLE_KEYS: Record<ApprovalSortKey, ApprovalSortKey> = {
-  projectName: 'projectName',
-  serviceName: 'serviceName',
-  resourceName: 'resourceName',
-  value: 'value',
-  createdBy: 'createdBy',
-  createdAt: 'createdAt',
-  status: 'status',
-};
-
 const noop = () => {};
 
 export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprovalRequestsProps>(
@@ -100,12 +90,12 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
 
     const handleClearFilters = useCallback(() => setFilters(INITIAL_FILTERS), []);
 
-    const handleColumnSort = useCallback((key: ApprovalSortKey) => {
+    const handleColumnSort = useCallback((key: string) => {
       setSortState(prev => {
         if (prev.field === key) {
-          return { field: key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+          return { field: key as ApprovalSortKey, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
         }
-        return { field: key, direction: 'asc' };
+        return { field: key as ApprovalSortKey, direction: 'asc' };
       });
     }, []);
 
@@ -172,7 +162,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                   <SortableHeader
                     label={t('demands.project')}
                     sortKey="projectName"
-                    currentSortKey={sortState.field}
+                    currentSortKey={sortState.field as string | undefined}
                     currentSortDir={sortState.direction}
                     onSort={handleColumnSort}
                     align="end"
@@ -180,7 +170,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                   <SortableHeader
                     label={t('demands.service')}
                     sortKey="serviceName"
-                    currentSortKey={sortState.field}
+                    currentSortKey={sortState.field as string | undefined}
                     currentSortDir={sortState.direction}
                     onSort={handleColumnSort}
                     align="end"
@@ -188,7 +178,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                   <SortableHeader
                     label={t('demands.resource')}
                     sortKey="resourceName"
-                    currentSortKey={sortState.field}
+                    currentSortKey={sortState.field as string | undefined}
                     currentSortDir={sortState.direction}
                     onSort={handleColumnSort}
                     align="end"
@@ -196,7 +186,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                   <SortableHeader
                     label={t('demands.value')}
                     sortKey="value"
-                    currentSortKey={sortState.field}
+                    currentSortKey={sortState.field as string | undefined}
                     currentSortDir={sortState.direction}
                     onSort={handleColumnSort}
                     align="end"
@@ -204,7 +194,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                   <SortableHeader
                     label={t('demands.createdBy')}
                     sortKey="createdBy"
-                    currentSortKey={sortState.field}
+                    currentSortKey={sortState.field as string | undefined}
                     currentSortDir={sortState.direction}
                     onSort={handleColumnSort}
                     align="end"
@@ -212,7 +202,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                   <SortableHeader
                     label={t('demands.createdAt')}
                     sortKey="createdAt"
-                    currentSortKey={sortState.field}
+                    currentSortKey={sortState.field as string | undefined}
                     currentSortDir={sortState.direction}
                     onSort={handleColumnSort}
                     align="end"
@@ -220,7 +210,7 @@ export const MyApprovalRequests = forwardRef<MyApprovalRequestsHandle, MyApprova
                   <SortableHeader
                     label={t('common.status')}
                     sortKey="status"
-                    currentSortKey={sortState.field}
+                    currentSortKey={sortState.field as string | undefined}
                     currentSortDir={sortState.direction}
                     onSort={handleColumnSort}
                     align="end"
