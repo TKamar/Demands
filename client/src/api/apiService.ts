@@ -29,6 +29,7 @@ import type {
   BulkDecisionResult,
   BulkApproveMatrixPayload,
   UpdateUserPayload,
+  CloudResourceStatusFlat,
 } from './types';
 
 // --- Response mappers ---
@@ -495,3 +496,15 @@ export const updateCloudMonitorStatus = (
   data: { status: string; reason: string; tag: string }
 ): Promise<CloudResourceStatusEntry> =>
   api.put(`/api/cloud-monitor/${id}`, data).then((r) => r.data);
+
+export const fetchCloudResourceStatusFlat = (): Promise<CloudResourceStatusFlat[]> =>
+  api.get('/api/cloud-monitor/flat').then((r) => r.data);
+
+export const createCloudResourceStatus = (payload: any): Promise<CloudResourceStatusFlat> =>
+  api.post('/api/cloud-monitor', payload).then((r) => r.data);
+
+export const deleteCloudResourceStatus = (id: number): Promise<void> =>
+  api.delete(`/api/cloud-monitor/${id}`).then(() => undefined);
+
+export const fetchValidBoxLocations = (): Promise<LocationItem[]> =>
+  api.get('/api/locations?hasCloudStatus=true').then((r) => r.data);

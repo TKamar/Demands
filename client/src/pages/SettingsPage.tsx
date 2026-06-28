@@ -5,6 +5,7 @@ import { useAuth } from 'react-oidc-context';
 import { MdArrowBack } from 'react-icons/md';
 import CapacityManagement from '../components/management/CapacityManagement';
 import WalletManagement from '../components/management/WalletManagement';
+import CloudResourceManagement from '../components/management/CloudResourceManagement';
 import EntityManager from '../components/common/EntityManager';
 import { useReferenceData } from '../hooks/useReferenceData';
 import { UserManagement } from '../components/settings/UserManagement';
@@ -16,7 +17,7 @@ import type { UserRole } from '../types/domain';
 const getVisibleTabs = (role: UserRole): string[] => {
   switch (role) {
     case 'ADMIN':
-      return ['infrastructure', 'organization', 'options', 'services', 'capacity', 'wallets', 'users'];
+      return ['infrastructure', 'organization', 'options', 'services', 'capacity', 'cloudResources', 'wallets', 'users'];
     case 'MODERATOR':
       return ['services', 'capacity', 'wallets'];
     default:
@@ -71,8 +72,18 @@ function InfrastructureSettings({
                     endpoint="/api/bases"
                     onSuccess={onSuccess}
                     columns={[
-                        { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
-                        { key: 'displayName', label: t('common.displayName', 'Display Name') },
+                        {
+                            key: 'name',
+                            label: t('common.name', 'Name'),
+                            render: (item) => (
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-text-primary">{item.displayName || item.name}</span>
+                                    {item.displayName && (
+                                        <span className="text-xs text-text-secondary font-mono">{item.name}</span>
+                                    )}
+                                </div>
+                            ),
+                        },
                         { key: 'isActive', label: t('common.active', 'Active'), type: 'toggle' },
                     ]}
                     fields={[
@@ -87,8 +98,18 @@ function InfrastructureSettings({
                     endpoint="/api/environments"
                     onSuccess={onSuccess}
                     columns={[
-                        { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
-                        { key: 'displayName', label: t('common.displayName', 'Display Name') },
+                        {
+                            key: 'name',
+                            label: t('common.name', 'Name'),
+                            render: (item) => (
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-text-primary">{item.displayName || item.name}</span>
+                                    {item.displayName && (
+                                        <span className="text-xs text-text-secondary font-mono">{item.name}</span>
+                                    )}
+                                </div>
+                            ),
+                        },
                         { key: 'isActive', label: t('common.active', 'Active'), type: 'toggle' },
                     ]}
                     fields={[
@@ -103,8 +124,18 @@ function InfrastructureSettings({
                     endpoint="/api/networks"
                     onSuccess={onSuccess}
                     columns={[
-                        { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
-                        { key: 'displayName', label: t('common.displayName', 'Display Name') },
+                        {
+                            key: 'name',
+                            label: t('common.name', 'Name'),
+                            render: (item) => (
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-text-primary">{item.displayName || item.name}</span>
+                                    {item.displayName && (
+                                        <span className="text-xs text-text-secondary font-mono">{item.name}</span>
+                                    )}
+                                </div>
+                            ),
+                        },
                         { key: 'isActive', label: t('common.active', 'Active'), type: 'toggle' },
                     ]}
                     fields={[
@@ -119,8 +150,18 @@ function InfrastructureSettings({
                     endpoint="/api/clusters"
                     onSuccess={onSuccess}
                     columns={[
-                        { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
-                        { key: 'displayName', label: t('common.displayName', 'Display Name') },
+                        {
+                            key: 'name',
+                            label: t('common.name', 'Name'),
+                            render: (item) => (
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-text-primary">{item.displayName || item.name}</span>
+                                    {item.displayName && (
+                                        <span className="text-xs text-text-secondary font-mono">{item.name}</span>
+                                    )}
+                                </div>
+                            ),
+                        },
                         { key: 'isActive', label: t('common.active', 'Active'), type: 'toggle' },
                     ]}
                     fields={[
@@ -191,8 +232,18 @@ function OrganizationSettings({
                     endpoint="/api/centers"
                     onSuccess={onSuccess}
                     columns={[
-                        { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
-                        { key: 'displayName', label: t('common.displayName', 'Display Name') },
+                        {
+                            key: 'name',
+                            label: t('common.name', 'Name'),
+                            render: (item) => (
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-text-primary">{item.displayName || item.name}</span>
+                                    {item.displayName && (
+                                        <span className="text-xs text-text-secondary font-mono">{item.name}</span>
+                                    )}
+                                </div>
+                            ),
+                        },
                         { key: 'isActive', label: t('common.active', 'Active'), type: 'toggle' },
                     ]}
                     fields={[
@@ -208,8 +259,18 @@ function OrganizationSettings({
                     idField={['centerName', 'name']} // Order matters for API url: /branches/centerName/name
                     onSuccess={onSuccess}
                     columns={[
-                        { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
-                        { key: 'displayName', label: t('common.displayName', 'Display Name') },
+                        {
+                            key: 'name',
+                            label: t('common.name', 'Name'),
+                            render: (item) => (
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-text-primary">{item.displayName || item.name}</span>
+                                    {item.displayName && (
+                                        <span className="text-xs text-text-secondary font-mono">{item.name}</span>
+                                    )}
+                                </div>
+                            ),
+                        },
                         { key: 'centerName', label: t('settings.branch.center', 'Center') },
                         { key: 'isActive', label: t('common.active', 'Active'), type: 'toggle' },
                     ]}
@@ -227,8 +288,18 @@ function OrganizationSettings({
                     idField={['branchCenter', 'branchName', 'name']} // API: /sections/branchCenter/branchName/name
                     onSuccess={onSuccess}
                     columns={[
-                        { key: 'name', label: t('common.name', 'Name'), render: (item) => <span className="font-bold text-gray-900">{item.name}</span> },
-                        { key: 'displayName', label: t('common.displayName', 'Display Name') },
+                        {
+                            key: 'name',
+                            label: t('common.name', 'Name'),
+                            render: (item) => (
+                                <div className="flex flex-col">
+                                    <span className="font-semibold text-text-primary">{item.displayName || item.name}</span>
+                                    {item.displayName && (
+                                        <span className="text-xs text-text-secondary font-mono">{item.name}</span>
+                                    )}
+                                </div>
+                            ),
+                        },
                         { key: 'branchName', label: t('settings.section.branch', 'Branch') },
                         { key: 'branchCenter', label: t('settings.section.center', 'Center') },
                         { key: 'isActive', label: t('common.active', 'Active'), type: 'toggle' },
@@ -433,7 +504,7 @@ export default function SettingsPage() {
     // Check access permissions
     const hasAccess = showTab('infrastructure', userRole) || showTab('services', userRole);
 
-    const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services' | 'capacity' | 'wallets' | 'users'>(
+    const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services' | 'capacity' | 'cloudResources' | 'wallets' | 'users'>(
         isAdmin ? 'infrastructure' : 'services'
     );
 
@@ -462,9 +533,10 @@ export default function SettingsPage() {
         { id: 'services', label: t('settings.mainTabs.services', 'Services') },
         ...((isAdmin || isModerator) ? [
             { id: 'capacity', label: t('settings.mainTabs.capacity', 'Capacity') },
-            { id: 'wallets', label: t('settings.mainTabs.wallets', 'Wallets') },
         ] : []),
         ...(isAdmin ? [
+            { id: 'cloudResources', label: t('settings.mainTabs.cloudResources', 'Cloud Resources') },
+            { id: 'wallets', label: t('settings.mainTabs.wallets', 'Wallets') },
             { id: 'users', label: t('settings.userManagement', 'User Management') },
         ] : []),
     ];
@@ -546,6 +618,7 @@ export default function SettingsPage() {
                 {mainTab === 'options' && showTab('options', userRole) && <OptionsSettings onSuccess={refreshData} />}
                 {mainTab === 'services' && showTab('services', userRole) && <ServicesSettings serviceOptions={serviceOptions} onSuccess={refreshData} />}
                 {mainTab === 'capacity' && showTab('capacity', userRole) && <CapacityManagement />}
+                {mainTab === 'cloudResources' && showTab('cloudResources', userRole) && <CloudResourceManagement />}
                 {mainTab === 'wallets' && showTab('wallets', userRole) && <WalletManagement />}
                 {mainTab === 'users' && showTab('users', userRole) && <UserManagement />}
             </div>

@@ -6,6 +6,7 @@ export class User {
   oidcRoles: string[];
   role: UserRole;
   centerName: string | null;
+  managedCenters: string[];
 
   // Legacy fields kept for backward compatibility with existing code
   readonly sub: string;
@@ -19,6 +20,7 @@ export class User {
     oidcRoles: string[];
     role: UserRole;
     centerName: string | null;
+    managedCenters?: string[];
     // Legacy optional fields
     sub?: string;
     email?: string;
@@ -30,6 +32,7 @@ export class User {
     this.oidcRoles = data.oidcRoles;
     this.role = data.role;
     this.centerName = data.centerName;
+    this.managedCenters = data.managedCenters ?? [];
     this.sub = data.sub ?? data.username;
     this.email = data.email;
     this.givenName = data.givenName;
@@ -43,7 +46,7 @@ export class User {
 
   canManageCenter(centerName: string): boolean {
     if (this.isAdmin) return true;
-    if (this.isCenterManager) return this.centerName === centerName;
+    if (this.isCenterManager) return this.managedCenters.includes(centerName);
     return false;
   }
 

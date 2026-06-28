@@ -1,9 +1,27 @@
 import { Request, Response } from "express";
+import prisma from "../../lib/prisma";
 import { locationService } from "../../services/location/location.service";
 
 export const locationController = {
-  getAll: async (_req: Request, res: Response) => {
+  getAll: async (req: Request, res: Response) => {
     try {
+      if (req.query.hasCloudStatus === 'true') {
+        const combos = await prisma.cloudResourceStatus.findMany({
+          select: { baseName: true, networkName: true, clusterName: true },
+          distinct: ['baseName', 'networkName', 'clusterName'],
+        });
+        const locations = combos.length === 0 ? [] : await prisma.location.findMany({
+          where: {
+            OR: combos.map(c => ({
+              baseName: c.baseName,
+              networkName: c.networkName,
+              clusterName: c.clusterName
+            }))
+          },
+        });
+        return res.json(locations);
+      }
+
       const locations = await locationService.findAll();
       res.json(locations);
     } catch (error) {

@@ -1,4 +1,40 @@
-# Core Fixes Sprint — Work Log
+# Work Log — Demands Monorepo
+
+## Sprint: Multi-Center RBAC & Admin CRUD Features
+
+**Branch:** `feature/rbac-multi-center-and-admin-crud` from `dev`  
+**Started:** 2026-06-28  
+**Status:** **✅ ALL TASKS COMPLETE**
+
+### Tasks
+- [x] A. Many-to-Many Center Managers (Prisma + Backend + Frontend)
+  - A1: UserCenterManagement schema with join table
+  - A2-A3: Backend service and controller with centerNames[] support
+  - A4-A5: GET /me route and authorization middleware updates
+  - A6: Client types (AppUser.managedCenters, UpdateUserPayload.centerNames)
+  - A7: UserManagement.tsx multi-select centers UI
+- [x] B1. CloudResourceStatus CRUD Admin Tab
+  - Server: getAllFlat, create, delete handlers in cloudMonitor.controller.ts
+  - Routes: /flat (GET), POST /, DELETE /:id with proper auth guards
+  - Client: CloudResourceManagement, CloudResourceTable, CloudResourceModal components
+  - SettingsPage: wired Cloud Resources tab (ADMIN only)
+- [x] B2. Name/DisplayName Column Merge
+  - Merged Name+DisplayName columns in all admin entity tables
+  - Display name shown as bold primary, internal name as dim secondary text
+- [x] C. Box Location Guard & Validation Engine
+  - Server: cluster.isActive check + CloudResourceStatus (base/network/cluster) guard
+  - Server: location.controller hasCloudStatus filter returns only valid box locations
+  - Client: fetchValidBoxLocations() API + CreateDemandModal constraints
+- [x] D. Service-Centric Wallet Allocation View
+  - WalletTable refactored with service-grouped rendering
+  - Group headers show service name + total quota
+  - No redundant Service column in row cells
+
+---
+
+# Previous Sprints
+
+## Core Fixes Sprint — Work Log
 
 **Branches:** `task-1-bootstrap-worklog`, `task-2-table-scroll-fix`, `task-3-filtersort-portal-fix`, `task-4-splitview-actions`, `task-5-empty-projects`, `task-6-excel-export`, `task-7-advanced-filters`
 **Started:** 2026-06-28

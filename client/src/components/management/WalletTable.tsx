@@ -1,3 +1,4 @@
+import React from 'react';
 import { MdEdit, MdDelete } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import type { Wallet } from '../../api/types';
@@ -20,13 +21,25 @@ export default function WalletTable({ wallets, onEdit, onDelete, isLoading }: Wa
         );
     }
 
+    // Group wallets by service name
+    const groupedByService = new Map<string, Wallet[]>();
+    wallets.forEach(wallet => {
+        const serviceName = wallet.capacity.resource.serviceName;
+        if (!groupedByService.has(serviceName)) {
+            groupedByService.set(serviceName, []);
+        }
+        groupedByService.get(serviceName)!.push(wallet);
+    });
+
+    // Sort service names alphabetically
+    const sortedServices = Array.from(groupedByService.keys()).sort();
+
     return (
         <div className="bg-bg-paper rounded-xl shadow-sm border border-divider overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm text-start">
                     <thead className="text-xs text-text-secondary uppercase bg-gray-50 border-b border-divider">
                         <tr>
-                            <th className="px-6 py-3 font-semibold">{t('management.wallet.columns.service')}</th>
                             <th className="px-6 py-3 font-semibold">{t('management.wallet.columns.resource')}</th>
                             <th className="px-6 py-3 font-semibold">{t('management.wallet.columns.base')}</th>
                             <th className="px-6 py-3 font-semibold">{t('management.wallet.columns.environment')}</th>
@@ -39,52 +52,71 @@ export default function WalletTable({ wallets, onEdit, onDelete, isLoading }: Wa
                     <tbody className="divide-y divide-divider">
                         {wallets.length === 0 ? (
                             <tr>
-                                <td colSpan={8} className="px-6 py-12 text-center text-text-secondary">
+                                <td colSpan={7} className="px-6 py-12 text-center text-text-secondary">
                                     {t('common.noResults')}
                                 </td>
                             </tr>
                         ) : (
-                            wallets.map((wallet) => (
-                                <tr key={wallet.id} className="bg-white hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 font-medium text-text-primary">
-                                        {wallet.capacity.resource.serviceName}
-                                    </td>
-                                    <td className="px-6 py-4 text-text-secondary">
-                                        {wallet.capacity.resourceName}
-                                    </td>
-                                    <td className="px-6 py-4 text-text-secondary">
-                                        {wallet.capacity.location.baseName}
-                                    </td>
-                                    <td className="px-6 py-4 text-text-secondary">
-                                        {wallet.capacity.location.environmentName}
-                                    </td>
-                                    <td className="px-6 py-4 text-text-secondary">
-                                        {wallet.capacity.location.networkName}
-                                    </td>
-                                    <td className="px-6 py-4 text-text-secondary">
-                                        {wallet.center.displayName || wallet.centerName}
-                                    </td>
-                                    <td className="px-6 py-4 text-end font-bold text-text-primary">
-                                        {wallet.value}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center justify-center gap-1">
-                                            <button
-                                                onClick={() => onEdit(wallet)}
-                                                className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
-                                            >
-                                                <MdEdit size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => onDelete(wallet.id)}
-                                                className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer"
-                                            >
-                                                <MdDelete size={18} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
+                            sortedServices.map((serviceName) => {
+                                const serviceWallets = groupedByService.get(serviceName) || [];
+                                const totalQuota = serviceWallets.reduce((sum, w) => sum + w.value, 0);
+
+                                return (
+                                    <React.Fragment key={serviceName}>
+                                        {/* Group Header Row */}
+                                        <tr className="bg-gray-100 hover:bg-gray-100">
+                                            <td colSpan={7} className="px-6 py-3">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="font-bold text-text-primary">{serviceName}</span>
+                                                    <span className="text-sm text-text-secondary">
+                                                        {t('management.wallet.totalQuota', 'Total Quota')}: <span className="font-semibold text-text-primary">{totalQuota}</span>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        {/* Data Rows */}
+                                        {serviceWallets.map((wallet) => (
+                                            <tr key={wallet.id} className="bg-white hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 text-text-secondary">
+                                                    {wallet.capacity.resourceName}
+                                                </td>
+                                                <td className="px-6 py-4 text-text-secondary">
+                                                    {wallet.capacity.location.baseName}
+                                                </td>
+                                                <td className="px-6 py-4 text-text-secondary">
+                                                    {wallet.capacity.location.environmentName}
+                                                </td>
+                                                <td className="px-6 py-4 text-text-secondary">
+                                                    {wallet.capacity.location.networkName}
+                                                </td>
+                                                <td className="px-6 py-4 text-text-secondary">
+                                                    {wallet.center.displayName || wallet.centerName}
+                                                </td>
+                                                <td className="px-6 py-4 text-end font-bold text-text-primary">
+                                                    {wallet.value}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <button
+                                                            onClick={() => onEdit(wallet)}
+                                                            className="p-1.5 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
+                                                        >
+                                                            <MdEdit size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => onDelete(wallet.id)}
+                                                            className="p-1.5 text-text-secondary hover:text-danger transition-colors bg-transparent border-none cursor-pointer"
+                                                        >
+                                                            <MdDelete size={18} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </React.Fragment>
+                                );
+                            })
                         )}
                     </tbody>
                 </table>

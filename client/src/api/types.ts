@@ -1,4 +1,4 @@
-import type { ProjectType, ProjectKind, Median, DemandType, DemandStatus, UserRole } from '../types/domain';
+import type { ProjectType, ProjectKind, Median, DemandType, DemandStatus, UserRole, CloudResourceStatusFlat as CloudResourceStatusFlatType, CloudStatus, CloudTag } from '../types/domain';
 
 export interface ReferenceItem {
   name: string;
@@ -294,6 +294,18 @@ export interface BulkApproveMatrixPayload {
 
 export interface UpdateUserPayload {
   role: UserRole;
-  centerName?: string;
+  centerNames?: string[];
   managedServices?: string[];
 }
+
+export interface CreateCloudResourceStatusPayload {
+  baseName: string;
+  networkName: string;
+  clusterName: string;
+  service: string;
+  status: CloudStatus;
+  reason: string;
+  tag: CloudTag;
+}
+
+export type CloudResourceStatusFlat = CloudResourceStatusFlatType;

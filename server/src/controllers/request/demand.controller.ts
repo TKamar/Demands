@@ -222,7 +222,7 @@ export const demandController = {
       // Validate: location and its related entities must be active
       const location = await prisma.location.findUnique({
         where: { id: finalLocationId },
-        include: { base: true, environment: true, network: true },
+        include: { base: true, environment: true, network: true, cluster: true },
       });
       if (!location) {
         return res.status(400).json({ error: "Location not found" });
@@ -238,6 +238,23 @@ export const demandController = {
       }
       if (!location.network.isActive) {
         return res.status(400).json({ error: "Network is not active" });
+      }
+      if (!location.cluster.isActive) {
+        return res.status(400).json({ error: "Cluster is not active" });
+      }
+
+      // Validate: CloudResourceStatus must exist for this base/network/cluster combo
+      const cloudEntry = await prisma.cloudResourceStatus.findFirst({
+        where: {
+          baseName: location.baseName,
+          networkName: location.networkName,
+          clusterName: location.clusterName,
+        },
+      });
+      if (!cloudEntry) {
+        return res.status(400).json({
+          error: "Location is not a configured box location. No cloud resource status exists for this base/network/cluster.",
+        });
       }
 
       // If organization fields not provided, inherit from project
@@ -758,6 +775,61 @@ export const demandController = {
         value: Number(row.value),
         locationId: Number(row.locationId) || project.locationId,
       }));
+
+      // Validate location for all rows (use first row as reference for location validation)
+      const finalLocationId = resolvedRows[0]?.locationId;
+      if (!finalLocationId) {
+        return res.status(400).json({ error: 'Location ID is required' });
+      }
+
+      // Validate: service must be active
+      const service = await prisma.service.findUnique({
+        where: { name: serviceName },
+      });
+      if (!service) {
+        return res.status(400).json({ error: 'Service not found' });
+      }
+      if (!service.isActive) {
+        return res.status(400).json({ error: 'Service is not active' });
+      }
+
+      // Validate: location and its related entities must be active
+      const location = await prisma.location.findUnique({
+        where: { id: finalLocationId },
+        include: { base: true, environment: true, network: true, cluster: true },
+      });
+      if (!location) {
+        return res.status(400).json({ error: 'Location not found' });
+      }
+      if (!location.isActive) {
+        return res.status(400).json({ error: 'Location is not active' });
+      }
+      if (!location.base.isActive) {
+        return res.status(400).json({ error: 'Base is not active' });
+      }
+      if (!location.environment.isActive) {
+        return res.status(400).json({ error: 'Environment is not active' });
+      }
+      if (!location.network.isActive) {
+        return res.status(400).json({ error: 'Network is not active' });
+      }
+      if (!location.cluster.isActive) {
+        return res.status(400).json({ error: 'Cluster is not active' });
+      }
+
+      // Validate: CloudResourceStatus must exist for this base/network/cluster combo
+      const cloudEntry = await prisma.cloudResourceStatus.findFirst({
+        where: {
+          baseName: location.baseName,
+          networkName: location.networkName,
+          clusterName: location.clusterName,
+        },
+      });
+      if (!cloudEntry) {
+        return res.status(400).json({
+          error: 'Location is not a configured box location. No cloud resource status exists for this base/network/cluster.',
+        });
+      }
 
       const demands = await demandService.createDemandGroup({
         projectName,

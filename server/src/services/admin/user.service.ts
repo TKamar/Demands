@@ -3,7 +3,7 @@ import { UserRole } from '@prisma/client';
 
 export const userService = {
   async getAll() {
-    const [users, services] = await Promise.all([
+    const [users, services, centerAssignments] = await Promise.all([
       prisma.user.findMany({
         include: { center: { select: { name: true } } },
         orderBy: { username: 'asc' },
@@ -11,6 +11,9 @@ export const userService = {
       prisma.service.findMany({
         where: { moderators: { isEmpty: false } },
         select: { name: true, moderators: true },
+      }),
+      prisma.userCenterManagement.findMany({
+        select: { username: true, centerName: true },
       }),
     ]);
 
@@ -22,21 +25,31 @@ export const userService = {
       }
     }
 
-    return users.map((u) => ({ ...u, managedServices: moderatorMap.get(u.username) ?? [] }));
+    const centerMap = new Map<string, string[]>();
+    for (const ca of centerAssignments) {
+      if (!centerMap.has(ca.username)) centerMap.set(ca.username, []);
+      centerMap.get(ca.username)!.push(ca.centerName);
+    }
+
+    return users.map((u) => ({
+      ...u,
+      managedServices: moderatorMap.get(u.username) ?? [],
+      managedCenters: centerMap.get(u.username) ?? [],
+    }));
   },
 
   async updateRoleAndCenter(
     username: string,
     role: UserRole,
-    centerName: string | null,
+    centerNames: string[],
     requestingUsername: string,
     managedServices: string[] | null = null,
   ) {
-    if (role === UserRole.CENTER_MANAGER && !centerName) {
-      throw new Error('centerName is required for CENTER_MANAGER role');
+    if (role === UserRole.CENTER_MANAGER && centerNames.length === 0) {
+      throw new Error('At least one centerName is required for CENTER_MANAGER role');
     }
-    if (role !== UserRole.CENTER_MANAGER && centerName) {
-      throw new Error('centerName must be null for non-CM roles');
+    if (role !== UserRole.CENTER_MANAGER && centerNames.length > 0) {
+      throw new Error('centerNames must be empty for non-CM roles');
     }
 
     // Prevent self-demotion and last-admin removal
@@ -58,11 +71,21 @@ export const userService = {
       : true;
 
     return prisma.$transaction(async (tx) => {
+      // Update user role; always set centerName scalar to null (deprecated path)
       const updatedUser = await tx.user.update({
         where: { username },
-        data: { role, centerName: role === UserRole.CENTER_MANAGER ? centerName : null },
+        data: { role, centerName: null },
       });
 
+      // Sync UserCenterManagement join table
+      await tx.userCenterManagement.deleteMany({ where: { username } });
+      if (role === UserRole.CENTER_MANAGER && centerNames.length > 0) {
+        await tx.userCenterManagement.createMany({
+          data: centerNames.map((centerName) => ({ username, centerName })),
+        });
+      }
+
+      // Sync managed services
       if (needsServiceUpdate) {
         await tx.$executeRaw`UPDATE "Service" SET moderators = array_remove(moderators, ${username})`;
 
