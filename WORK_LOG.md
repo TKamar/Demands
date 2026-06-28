@@ -7,7 +7,12 @@
 **Status:** In Progress
 
 ### Tasks
-- [ ] A. Many-to-Many Center Managers (Prisma + Backend + Frontend)
+- [x] A. Many-to-Many Center Managers (Prisma + Backend + Frontend)
+  - A1: UserCenterManagement schema with join table
+  - A2-A3: Backend service and controller with centerNames[] support
+  - A4-A5: GET /me route and authorization middleware updates
+  - A6: Client types (AppUser.managedCenters, UpdateUserPayload.centerNames)
+  - A7: UserManagement.tsx multi-select centers UI
 - [ ] B1. CloudResourceStatus CRUD Admin Tab
 - [ ] B2. Name/DisplayName Column Merge
 - [ ] C. Box Location Guard & Validation Engine
