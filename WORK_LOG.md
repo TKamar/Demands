@@ -59,7 +59,28 @@
 - Updated apiService to pass date params to /api/demands/filter endpoint
 - Updated server demand controller to extract and pass date params to service
 - Added date range filtering logic to demand.service.ts (createdAt gte/lte)
-- Commit: (pending)
+- Commit: cb2691a
+
+## TypeScript Cleanup
+
+**Objective:** Fix 6 pre-existing TypeScript errors to achieve clean build.
+**Branch:** `task-7-advanced-filters` (final commit)
+**Status:** ✅ All errors resolved, both client and server compile successfully
+
+### Fixed Errors:
+1. **StatusBadge.tsx** — Added missing DemandStatus enum values (AwaitingProcurement, HeldForEfficiency, ConditionalFootprintReduction, InProgress, TransferredTo810)
+2. **MyApprovalRequests.tsx** — Fixed SortKey type mismatches by casting to string | undefined
+3. **DemandsTable.tsx** — Cast sort prop types to handle DemandSortKey/string compatibility
+4. **CreateProjectModal.tsx** — Fixed form state initialization, added median/year fields, corrected type mismatches
+5. **DemandSubTable.tsx** — Removed unused RejectDemandPayload import
+6. **ProjectsAccordion.tsx** — Removed unused MoreActionsMenu and MoreAction imports
+7. **RequestHistory.tsx** — Removed unused FilterGroupConfig import, cast sort types
+8. **ApprovalRequestsPanel.tsx** — Removed unused MdAdd and useModal imports, fixed ExcelToolbar props
+9. **AdminDashboard.tsx** — Removed unused statusColors and entry parameters
+10. **ManageServiceDemandsModal.tsx** — Removed unused CreateDemandPayload import
+
+**Build Status:** ✅ Client: 794 modules, built in 11.29s. Server: TypeScript clean.
+**Final Commit:** 5caa66e
 
 ---
 
