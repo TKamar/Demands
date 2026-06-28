@@ -1,3 +1,19 @@
+# Core Fixes Sprint — Table Layout, Sort, SplitView, Empty Projects & Excel Flattening
+
+**Branches:** One branch per task from `task-1-bootstrap-worklog` through `task-7-excel-and-filters`  
+**Started:** 2026-06-28  
+**Status:** In Progress
+
+## Task 1: Branch + WORK_LOG Bootstrap — `task-1-bootstrap-worklog`
+
+- [ ] Step 1: Created branch from dev
+- [ ] Step 2: Appended sprint log to WORK_LOG.md
+- [ ] Step 3: Committed bootstrap
+
+**Status:** In Progress
+
+---
+
 # Center Manager Hotfixes, Split-View UX, Admin Dashboard & Excel Engine — Work Log
 
 **Branches:** `fix/cm-role`, `fix/cm-table-styling`, `fix/drawer-ux`, `feat/admin-dashboard-backend`, `feat/admin-dashboard-frontend`, `feat/excel-engine`
