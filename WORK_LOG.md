@@ -1,4 +1,23 @@
-# Core Fixes Sprint — Work Log
+# Work Log — Demands Monorepo
+
+## Sprint: Multi-Center RBAC & Admin CRUD Features
+
+**Branch:** `feature/rbac-multi-center-and-admin-crud` from `dev`  
+**Started:** 2026-06-28  
+**Status:** In Progress
+
+### Tasks
+- [ ] A. Many-to-Many Center Managers (Prisma + Backend + Frontend)
+- [ ] B1. CloudResourceStatus CRUD Admin Tab
+- [ ] B2. Name/DisplayName Column Merge
+- [ ] C. Box Location Guard & Validation Engine
+- [ ] D. Service-Centric Wallet Allocation View
+
+---
+
+# Previous Sprints
+
+## Core Fixes Sprint — Work Log
 
 **Branches:** `task-1-bootstrap-worklog`, `task-2-table-scroll-fix`, `task-3-filtersort-portal-fix`, `task-4-splitview-actions`, `task-5-empty-projects`, `task-6-excel-export`, `task-7-advanced-filters`
 **Started:** 2026-06-28
