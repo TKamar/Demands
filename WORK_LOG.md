@@ -1,3 +1,68 @@
+# Core Fixes Sprint — Work Log
+
+**Branches:** `task-1-bootstrap-worklog`, `task-2-table-scroll-fix`, `task-3-filtersort-portal-fix`, `task-4-splitview-actions`, `task-5-empty-projects`, `task-6-excel-export`, `task-7-advanced-filters`
+**Started:** 2026-06-28
+**Status:** **✅ ALL 7 TASKS COMPLETE**
+
+## 2026-06-28 — Core Fixes Sprint
+
+### Task 1: Bootstrap & WORK_LOG ✅
+- Branch: `task-1-bootstrap-worklog`
+- Created WORK_LOG.md structure for sprint tracking
+- Commit: 094390b
+
+### Task 2: Table Scroll Layout Fix ✅
+- Branch: `task-2-table-scroll-fix`
+- Fixed: InfiniteScrollSentinel scrolling outside wrapper, horizontal scrollbar sinking off-screen
+- Added bounded container with max-height to RequirementsView and ProjectsAccordion
+- Updated useClientInfiniteScroll hook to accept optional `root` parameter for IntersectionObserver
+- Commit: 9ac6a6a
+
+### Task 3: FilterSort Portal Outside-Click Fix ✅
+- Branch: `task-3-filtersort-portal-fix`
+- Fixed: Portal dropdown closing prematurely on sort/filter Select interaction
+- Added panelRef to track both trigger and portal div in outside-click handler
+- Commit: ab3e265
+
+### Task 4: SplitView Action Footer Restoration ✅
+- Branch: `task-4-splitview-actions`
+- Fixed: Missing action buttons in demand sidebar for non-Pending statuses
+- Expanded status gate to include PendingCenterManager and WaitingOnPrerequisite
+- Implemented RBAC-aware button rendering: Approve/Deny/Edit (ADMIN/MOD) vs Edit/Cancel (regular users)
+- Added handleApproveDemand and handleDenyDemand callbacks
+- Wired sidebar callbacks: onEdit, onCancel, onApprove, onDeny
+- Added ManageServiceDemandsModal for demand editing
+- Commit: 6226586
+
+### Task 5: Empty Projects Dynamic Visibility ✅
+- Branch: `task-5-empty-projects`
+- Fixed: Empty project rows persisting after Quick Approve
+- Implemented onActiveDemandCountChange callback for parent notification
+- DemandSubTable emits count when active demands change
+- ProjectsAccordion tracks depleted projects and filters them from active view
+- Commit: 41be80d
+
+### Task 6: Excel Export Rewrite ✅
+- Branch: `task-6-excel-export`
+- Fixed: Two-sheet workbook with empty unit column
+- Changed to single flat sheet "דרישות" (RTL layout)
+- One row per demand with project metadata repeated
+- Updated Prisma query to include `resource` with unit field
+- Filename changed from `projects-*.xlsx` to `demands-*.xlsx`
+- Commit: efbeec4
+
+### Task 7: Advanced Filter Bar ✅
+- Branch: `task-7-advanced-filters`
+- Added always-visible filter bar above Demands table
+- Filter controls: center select, service select, status select, from-date picker, to-date picker, clear button
+- Extended DemandFilterParams with fromDate/toDate fields
+- Updated apiService to pass date params to /api/demands/filter endpoint
+- Updated server demand controller to extract and pass date params to service
+- Added date range filtering logic to demand.service.ts (createdAt gte/lte)
+- Commit: (pending)
+
+---
+
 # Center Manager Hotfixes, Split-View UX, Admin Dashboard & Excel Engine — Work Log
 
 **Branches:** `fix/cm-role`, `fix/cm-table-styling`, `fix/drawer-ux`, `feat/admin-dashboard-backend`, `feat/admin-dashboard-frontend`, `feat/excel-engine`

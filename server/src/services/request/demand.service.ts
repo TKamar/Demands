@@ -39,6 +39,8 @@ export const demandService = {
       projectEmergencyOption?: string;
       projectPriority?: string;
       centerName?: string;
+      createdFromDate?: Date;
+      createdToDate?: Date;
     },
     pagination?: { page: number; limit: number; sortBy?: string; sortDir?: 'asc' | 'desc' }
   ) => {
@@ -75,6 +77,12 @@ export const demandService = {
       }
       if (filters.projectEmergencyOption) where.project.emergencyOptionName = filters.projectEmergencyOption;
       if (filters.projectPriority) where.project.priority = filters.projectPriority;
+    }
+
+    if (filters.createdFromDate || filters.createdToDate) {
+      where.createdAt = {};
+      if (filters.createdFromDate) where.createdAt.gte = filters.createdFromDate;
+      if (filters.createdToDate) where.createdAt.lte = filters.createdToDate;
     }
 
     let orderBy: any = undefined;

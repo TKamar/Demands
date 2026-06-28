@@ -170,6 +170,8 @@ export async function fetchDemands(
     if (params.managed) query.append('managed', 'true');
     if (params.centerName) query.append('center', params.centerName);
     if (params.createdBy) query.append('createdBy', params.createdBy);
+    if (params.fromDate) query.append('fromDate', params.fromDate);
+    if (params.toDate) query.append('toDate', params.toDate);
   }
 
   // If any filter is present (besides pagination), use /api/demands/filter, otherwise /api/demands
@@ -178,7 +180,7 @@ export async function fetchDemands(
     params.locationId || params.baseName || params.environmentName ||
     params.networkName || params.clusterName || params.type || params.status ||
     params.projectType || params.median || params.year || params.relatedTo || params.emergencyOption || params.projectPriority ||
-    params.managed || params.centerName || params.createdBy
+    params.managed || params.centerName || params.createdBy || params.fromDate || params.toDate
   );
 
   const endpoint = isFiltering ? '/api/demands/filter' : '/api/demands';

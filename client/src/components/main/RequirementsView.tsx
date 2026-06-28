@@ -61,6 +61,8 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
 
   // Filter State
   const [filters, setFilters] = useState<Record<DemandFilterKey, string>>(initialDemandFilters);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
   // Sort State
   const [sortState, setSortState] = useState<SortState<DemandSortKey>>({
@@ -69,6 +71,8 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
   });
 
   const debouncedFilters = useDebounce(filters, 300);
+  const debouncedFromDate = useDebounce(fromDate, 300);
+  const debouncedToDate = useDebounce(toDate, 300);
 
   const isFiltersPending = useMemo(
     () => JSON.stringify(filters) !== JSON.stringify(debouncedFilters),
@@ -114,9 +118,11 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
       branchName: debouncedFilters.branch || undefined,
       sectionName: debouncedFilters.section || undefined,
       projectPriority: (debouncedFilters.priority || undefined) as DemandFilterParams['projectPriority'],
+      fromDate: debouncedFromDate || undefined,
+      toDate: debouncedToDate || undefined,
       managed: managed || undefined,
     };
-  }, [debouncedFilters, selectedCenters, managed]);
+  }, [debouncedFilters, selectedCenters, managed, debouncedFromDate, debouncedToDate];
 
   const {
     demands,
@@ -409,6 +415,91 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Prominent filter bar */}
+      <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm px-4 py-3 flex flex-wrap gap-3 items-end" dir="rtl">
+        {/* Center / גוף */}
+        <div className="flex flex-col gap-1 min-w-[160px]">
+          <label className="text-xs font-medium text-text-secondary">גוף (מרכז)</label>
+          <select
+            value={filters.center}
+            onChange={e => setFilters(prev => ({ ...prev, center: e.target.value }))}
+            className="text-sm border border-divider rounded-lg px-2 py-1.5 bg-bg-default text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            <option value="">הכל</option>
+            {centers.map(c => (
+              <option key={c.name} value={c.name}>{c.displayName || c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Service type */}
+        <div className="flex flex-col gap-1 min-w-[160px]">
+          <label className="text-xs font-medium text-text-secondary">שירות</label>
+          <select
+            value={filters.serviceName}
+            onChange={e => setFilters(prev => ({ ...prev, serviceName: e.target.value }))}
+            className="text-sm border border-divider rounded-lg px-2 py-1.5 bg-bg-default text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            <option value="">הכל</option>
+            {services.map(s => (
+              <option key={s.name} value={s.name}>{s.displayName || s.name}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Status */}
+        <div className="flex flex-col gap-1 min-w-[160px]">
+          <label className="text-xs font-medium text-text-secondary">סטטוס</label>
+          <select
+            value={filters.status}
+            onChange={e => setFilters(prev => ({ ...prev, status: e.target.value }))}
+            className="text-sm border border-divider rounded-lg px-2 py-1.5 bg-bg-default text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            <option value="">הכל</option>
+            {(['Pending','PendingCenterManager','Approved','PartiallyApproved','Rejected','Cancelled','WaitingOnPrerequisite'] as const).map(s => (
+              <option key={s} value={s}>{t(`projects.status.${s}`, s)}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Date range from */}
+        <div className="flex flex-col gap-1 min-w-[140px]">
+          <label className="text-xs font-medium text-text-secondary">מתאריך</label>
+          <input
+            type="date"
+            value={fromDate}
+            onChange={e => setFromDate(e.target.value)}
+            className="text-sm border border-divider rounded-lg px-2 py-1.5 bg-bg-default text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
+
+        {/* Date range to */}
+        <div className="flex flex-col gap-1 min-w-[140px]">
+          <label className="text-xs font-medium text-text-secondary">עד תאריך</label>
+          <input
+            type="date"
+            value={toDate}
+            onChange={e => setToDate(e.target.value)}
+            className="text-sm border border-divider rounded-lg px-2 py-1.5 bg-bg-default text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
+
+        {/* Clear button */}
+        {(filters.center || filters.serviceName || filters.status || fromDate || toDate) && (
+          <button
+            type="button"
+            onClick={() => {
+              setFilters(prev => ({ ...prev, center: '', serviceName: '', status: '' }));
+              setFromDate('');
+              setToDate('');
+            }}
+            className="text-xs text-primary font-medium hover:underline bg-transparent border-none cursor-pointer mt-4"
+          >
+            {t('common.clearFilters', 'נקה פילטרים')}
+          </button>
+        )}
+      </div>
+
       {/* Table card with embedded FilterSort in header */}
       <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
         {/* Table header with button and funnel icon */}
