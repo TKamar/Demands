@@ -122,7 +122,7 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
       toDate: debouncedToDate || undefined,
       managed: managed || undefined,
     };
-  }, [debouncedFilters, selectedCenters, managed, debouncedFromDate, debouncedToDate];
+  }, [debouncedFilters, selectedCenters, managed, debouncedFromDate, debouncedToDate]);
 
   const {
     demands,
@@ -136,8 +136,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
     cancelDemand,
     approveDemand,
     rejectDemand,
-    bulkApproveDemands,
-    bulkRejectDemands,
   } = useDemands(demandFilterParams, {
     page: currentPage,
     limit: itemsPerPage,
@@ -218,8 +216,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
     setCurrentPage(1);
     setAccumulatedDemands([]);
     setSelectedDemandIds(new Set());
-    setLockedCenter(null);
-    setLockedResource(null);
   }, []);
 
   const handleClearAllFilters = useCallback(() => {
@@ -227,8 +223,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
     setCurrentPage(1);
     setAccumulatedDemands([]);
     setSelectedDemandIds(new Set());
-    setLockedCenter(null);
-    setLockedResource(null);
   }, []);
 
   const handleSortChange = useCallback((field: DemandSortKey | null, direction: SortDirection) => {
@@ -236,8 +230,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
     setCurrentPage(1);
     setAccumulatedDemands([]);
     setSelectedDemandIds(new Set());
-    setLockedCenter(null);
-    setLockedResource(null);
   }, []);
 
   const handleColumnSort = useCallback((key: DemandSortKey) => {

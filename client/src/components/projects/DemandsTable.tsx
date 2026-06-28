@@ -125,8 +125,6 @@ export default function DemandsTable({
   onColumnSort,
   showBulkSelect = false,
   selectedIds,
-  lockedCenter,
-  lockedResourceName,
   onToggleSelect,
   onDeselectAll,
 }: DemandsTableProps) {
