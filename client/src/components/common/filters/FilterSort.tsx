@@ -23,6 +23,7 @@ export default function FilterSort<
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
 
   // Calculate dropdown position when expanded
@@ -58,7 +59,10 @@ export default function FilterSort<
   useEffect(() => {
     if (isCollapsed) return;
     const handler = (e: MouseEvent) => {
-      if (!triggerRef.current?.contains(e.target as Node)) {
+      if (
+        !triggerRef.current?.contains(e.target as Node) &&
+        !panelRef.current?.contains(e.target as Node)
+      ) {
         setIsCollapsed(true);
       }
     };
@@ -104,6 +108,7 @@ export default function FilterSort<
         {/* Expanded panel rendered via portal to escape overflow-hidden clip */}
         {!isCollapsed && createPortal(
           <div
+            ref={panelRef}
             style={dropdownStyle}
             className="bg-bg-paper border border-divider rounded-xl shadow-xl p-4 max-h-96 overflow-y-auto"
           >

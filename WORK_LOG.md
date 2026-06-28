@@ -1,3 +1,23 @@
+# Core Fixes Sprint — Table Layout, Sort, SplitView, Empty Projects & Excel
+
+**Branches:** Separate branch per task (task-1, task-2, task-3, etc.)  
+**Started:** 2026-06-28  
+**Status:** In Progress
+
+## Progress Summary
+
+| Task | Branch | Status |
+|------|--------|--------|
+| 1 | task-1-bootstrap-worklog | ✅ Complete |
+| 2 | task-2-table-scroll-fix | ✅ Complete |
+| 3 | task-3-filtersort-portal-fix | ✅ Complete |
+| 4 | task-4-splitview-actions | 🔄 Next |
+| 5 | task-5-empty-projects | 🔄 Next |
+| 6 | task-6-excel-export | 🔄 Next |
+| 7 | task-7-filter-bar | 🔄 Next |
+
+---
+
 # Center Manager Hotfixes, Split-View UX, Admin Dashboard & Excel Engine — Work Log
 
 **Branches:** `fix/cm-role`, `fix/cm-table-styling`, `fix/drawer-ux`, `feat/admin-dashboard-backend`, `feat/admin-dashboard-frontend`, `feat/excel-engine`
