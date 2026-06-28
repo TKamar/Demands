@@ -5,6 +5,7 @@ import { useAuth } from 'react-oidc-context';
 import { MdArrowBack } from 'react-icons/md';
 import CapacityManagement from '../components/management/CapacityManagement';
 import WalletManagement from '../components/management/WalletManagement';
+import CloudResourceManagement from '../components/management/CloudResourceManagement';
 import EntityManager from '../components/common/EntityManager';
 import { useReferenceData } from '../hooks/useReferenceData';
 import { UserManagement } from '../components/settings/UserManagement';
@@ -16,7 +17,7 @@ import type { UserRole } from '../types/domain';
 const getVisibleTabs = (role: UserRole): string[] => {
   switch (role) {
     case 'ADMIN':
-      return ['infrastructure', 'organization', 'options', 'services', 'capacity', 'wallets', 'users'];
+      return ['infrastructure', 'organization', 'options', 'services', 'capacity', 'cloudResources', 'wallets', 'users'];
     case 'MODERATOR':
       return ['services', 'capacity', 'wallets'];
     default:
@@ -433,7 +434,7 @@ export default function SettingsPage() {
     // Check access permissions
     const hasAccess = showTab('infrastructure', userRole) || showTab('services', userRole);
 
-    const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services' | 'capacity' | 'wallets' | 'users'>(
+    const [mainTab, setMainTab] = useState<'infrastructure' | 'organization' | 'options' | 'services' | 'capacity' | 'cloudResources' | 'wallets' | 'users'>(
         isAdmin ? 'infrastructure' : 'services'
     );
 
@@ -462,9 +463,10 @@ export default function SettingsPage() {
         { id: 'services', label: t('settings.mainTabs.services', 'Services') },
         ...((isAdmin || isModerator) ? [
             { id: 'capacity', label: t('settings.mainTabs.capacity', 'Capacity') },
-            { id: 'wallets', label: t('settings.mainTabs.wallets', 'Wallets') },
         ] : []),
         ...(isAdmin ? [
+            { id: 'cloudResources', label: t('settings.mainTabs.cloudResources', 'Cloud Resources') },
+            { id: 'wallets', label: t('settings.mainTabs.wallets', 'Wallets') },
             { id: 'users', label: t('settings.userManagement', 'User Management') },
         ] : []),
     ];
@@ -546,6 +548,7 @@ export default function SettingsPage() {
                 {mainTab === 'options' && showTab('options', userRole) && <OptionsSettings onSuccess={refreshData} />}
                 {mainTab === 'services' && showTab('services', userRole) && <ServicesSettings serviceOptions={serviceOptions} onSuccess={refreshData} />}
                 {mainTab === 'capacity' && showTab('capacity', userRole) && <CapacityManagement />}
+                {mainTab === 'cloudResources' && showTab('cloudResources', userRole) && <CloudResourceManagement />}
                 {mainTab === 'wallets' && showTab('wallets', userRole) && <WalletManagement />}
                 {mainTab === 'users' && showTab('users', userRole) && <UserManagement />}
             </div>

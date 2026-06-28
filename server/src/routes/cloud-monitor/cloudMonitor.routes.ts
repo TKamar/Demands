@@ -7,8 +7,12 @@ import { cloudMonitorController } from '../../controllers/cloud-monitor/cloudMon
 const router = Router();
 
 const requireModerator = requireRoles(settings.authAdminGroup, settings.authModeratorGroup);
+const requireAdmin = requireRoles(settings.authAdminGroup);
 
-router.get('/',     authenticate, requireAuth,        cloudMonitorController.getAll);
-router.put('/:id',  authenticate, requireModerator,   cloudMonitorController.update);
+router.get('/flat', authenticate, requireAuth,      cloudMonitorController.getAllFlat);
+router.get('/',     authenticate, requireAuth,      cloudMonitorController.getAll);
+router.post('/',    authenticate, requireAdmin,     cloudMonitorController.create);
+router.put('/:id',  authenticate, requireModerator, cloudMonitorController.update);
+router.delete('/:id', authenticate, requireAdmin,  cloudMonitorController.delete);
 
 export default router;

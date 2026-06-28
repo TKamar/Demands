@@ -102,3 +102,16 @@ export type CloudMonitorCluster = Record<string, CloudResourceStatusEntry>;
 export type CloudMonitorNetwork = { clusters: Record<string, CloudMonitorCluster> };
 export type CloudMonitorSite    = { networks: Record<string, CloudMonitorNetwork> };
 export type CloudMonitorData    = Record<string, CloudMonitorSite>;
+
+export interface CloudResourceStatusFlat {
+  id: number;
+  baseName: string;
+  networkName: string;
+  clusterName: string;
+  service: string;
+  status: CloudStatus;
+  reason: string;
+  tag: CloudTag;
+  updatedAt: string;
+  updatedBy: string | null;
+}
