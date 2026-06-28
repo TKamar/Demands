@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { userService } from '../../services/admin/user.service';
 import { UserRole } from '@prisma/client';
+import prisma from '../../lib/prisma';
 
 export const userController = {
   async getAll(req: Request, res: Response) {
@@ -14,9 +15,9 @@ export const userController = {
 
   async updateUser(req: Request, res: Response) {
     const { username } = req.params;
-    const { role, centerName, managedServices } = req.body as {
+    const { role, centerNames, managedServices } = req.body as {
       role: UserRole;
-      centerName?: string;
+      centerNames?: string[];
       managedServices?: string[];
     };
     if (!role || !Object.values(UserRole).includes(role)) {
@@ -29,18 +30,32 @@ export const userController = {
     ) {
       return res.status(400).json({ message: 'managedServices must be an array of strings' });
     }
-    if (role === UserRole.CENTER_MANAGER && (!centerName || typeof centerName !== 'string')) {
-      return res.status(400).json({ message: 'centerName is required for CENTER_MANAGER role' });
+    if (role === UserRole.CENTER_MANAGER) {
+      if (!Array.isArray(centerNames) || centerNames.length === 0) {
+        return res.status(400).json({ message: 'centerNames must be a non-empty array for CENTER_MANAGER role' });
+      }
+      if (centerNames.some((c) => typeof c !== 'string')) {
+        return res.status(400).json({ message: 'centerNames must be an array of strings' });
+      }
     }
     try {
-      const updated = await userService.updateRoleAndCenter(
+      await userService.updateRoleAndCenter(
         username,
         role,
-        centerName ?? null,
+        role === UserRole.CENTER_MANAGER ? (centerNames ?? []) : [],
         req.auth!.user.username,
         managedServices ?? null,
       );
-      res.json(updated);
+      // Re-fetch with managedCenters for the response
+      const centerAssignments = await prisma.userCenterManagement.findMany({
+        where: { username },
+        select: { centerName: true },
+      });
+      const user = await prisma.user.findUnique({ where: { username } });
+      res.json({
+        ...user,
+        managedCenters: centerAssignments.map((c) => c.centerName),
+      });
     } catch (err: any) {
       res.status(400).json({ message: err.message });
     }

@@ -52,15 +52,22 @@ const router = Router();
 router.get('/me', authenticate, requireAuth, async (req, res) => {
   try {
     const u = req.auth!.user;
-    const managedServicesRows = await prisma.service.findMany({
-      where: { moderators: { has: u.username } },
-      select: { name: true },
-    });
+    const [managedServicesRows, centerAssignments] = await Promise.all([
+      prisma.service.findMany({
+        where: { moderators: { has: u.username } },
+        select: { name: true },
+      }),
+      prisma.userCenterManagement.findMany({
+        where: { username: u.username },
+        select: { centerName: true },
+      }),
+    ]);
     res.json({
       username: u.username,
       fullName: u.fullName,
       role: u.role,
-      centerName: u.centerName,
+      centerName: centerAssignments[0]?.centerName ?? u.centerName,
+      managedCenters: centerAssignments.map((c) => c.centerName),
       managedServices: managedServicesRows.map((s) => s.name),
     });
   } catch (error) {
