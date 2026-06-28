@@ -8,7 +8,7 @@ import ServiceDecisionModal from '../management/ServiceDecisionModal';
 import { useDemands } from '../../hooks/useDemands';
 import { useToast } from '../common/Toast';
 import type { Demand } from '../../types/domain';
-import type { ApproveDemandPayload, RejectDemandPayload } from '../../api/types';
+import type { ApproveDemandPayload } from '../../api/types';
 
 export const ACTIVE_STATUSES = new Set(['PendingCenterManager', 'Pending', 'WaitingOnPrerequisite']);
 export const TERMINAL_STATUSES = new Set(['Approved', 'PartiallyApproved', 'ApprovedWithCondition', 'Rejected', 'CenterManagerRejected', 'Cancelled']);
@@ -47,6 +47,26 @@ export default function DemandSubTable({
     { page: 1, limit: 100 }
   );
 
+  const handleApproveDemand = useCallback(async (demand: Demand) => {
+    try {
+      await approveDemand(demand.id, { status: 'Approved', approvedValue: demand.value });
+      setSelectedDemand(null);
+      showToast(t('management.success.approved', 'הדרישה אושרה'), 'success');
+    } catch {
+      showToast(t('management.error.approveFailed', 'שגיאה באישור'), 'error');
+    }
+  }, [approveDemand, showToast, t]);
+
+  const handleDenyDemand = useCallback(async (demand: Demand) => {
+    try {
+      await rejectDemand(demand.id, { reason: 'נדחה מהסידבר' });
+      setSelectedDemand(null);
+      showToast(t('management.success.rejected', 'הדרישה נדחתה'), 'success');
+    } catch {
+      showToast(t('management.error.rejectFailed', 'שגיאה בדחייה'), 'error');
+    }
+  }, [rejectDemand, showToast, t]);
+
   const demands = useMemo(
     () => allDemands.filter(d =>
       mode === 'history' ? TERMINAL_STATUSES.has(d.status) : ACTIVE_STATUSES.has(d.status)
@@ -76,6 +96,7 @@ export default function DemandSubTable({
 
   // Resource row sidebar
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
+  const [editingDemand, setEditingDemand] = useState<Demand | null>(null);
 
   // Delete group confirm
   const [deleteServiceTarget, setDeleteServiceTarget] = useState<string | null>(null);
@@ -232,6 +253,10 @@ export default function DemandSubTable({
         isOpen={selectedDemand !== null}
         onClose={() => setSelectedDemand(null)}
         isModerator={canDecide}
+        onEdit={(d) => { setEditingDemand(d); setSelectedDemand(null); }}
+        onCancel={() => setSelectedDemand(null)}
+        onApprove={canDecide ? handleApproveDemand : undefined}
+        onDeny={canDecide ? handleDenyDemand : undefined}
       />
 
       <ConfirmDialog
@@ -250,6 +275,15 @@ export default function DemandSubTable({
         onConfirm={handleConfirmQuickApprove}
         onCancel={() => setQuickApproveTarget(null)}
       />
+
+      {editingDemand !== null && (
+        <ManageServiceDemandsModal
+          isOpen={true}
+          onClose={() => setEditingDemand(null)}
+          projectName={projectName}
+          serviceName={editingDemand.serviceName}
+        />
+      )}
 
       {managingServiceName !== null && (
         <ManageServiceDemandsModal

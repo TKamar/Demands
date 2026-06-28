@@ -1,20 +1,18 @@
 # Core Fixes Sprint — Table Layout, Sort, SplitView, Empty Projects & Excel
 
-**Branches:** Separate branch per task (task-1, task-2, task-3, etc.)  
+**Branches:** Separate branch per task  
 **Started:** 2026-06-28  
-**Status:** In Progress
+**Status:** In Progress (Tasks 1-4 Complete)
 
-## Progress Summary
-
-| Task | Branch | Status |
+| Task | Status | Branch |
 |------|--------|--------|
-| 1 | task-1-bootstrap-worklog | ✅ Complete |
-| 2 | task-2-table-scroll-fix | ✅ Complete |
-| 3 | task-3-filtersort-portal-fix | ✅ Complete |
-| 4 | task-4-splitview-actions | 🔄 Next |
-| 5 | task-5-empty-projects | 🔄 Next |
-| 6 | task-6-excel-export | 🔄 Next |
-| 7 | task-7-filter-bar | 🔄 Next |
+| 1 - Bootstrap | ✅ | task-1-bootstrap-worklog |
+| 2 - Table Scroll | ✅ | task-2-table-scroll-fix |
+| 3 - FilterSort Portal | ✅ | task-3-filtersort-portal-fix |
+| 4 - SplitView Actions | ✅ | task-4-splitview-actions |
+| 5 - Empty Projects | 🔄 | task-5-empty-projects |
+| 6 - Excel Export | 🔄 | task-6-excel-export |
+| 7 - Filter Bar | 🔄 | task-7-filter-bar |
 
 ---
 
