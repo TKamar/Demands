@@ -38,7 +38,7 @@ export const UserManagement: React.FC = () => {
   // Modal state
   const [editingUser, setEditingUser] = useState<AppUser | null>(null);
   const [draftRole, setDraftRole] = useState<UserRole>('REGULAR_USER');
-  const [draftCenter, setDraftCenter] = useState('');
+  const [draftCenters, setDraftCenters] = useState<string[]>([]);
   const [draftServices, setDraftServices] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -56,15 +56,20 @@ export const UserManagement: React.FC = () => {
   useEffect(() => {
     if (editingUser) {
       setDraftRole(editingUser.role);
-      setDraftCenter(editingUser.centerName ?? '');
+      setDraftCenters(editingUser.managedCenters ?? []);
       setDraftServices(editingUser.managedServices ?? []);
     }
   }, [editingUser]);
 
   const handleDraftRoleChange = (newRole: UserRole) => {
     setDraftRole(newRole);
-    if (newRole !== 'CENTER_MANAGER') setDraftCenter('');
+    if (newRole !== 'CENTER_MANAGER') setDraftCenters([]);
     if (newRole !== 'MODERATOR') setDraftServices([]);
+  };
+
+  const handleCentersChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
+    setDraftCenters(selected);
   };
 
   const handleServicesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -105,7 +110,7 @@ export const UserManagement: React.FC = () => {
 
       if (users) {
         const updated = users.map(u =>
-          selectedUsers.has(u.username) ? { ...u, role: newRole, centerName: null } : u
+          selectedUsers.has(u.username) ? { ...u, role: newRole, managedCenters: [] } : u
         );
         setUsers(updated);
       }
@@ -123,7 +128,7 @@ export const UserManagement: React.FC = () => {
     try {
       const updated = await updateUser(editingUser.username, {
         role: draftRole,
-        centerName: draftRole === 'CENTER_MANAGER' ? draftCenter : undefined,
+        centerNames: draftRole === 'CENTER_MANAGER' ? draftCenters : undefined,
         managedServices: draftRole === 'MODERATOR' ? draftServices : undefined,
       });
       setUsers(prev => prev.map(u => u.username === editingUser.username ? updated : u));
@@ -265,8 +270,8 @@ export const UserManagement: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-text-primary whitespace-nowrap text-start">
-                      {user.role === 'CENTER_MANAGER' && user.centerName
-                        ? user.centerName
+                      {user.role === 'CENTER_MANAGER' && (user.managedCenters?.length ?? 0) > 0
+                        ? user.managedCenters!.join(', ')
                         : user.role === 'MODERATOR' && user.managedServices?.length
                           ? user.managedServices.join(', ')
                           : <span className="text-text-secondary">—</span>}
@@ -312,22 +317,24 @@ export const UserManagement: React.FC = () => {
             </select>
           </div>
 
-          {/* Center field — only for CENTER_MANAGER */}
+          {/* Centers field — only for CENTER_MANAGER */}
           {draftRole === 'CENTER_MANAGER' && (
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-text-secondary">
-                {t('users.center')}
+                {t('users.centers', 'Centers')}
               </label>
               <select
-                value={draftCenter}
-                onChange={e => setDraftCenter(e.target.value)}
+                multiple
+                value={draftCenters}
+                onChange={handleCentersChange}
+                size={Math.min(centers.length || 4, 6)}
                 className="px-4 py-2 border border-divider rounded-xl outline-none focus:border-primary transition-colors bg-bg-paper text-text-primary text-sm w-full"
               >
-                <option value="">{t('users.selectCenter')}</option>
                 {centers.map(c => (
                   <option key={c.name} value={c.name}>{c.displayName ?? c.name}</option>
                 ))}
               </select>
+              <p className="text-xs text-text-secondary">{t('users.selectCentersHint', 'Hold Ctrl/Cmd to select multiple')}</p>
             </div>
           )}
 
@@ -362,8 +369,8 @@ export const UserManagement: React.FC = () => {
             </button>
             <button
               onClick={handleSave}
-              disabled={isSaving || (draftRole === 'CENTER_MANAGER' && !draftCenter)}
-              className={`px-4 py-2 bg-text-primary text-bg-paper rounded-xl hover:bg-black transition-colors border-none cursor-pointer font-medium${isSaving || (draftRole === 'CENTER_MANAGER' && !draftCenter) ? ' opacity-70 cursor-not-allowed' : ''}`}
+              disabled={isSaving || (draftRole === 'CENTER_MANAGER' && draftCenters.length === 0)}
+              className={`px-4 py-2 bg-text-primary text-bg-paper rounded-xl hover:bg-black transition-colors border-none cursor-pointer font-medium${isSaving || (draftRole === 'CENTER_MANAGER' && draftCenters.length === 0) ? ' opacity-70 cursor-not-allowed' : ''}`}
             >
               {isSaving ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
             </button>
