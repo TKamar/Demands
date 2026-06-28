@@ -17,7 +17,10 @@ export const excelController = {
           location: true,
           kind: true,
           demands: {
-            include: { location: true },
+            include: {
+              location: true,
+              resource: { select: { unit: true } },
+            },
             orderBy: { createdAt: 'asc' },
           },
           _count: { select: { demands: true } },
@@ -29,117 +32,95 @@ export const excelController = {
       workbook.creator = 'Demands System';
       workbook.created = new Date();
 
-      // Sheet 1: Projects
-      const pSheet = workbook.addWorksheet('Projects');
-      pSheet.columns = [
-        { header: 'שם פרויקט', key: 'name', width: 32 },
-        { header: 'מטרה', key: 'purpose', width: 42 },
-        { header: 'קשור ל', key: 'relatedTo', width: 22 },
-        { header: 'סוג', key: 'type', width: 14 },
+      const sheet = workbook.addWorksheet('דרישות');
+      sheet.views = [{ rightToLeft: true }];
+
+      sheet.columns = [
+        { header: 'שם פרויקט', key: 'projectName', width: 32 },
+        { header: 'מטרה', key: 'purpose', width: 36 },
+        { header: 'סוג פרויקט', key: 'projectType', width: 14 },
         { header: 'קטגוריה', key: 'kind', width: 22 },
-        { header: 'שנה', key: 'year', width: 8 },
-        { header: 'חצי', key: 'median', width: 8 },
         { header: 'עדיפות', key: 'priority', width: 10 },
         { header: 'מרכז', key: 'centerName', width: 22 },
         { header: 'ענף', key: 'branchName', width: 22 },
         { header: 'מחלקה', key: 'sectionName', width: 22 },
+        { header: 'שירות', key: 'serviceName', width: 18 },
+        { header: 'משאב', key: 'resourceName', width: 18 },
+        { header: 'כמות מבוקשת', key: 'value', width: 14 },
+        { header: 'יחידה', key: 'unit', width: 10 },
+        { header: 'כמות מאושרת', key: 'approvedValue', width: 14 },
+        { header: 'סטטוס', key: 'status', width: 24 },
+        { header: 'סוג דרישה', key: 'demandType', width: 12 },
         { header: 'בסיס', key: 'base', width: 16 },
-        { header: 'סביבה', key: 'environment', width: 16 },
         { header: 'רשת', key: 'network', width: 16 },
         { header: 'אשכול', key: 'cluster', width: 16 },
         { header: 'נוצר ע"י', key: 'createdBy', width: 22 },
         { header: 'תאריך יצירה', key: 'createdAt', width: 18 },
-        { header: 'מספר דרישות', key: 'demandCount', width: 14 },
+        { header: 'סיבת דחייה', key: 'reason', width: 32 },
       ];
 
-      const headerRow = pSheet.getRow(1);
+      const headerRow = sheet.getRow(1);
       headerRow.font = { bold: true, color: { argb: 'FF1A237E' } };
       headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8EAF6' } };
       headerRow.alignment = { horizontal: 'right' };
 
       projects.forEach((p: any) => {
-        pSheet.addRow({
-          name: p.name,
-          purpose: p.purpose,
-          relatedTo: p.relatedTo ?? '',
-          type: p.type,
-          kind: p.kindName,
-          year: p.year ?? '',
-          median: p.median ?? '',
-          priority: p.priority ?? '',
-          centerName: p.centerName,
-          branchName: p.branchName,
-          sectionName: p.sectionName,
-          base: p.location.baseName,
-          environment: p.location.environmentName,
-          network: p.location.networkName,
-          cluster: p.location.clusterName,
-          createdBy: p.createdByName ?? p.createdBy ?? '',
-          createdAt: new Date(p.createdAt).toLocaleDateString('he-IL'),
-          demandCount: p._count.demands,
-        });
-      });
-
-      // Sheet 2: Demands
-      const dSheet = workbook.addWorksheet('Demands');
-      dSheet.columns = [
-        { header: 'שם פרויקט (FK)', key: 'projectName', width: 32 },
-        { header: 'שירות', key: 'serviceName', width: 18 },
-        { header: 'שירות משאב', key: 'resourceService', width: 18 },
-        { header: 'משאב', key: 'resourceName', width: 18 },
-        { header: 'ערך', key: 'value', width: 10 },
-        { header: 'יחידה', key: 'unit', width: 10 },
-        { header: 'סוג', key: 'type', width: 12 },
-        { header: 'סטטוס', key: 'status', width: 24 },
-        { header: 'מרכז', key: 'centerName', width: 22 },
-        { header: 'ענף', key: 'branchName', width: 22 },
-        { header: 'מחלקה', key: 'sectionName', width: 22 },
-        { header: 'בסיס', key: 'base', width: 16 },
-        { header: 'סביבה', key: 'environment', width: 16 },
-        { header: 'רשת', key: 'network', width: 16 },
-        { header: 'אשכול', key: 'cluster', width: 16 },
-        { header: 'ערך מאושר', key: 'approvedValue', width: 14 },
-        { header: 'ערך משוייך', key: 'assignedValue', width: 14 },
-        { header: 'סיבה', key: 'reason', width: 32 },
-        { header: 'נוצר ע"י', key: 'createdBy', width: 22 },
-        { header: 'תאריך יצירה', key: 'createdAt', width: 18 },
-      ];
-
-      const dHeaderRow = dSheet.getRow(1);
-      dHeaderRow.font = { bold: true, color: { argb: 'FF1B5E20' } };
-      dHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8F5E9' } };
-      dHeaderRow.alignment = { horizontal: 'right' };
-
-      projects.forEach((p: any) => {
-        p.demands.forEach((d: any) => {
-          dSheet.addRow({
-            projectName: d.projectName,
-            serviceName: d.serviceName,
-            resourceService: d.resourceService,
-            resourceName: d.resourceName,
-            value: d.value,
+        if (p.demands.length === 0) {
+          sheet.addRow({
+            projectName: p.name,
+            purpose: p.purpose,
+            projectType: p.type,
+            kind: p.kindName,
+            priority: p.priority ?? '',
+            centerName: p.centerName,
+            branchName: p.branchName,
+            sectionName: p.sectionName,
+            serviceName: '',
+            resourceName: '',
+            value: '',
             unit: '',
-            type: d.type,
-            status: d.status,
-            centerName: d.centerName,
-            branchName: d.branchName,
-            sectionName: d.sectionName,
-            base: d.location.baseName,
-            environment: d.location.environmentName,
-            network: d.location.networkName,
-            cluster: d.location.clusterName,
-            approvedValue: d.approvedValue ?? '',
-            assignedValue: d.assignedValue ?? '',
-            reason: d.reason ?? '',
-            createdBy: d.createdByName ?? d.createdBy ?? '',
-            createdAt: new Date(d.createdAt).toLocaleDateString('he-IL'),
+            approvedValue: '',
+            status: '',
+            demandType: '',
+            base: p.location.baseName,
+            network: p.location.networkName,
+            cluster: p.location.clusterName,
+            createdBy: p.createdByName ?? p.createdBy ?? '',
+            createdAt: new Date(p.createdAt).toLocaleDateString('he-IL'),
+            reason: '',
           });
-        });
+        } else {
+          p.demands.forEach((d: any) => {
+            sheet.addRow({
+              projectName: p.name,
+              purpose: p.purpose,
+              projectType: p.type,
+              kind: p.kindName,
+              priority: p.priority ?? '',
+              centerName: p.centerName,
+              branchName: p.branchName,
+              sectionName: p.sectionName,
+              serviceName: d.serviceName,
+              resourceName: d.resourceName,
+              value: d.value,
+              unit: d.resource?.unit ?? '',
+              approvedValue: d.approvedValue ?? '',
+              status: d.status,
+              demandType: d.type,
+              base: d.location.baseName,
+              network: d.location.networkName,
+              cluster: d.location.clusterName,
+              createdBy: d.createdByName ?? d.createdBy ?? '',
+              createdAt: new Date(d.createdAt).toLocaleDateString('he-IL'),
+              reason: d.reason ?? '',
+            });
+          });
+        }
       });
 
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       const timestamp = new Date().toISOString().slice(0, 10);
-      res.setHeader('Content-Disposition', `attachment; filename="projects-${timestamp}.xlsx"`);
+      res.setHeader('Content-Disposition', `attachment; filename="demands-${timestamp}.xlsx"`);
 
       await workbook.xlsx.write(res);
       res.end();

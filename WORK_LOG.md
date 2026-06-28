@@ -1,18 +1,61 @@
-# Core Fixes Sprint — Table Layout, Sort, SplitView, Empty Projects & Excel
+# Core Fixes Sprint — Work Log
 
-**Branches:** Separate branch per task  
-**Started:** 2026-06-28  
-**Status:** In Progress (Tasks 1-4 Complete)
+**Branch:** `task-1-bootstrap-worklog`, `task-2-table-scroll-fix`, `task-3-filtersort-portal-fix`, `task-4-splitview-actions`, `task-5-empty-projects`, `task-6-excel-export`
+**Started:** 2026-06-28
+**Status:** **In Progress** (Tasks 1–6 Complete, Task 7 Pending)
 
-| Task | Status | Branch |
-|------|--------|--------|
-| 1 - Bootstrap | ✅ | task-1-bootstrap-worklog |
-| 2 - Table Scroll | ✅ | task-2-table-scroll-fix |
-| 3 - FilterSort Portal | ✅ | task-3-filtersort-portal-fix |
-| 4 - SplitView Actions | ✅ | task-4-splitview-actions |
-| 5 - Empty Projects | 🔄 | task-5-empty-projects |
-| 6 - Excel Export | 🔄 | task-6-excel-export |
-| 7 - Filter Bar | 🔄 | task-7-filter-bar |
+## 2026-06-28 — Core Fixes Sprint
+
+### Task 1: Bootstrap & WORK_LOG ✅
+- Branch: `task-1-bootstrap-worklog`
+- Created WORK_LOG.md structure
+- Commit: 094390b
+
+### Task 2: Table Scroll Layout Fix ✅
+- Branch: `task-2-table-scroll-fix`
+- Fixed: InfiniteScrollSentinel scrolling outside wrapper container
+- Added bounded container with max-height to RequirementsView and ProjectsAccordion
+- Updated useClientInfiniteScroll hook to accept optional `root` parameter for IntersectionObserver
+- Commit: 9ac6a6a
+
+### Task 3: FilterSort Portal Outside-Click Fix ✅
+- Branch: `task-3-filtersort-portal-fix`
+- Fixed: Portal dropdown closing on sort/filter Select interaction
+- Added panelRef to guard both trigger and portal in outside-click handler
+- Commit: ab3e265
+
+### Task 4: SplitView Action Footer Restoration ✅
+- Branch: `task-4-splitview-actions`
+- Fixed: Missing action buttons in demand sidebar for non-Pending statuses
+- Expanded status gate to include PendingCenterManager and WaitingOnPrerequisite
+- Implemented RBAC-aware button rendering: Approve/Deny/Edit for ADMIN/MOD, Edit/Cancel for regular users
+- Added handleApproveDemand and handleDenyDemand callbacks
+- Wired sidebar callbacks: onEdit, onCancel, onApprove, onDeny
+- Added ManageServiceDemandsModal for demand editing
+- Commit: 6226586
+
+### Task 5: Empty Projects Dynamic Visibility ✅
+- Branch: `task-5-empty-projects`
+- Fixed: Empty project rows persisting after Quick Approve
+- Implemented parent notification callback: onActiveDemandCountChange
+- DemandSubTable emits count when active demands change
+- ProjectsAccordion tracks depleted projects and filters them from active view
+- Commit: 41be80d
+
+### Task 6: Excel Export Rewrite ✅
+- Branch: `task-6-excel-export`
+- Fixed: Two-sheet workbook with empty unit column
+- Changed to single flat sheet "דרישות" (RTL layout)
+- One row per demand with project metadata repeated
+- Updated Prisma query to include `resource` with unit field
+- Filename changed from `projects-*.xlsx` to `demands-*.xlsx`
+- Commit: (pending)
+
+### Task 7: Advanced Filter Bar (In Progress)
+- Branch: `task-7-advanced-filters` (pending)
+- Target: Add always-visible filter bar with center/service/status/date-range filters
+- Extends DemandFilterParams with fromDate/toDate
+- Server-side date range filtering on createdAt field
 
 ---
 
