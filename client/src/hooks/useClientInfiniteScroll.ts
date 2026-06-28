@@ -2,7 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 const DEFAULT_CHUNK = 20;
 
-export function useClientInfiniteScroll<T>(items: T[], chunkSize: number = DEFAULT_CHUNK) {
+export function useClientInfiniteScroll<T>(
+  items: T[],
+  chunkSize: number = DEFAULT_CHUNK,
+  root?: Element | null,
+) {
   const [displayCount, setDisplayCount] = useState(chunkSize);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -23,10 +27,10 @@ export function useClientInfiniteScroll<T>(items: T[], chunkSize: number = DEFAU
           setDisplayCount((prev) => prev + chunkSize);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, root: root ?? null }
     );
     observerRef.current.observe(node);
-  }, [chunkSize]);
+  }, [chunkSize, root]);
 
   // Cleanup on unmount
   useEffect(() => {
