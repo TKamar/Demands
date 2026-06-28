@@ -9,8 +9,8 @@ import type { ResourceEntry } from './ResourceRow';
 import { useToast } from '../common/Toast';
 import { useReferenceData } from '../../hooks/useReferenceData';
 import { useCachedProjects } from '../../hooks/useCachedProjects';
-import { createDemandGroup } from '../../api/apiService';
-import type { CreateDemandPayload, UpdateDemandPayload } from '../../api/types';
+import { createDemandGroup, fetchValidBoxLocations } from '../../api/apiService';
+import type { CreateDemandPayload, UpdateDemandPayload, LocationItem } from '../../api/types';
 import type { Demand, DemandType } from '../../types/domain';
 
 let rowIdCounter = 0;
@@ -71,6 +71,13 @@ export default function CreateDemandModal({
   const [resourceRows, setResourceRows] = useState<ResourceEntry[]>([
     { id: newRowId(), resourceName: '', value: '', unit: '' },
   ]);
+
+  // Valid box locations (for override mode)
+  const [validBoxLocations, setValidBoxLocations] = useState<LocationItem[]>([]);
+
+  useEffect(() => {
+    fetchValidBoxLocations().then(setValidBoxLocations).catch(() => {});
+  }, []);
 
   // Populate form when editing
   useEffect(() => {
@@ -201,6 +208,9 @@ export default function CreateDemandModal({
 
   // --- Location Hierarchy (same logic as CreateProjectModal) ---
 
+  // Determine which locations to use: validBoxLocations if override, else referenceData.locations
+  const locationsForFilter = form.overrideLocation ? validBoxLocations : referenceData.locations;
+
   const networkOptions = referenceData.networks
     .filter((v) => v.isActive !== false || v.name === form.network)
     .map((v) => ({
@@ -210,18 +220,18 @@ export default function CreateDemandModal({
 
   const baseOptions = useMemo(() => {
     if (!form.network) return [];
-    const relevantLocations = referenceData.locations.filter(
+    const relevantLocations = locationsForFilter.filter(
       (l) => l.networkName === form.network
     );
     const relevantBaseNames = new Set(relevantLocations.map((l) => l.baseName));
     return referenceData.bases
       .filter((b) => relevantBaseNames.has(b.name) && (b.isActive !== false || b.name === form.base))
       .map((v) => ({ value: v.name, label: v.displayName || v.name }));
-  }, [referenceData.locations, referenceData.bases, form.network, form.base]);
+  }, [locationsForFilter, referenceData.bases, form.network, form.base]);
 
   const environmentOptions = useMemo(() => {
     if (!form.network || !form.base) return [];
-    const relevantLocations = referenceData.locations.filter(
+    const relevantLocations = locationsForFilter.filter(
       (l) => l.networkName === form.network && l.baseName === form.base
     );
     const relevantEnvNames = new Set(
@@ -231,7 +241,7 @@ export default function CreateDemandModal({
       .filter((e) => relevantEnvNames.has(e.name) && (e.isActive !== false || e.name === form.environment))
       .map((v) => ({ value: v.name, label: v.displayName || v.name }));
   }, [
-    referenceData.locations,
+    locationsForFilter,
     referenceData.environments,
     form.network,
     form.base,
@@ -240,7 +250,7 @@ export default function CreateDemandModal({
 
   const clusterOptions = useMemo(() => {
     if (!form.network || !form.base || !form.environment) return [];
-    const relevantLocations = referenceData.locations.filter(
+    const relevantLocations = locationsForFilter.filter(
       (l) => l.networkName === form.network && l.baseName === form.base && l.environmentName === form.environment
     );
     const relevantClusterNames = new Set(relevantLocations.map((l) => l.clusterName));
@@ -248,7 +258,7 @@ export default function CreateDemandModal({
       .filter((c) => relevantClusterNames.has(c.name) && (c.isActive !== false || c.name === form.cluster))
       .map((v) => ({ value: v.name, label: v.displayName || v.name }));
   }, [
-    referenceData.locations,
+    locationsForFilter,
     referenceData.clusters,
     form.network,
     form.base,

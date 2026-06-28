@@ -505,3 +505,6 @@ export const createCloudResourceStatus = (payload: any): Promise<CloudResourceSt
 
 export const deleteCloudResourceStatus = (id: number): Promise<void> =>
   api.delete(`/api/cloud-monitor/${id}`).then(() => undefined);
+
+export const fetchValidBoxLocations = (): Promise<LocationItem[]> =>
+  api.get('/api/locations?hasCloudStatus=true').then((r) => r.data);
