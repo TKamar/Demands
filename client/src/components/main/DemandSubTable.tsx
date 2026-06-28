@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdExpandMore, MdChevronLeft, MdEdit, MdDelete, MdGavel } from 'react-icons/md';
 import ConfirmDialog from '../common/ConfirmDialog';
@@ -31,6 +31,7 @@ export interface DemandSubTableProps {
   canDecide: boolean;
   mode?: 'active' | 'history';
   createdBy?: string;
+  onActiveDemandCountChange?: (projectName: string, count: number) => void;
 }
 
 export default function DemandSubTable({
@@ -38,6 +39,7 @@ export default function DemandSubTable({
   canDecide,
   mode = 'active',
   createdBy,
+  onActiveDemandCountChange,
 }: DemandSubTableProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -73,6 +75,11 @@ export default function DemandSubTable({
     ),
     [allDemands, mode]
   );
+
+  useEffect(() => {
+    if (isLoading || mode !== 'active') return;
+    onActiveDemandCountChange?.(projectName, demands.length);
+  }, [demands.length, isLoading, mode, projectName, onActiveDemandCountChange]);
 
   // Group demands by serviceName
   const serviceGroups = useMemo(() => {

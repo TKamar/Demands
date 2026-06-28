@@ -177,6 +177,20 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
     direction: 'asc',
   });
 
+  const [depletedProjects, setDepletedProjects] = useState<Set<string>>(new Set());
+
+  const handleActiveDemandCountChange = useCallback((name: string, count: number) => {
+    setDepletedProjects(prev => {
+      if (count === 0 && !prev.has(name)) return new Set([...prev, name]);
+      if (count > 0 && prev.has(name)) {
+        const next = new Set(prev);
+        next.delete(name);
+        return next;
+      }
+      return prev;
+    });
+  }, []);
+
   // Fetch all projects — center/type/priority filters applied client-side
   const { projects: allProjects, isLoading, updateProject, deleteProject, duplicateProject } =
     useProjects({ createdBy }, { page: 1, limit: 1000 });
@@ -223,8 +237,11 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
         return vals.includes(v);
       });
     }
+    if (mode === 'active') {
+      result = result.filter(p => !depletedProjects.has(p.name));
+    }
     return result;
-  }, [allProjects, selectedCenters, columnFilters]);
+  }, [allProjects, selectedCenters, columnFilters, mode, depletedProjects]);
 
   // Sort
   const sortedProjects = useMemo(() => {
@@ -551,7 +568,13 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
                 </div>
 
                 {isExpanded && (
-                  <DemandSubTable projectName={project.name} canDecide={canDecide} mode={mode} createdBy={createdBy} />
+                  <DemandSubTable
+                    projectName={project.name}
+                    canDecide={canDecide}
+                    mode={mode}
+                    createdBy={createdBy}
+                    onActiveDemandCountChange={handleActiveDemandCountChange}
+                  />
                 )}
               </div>
             );
