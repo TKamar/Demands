@@ -1,36 +1,20 @@
-# Core Fixes Sprint — Table Layout, Sort, SplitView, Empty Projects & Excel Flattening
+# Core Fixes Sprint — Table Layout, Sort, SplitView, Empty Projects & Excel
 
-**Branches:** Separate branch per task: `task-1-bootstrap-worklog`, `task-2-table-scroll-fix`, etc.  
+**Branches:** Separate branch per task (task-1, task-2, task-3, etc.)  
 **Started:** 2026-06-28  
 **Status:** In Progress
 
-## Task 1: Bootstrap & WORK_LOG — ✅ Complete
+## Progress Summary
 
-**Branch:** `task-1-bootstrap-worklog`  
-**Commit:** 094390b
-
-- [x] Created branch from dev
-- [x] Appended sprint log to WORK_LOG.md
-- [x] Committed bootstrap
-
----
-
-## Task 2: Table Scroll Layout Fix — ✅ Complete
-
-**Branch:** `task-2-table-scroll-fix`
-
-**Problem:** Infinite scroll loads caused horizontal scrollbar to disappear from viewport
-
-**Files Modified:**
-- `client/src/hooks/useClientInfiniteScroll.ts` — Added optional `root` parameter to IntersectionObserver
-- `client/src/components/main/RequirementsView.tsx` — Added `tableWrapperRef`, bounded wrapper with `maxHeight: calc(100vh - 220px)`, moved sentinel inside
-- `client/src/components/main/ProjectsAccordion.tsx` — Added `accordionWrapperRef`, bounded wrapper, moved sentinel inside
-
-**Changes:**
-- [x] useClientInfiniteScroll: `root?: Element | null` parameter + dependency
-- [x] RequirementsView: `tableWrapperRef`, bounded `<div>` with overflow-x-auto/y-auto
-- [x] ProjectsAccordion: `accordionWrapperRef`, bounded `<div>` wrapping batch bar + projects + sentinel
-- [x] TypeScript build: No new errors introduced
+| Task | Branch | Status |
+|------|--------|--------|
+| 1 | task-1-bootstrap-worklog | ✅ Complete |
+| 2 | task-2-table-scroll-fix | ✅ Complete |
+| 3 | task-3-filtersort-portal-fix | ✅ Complete |
+| 4 | task-4-splitview-actions | 🔄 Next |
+| 5 | task-5-empty-projects | 🔄 Next |
+| 6 | task-6-excel-export | 🔄 Next |
+| 7 | task-7-filter-bar | 🔄 Next |
 
 ---
 
@@ -43,6 +27,42 @@
 ---
 
 ## Cloud Monitor Integration (2026-06-24)
+
+**Objective:** Integrate Cloud/Ops Resource Monitor Dashboard with Prisma persistence and RBAC controls.
+**Branch:** `feature/cloud-monitor-integration`
+
+### Task 1: Git Setup & Docs Structure ✅
+- Branch created: feature/cloud-monitor-integration
+- Docs structure created: docs/superpowers/specs/ and docs/superpowers/plans/
+- Design doc and plan committed
+- Next: Prisma schema migration (Task 2)
+
+### Task 2: Prisma Schema Migration ✅
+- CloudResourceStatus model added with FK relations to Base, Network, Cluster
+- Reverse relations added to Base, Network, Cluster models
+- Migration applied successfully (20260624112748_add_cloud_resource_status)
+- Next: Seed data (Task 3)
+
+### Task 3: Seed Data ✅
+- seedCloudMonitor() added to seed.ts with 72 Hebrew entries (4 sites, 3 networks, 2 clusters, 8 services)
+- Hebrew Base/Network/Cluster reference records upserted in seed function
+- 72 CloudResourceStatus rows seeded (already present from migration)
+- Next: Backend controller + routes (Task 4)
+
+### Task 4: Backend Controller & Routes ✅
+- cloudMonitor.controller.ts: getAll (nested tree) + update (validated upsert)
+- cloudMonitor.routes.ts: GET (requireAuth) + PUT (requireModerator)
+- Registered at /api/cloud-monitor in routes/index.ts
+- TypeScript compiles cleanly
+- Next: Frontend types + API service (Task 5)
+
+### Task 5: Frontend Types & API Service ✅
+- CloudResourceStatusEntry, CloudMonitorData, CloudMonitorSite/Network/Cluster types added to domain.ts
+- getCloudMonitor() and updateCloudMonitorStatus() added to apiService.ts
+- Imports updated
+- TypeScript compiles without errors
+- Next: Tab registration (Task 6)
+
 ### Task 6: Tab Registration ✅
 - TopNavTabId union expanded with 'cloudMonitor'
 - getAvailableTabs: 'cloudMonitor' added for ALL roles
