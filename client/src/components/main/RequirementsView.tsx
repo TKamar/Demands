@@ -152,6 +152,7 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
   }, [demands, currentPage, isLoading]);
 
   // Sentinel refs for IntersectionObserver (use refs to avoid stale closures)
+  const tableWrapperRef = useRef<HTMLDivElement>(null);
   const rvObserverRef = useRef<IntersectionObserver | null>(null);
   const currentPageRef = useRef(currentPage);
   const totalPagesRef = useRef(totalPages);
@@ -176,7 +177,7 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
       if (entry.isIntersecting && !isLoadingRef.current && currentPageRef.current < totalPagesRef.current) {
         setCurrentPage((p) => p + 1);
       }
-    }, { threshold: 0.1 });
+    }, { threshold: 0.1, root: tableWrapperRef.current });
     rvObserverRef.current.observe(node);
   }, []);
 
@@ -459,7 +460,9 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
         ) : (
           <>
             <div
-              className={`overflow-x-auto transition-opacity duration-200 ${isFiltersPending || showLoading ? 'opacity-50' : 'opacity-100'}`}
+              ref={tableWrapperRef}
+              className={`overflow-x-auto overflow-y-auto transition-opacity duration-200 ${isFiltersPending || showLoading ? 'opacity-50' : 'opacity-100'}`}
+              style={{ maxHeight: 'calc(100vh - 220px)' }}
             >
               <DemandsTable
                 demands={accumulatedDemands}
@@ -481,16 +484,15 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
                 onToggleSelect={handleToggleSelect}
                 onDeselectAll={clearSelection}
               />
+              <InfiniteScrollSentinel
+                sentinelRef={sentinelRef}
+                isLoading={isLoading}
+                hasMore={currentPage < totalPages}
+              />
             </div>
           </>
         )}
       </div>
-
-      <InfiniteScrollSentinel
-        sentinelRef={sentinelRef}
-        isLoading={isLoading}
-        hasMore={currentPage < totalPages}
-      />
 
       <DemandDetailSidebar
         demand={selectedDemand}

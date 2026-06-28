@@ -242,7 +242,12 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
     });
   }, [filteredProjects, sortState]);
 
-  const { displayedItems: pageProjects, sentinelRef, hasMore } = useClientInfiniteScroll(sortedProjects, 20);
+  const accordionWrapperRef = useRef<HTMLDivElement>(null);
+  const { displayedItems: pageProjects, sentinelRef, hasMore } = useClientInfiniteScroll(
+    sortedProjects,
+    20,
+    accordionWrapperRef.current,
+  );
 
   const toggleExpand = useCallback((name: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -319,7 +324,7 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl border border-divider overflow-visible bg-bg-paper shadow-sm">
+      <div className="rounded-2xl border border-divider overflow-hidden bg-bg-paper shadow-sm">
         {/* Column header row */}
         <div className="flex items-center gap-3 bg-bg-default border-b border-divider px-4 py-3">
           <input
@@ -390,9 +395,15 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
           </div>
         </div>
 
-        {/* Batch action bar */}
-        {selectedProjectNames.size > 0 && (
-          <div className="flex items-center gap-3 bg-primary/5 border-b border-primary/20 px-4 py-3">
+        {/* Bounded scrollable list */}
+        <div
+          ref={accordionWrapperRef}
+          className="overflow-y-auto overflow-x-auto"
+          style={{ maxHeight: 'calc(100vh - 220px)' }}
+        >
+          {/* Batch action bar */}
+          {selectedProjectNames.size > 0 && (
+            <div className="flex items-center gap-3 bg-primary/5 border-b border-primary/20 px-4 py-3">
             <span className="text-sm font-medium text-text-primary">
               {t('common.selected', 'Selected')}: {selectedProjectNames.size}
             </span>
@@ -545,13 +556,13 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
               </div>
             );
           })}
+          <InfiniteScrollSentinel
+            sentinelRef={sentinelRef}
+            isLoading={isLoading}
+            hasMore={hasMore}
+          />
+        </div>
       </div>
-
-      <InfiniteScrollSentinel
-        sentinelRef={sentinelRef}
-        isLoading={isLoading}
-        hasMore={hasMore}
-      />
 
       <ProjectDetailSidebar
         project={selectedProject}
