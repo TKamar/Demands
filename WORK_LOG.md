@@ -1,34 +1,34 @@
 # Core Fixes Sprint — Work Log
 
-**Branch:** `task-1-bootstrap-worklog`, `task-2-table-scroll-fix`, `task-3-filtersort-portal-fix`, `task-4-splitview-actions`, `task-5-empty-projects`, `task-6-excel-export`
+**Branches:** `task-1-bootstrap-worklog`, `task-2-table-scroll-fix`, `task-3-filtersort-portal-fix`, `task-4-splitview-actions`, `task-5-empty-projects`, `task-6-excel-export`, `task-7-advanced-filters`
 **Started:** 2026-06-28
-**Status:** **In Progress** (Tasks 1–6 Complete, Task 7 Pending)
+**Status:** **✅ ALL 7 TASKS COMPLETE**
 
 ## 2026-06-28 — Core Fixes Sprint
 
 ### Task 1: Bootstrap & WORK_LOG ✅
 - Branch: `task-1-bootstrap-worklog`
-- Created WORK_LOG.md structure
+- Created WORK_LOG.md structure for sprint tracking
 - Commit: 094390b
 
 ### Task 2: Table Scroll Layout Fix ✅
 - Branch: `task-2-table-scroll-fix`
-- Fixed: InfiniteScrollSentinel scrolling outside wrapper container
+- Fixed: InfiniteScrollSentinel scrolling outside wrapper, horizontal scrollbar sinking off-screen
 - Added bounded container with max-height to RequirementsView and ProjectsAccordion
 - Updated useClientInfiniteScroll hook to accept optional `root` parameter for IntersectionObserver
 - Commit: 9ac6a6a
 
 ### Task 3: FilterSort Portal Outside-Click Fix ✅
 - Branch: `task-3-filtersort-portal-fix`
-- Fixed: Portal dropdown closing on sort/filter Select interaction
-- Added panelRef to guard both trigger and portal in outside-click handler
+- Fixed: Portal dropdown closing prematurely on sort/filter Select interaction
+- Added panelRef to track both trigger and portal div in outside-click handler
 - Commit: ab3e265
 
 ### Task 4: SplitView Action Footer Restoration ✅
 - Branch: `task-4-splitview-actions`
 - Fixed: Missing action buttons in demand sidebar for non-Pending statuses
 - Expanded status gate to include PendingCenterManager and WaitingOnPrerequisite
-- Implemented RBAC-aware button rendering: Approve/Deny/Edit for ADMIN/MOD, Edit/Cancel for regular users
+- Implemented RBAC-aware button rendering: Approve/Deny/Edit (ADMIN/MOD) vs Edit/Cancel (regular users)
 - Added handleApproveDemand and handleDenyDemand callbacks
 - Wired sidebar callbacks: onEdit, onCancel, onApprove, onDeny
 - Added ManageServiceDemandsModal for demand editing
@@ -37,7 +37,7 @@
 ### Task 5: Empty Projects Dynamic Visibility ✅
 - Branch: `task-5-empty-projects`
 - Fixed: Empty project rows persisting after Quick Approve
-- Implemented parent notification callback: onActiveDemandCountChange
+- Implemented onActiveDemandCountChange callback for parent notification
 - DemandSubTable emits count when active demands change
 - ProjectsAccordion tracks depleted projects and filters them from active view
 - Commit: 41be80d
@@ -49,13 +49,38 @@
 - One row per demand with project metadata repeated
 - Updated Prisma query to include `resource` with unit field
 - Filename changed from `projects-*.xlsx` to `demands-*.xlsx`
-- Commit: (pending)
+- Commit: efbeec4
 
-### Task 7: Advanced Filter Bar (In Progress)
-- Branch: `task-7-advanced-filters` (pending)
-- Target: Add always-visible filter bar with center/service/status/date-range filters
-- Extends DemandFilterParams with fromDate/toDate
-- Server-side date range filtering on createdAt field
+### Task 7: Advanced Filter Bar ✅
+- Branch: `task-7-advanced-filters`
+- Added always-visible filter bar above Demands table
+- Filter controls: center select, service select, status select, from-date picker, to-date picker, clear button
+- Extended DemandFilterParams with fromDate/toDate fields
+- Updated apiService to pass date params to /api/demands/filter endpoint
+- Updated server demand controller to extract and pass date params to service
+- Added date range filtering logic to demand.service.ts (createdAt gte/lte)
+- Commit: cb2691a
+
+## TypeScript Cleanup
+
+**Objective:** Fix 6 pre-existing TypeScript errors to achieve clean build.
+**Branch:** `task-7-advanced-filters` (final commit)
+**Status:** ✅ All errors resolved, both client and server compile successfully
+
+### Fixed Errors:
+1. **StatusBadge.tsx** — Added missing DemandStatus enum values (AwaitingProcurement, HeldForEfficiency, ConditionalFootprintReduction, InProgress, TransferredTo810)
+2. **MyApprovalRequests.tsx** — Fixed SortKey type mismatches by casting to string | undefined
+3. **DemandsTable.tsx** — Cast sort prop types to handle DemandSortKey/string compatibility
+4. **CreateProjectModal.tsx** — Fixed form state initialization, added median/year fields, corrected type mismatches
+5. **DemandSubTable.tsx** — Removed unused RejectDemandPayload import
+6. **ProjectsAccordion.tsx** — Removed unused MoreActionsMenu and MoreAction imports
+7. **RequestHistory.tsx** — Removed unused FilterGroupConfig import, cast sort types
+8. **ApprovalRequestsPanel.tsx** — Removed unused MdAdd and useModal imports, fixed ExcelToolbar props
+9. **AdminDashboard.tsx** — Removed unused statusColors and entry parameters
+10. **ManageServiceDemandsModal.tsx** — Removed unused CreateDemandPayload import
+
+**Build Status:** ✅ Client: 794 modules, built in 11.29s. Server: TypeScript clean.
+**Final Commit:** 5caa66e
 
 ---
 

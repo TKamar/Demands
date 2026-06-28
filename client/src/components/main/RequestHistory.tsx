@@ -10,7 +10,7 @@ import { useHistoryDemands } from '../../hooks/useHistoryDemands';
 import { useToast } from '../common/Toast';
 import { restoreDemand } from '../../api/apiService';
 import type { Demand, Project } from '../../types/domain';
-import type { FilterGroupConfig, SortState } from '../../types/filter';
+import type { SortState } from '../../types/filter';
 
 const HISTORY_COLUMNS = demandColumnConfig.filter((col) =>
   ['project', 'service', 'resource', 'status', 'value', 'approvedValue', 'createdBy', 'createdAt', 'actions'].includes(col.key)
@@ -89,8 +89,8 @@ export default function RequestHistory({ selectedCenters }: RequestHistoryProps)
           selectedDemand={selectedDemand}
           onSelectDemand={setSelectedDemand}
           onRestore={handleRestore}
-          sortState={sortState}
-          onColumnSort={handleColumnSort}
+          sortState={sortState as any}
+          onColumnSort={handleColumnSort as any}
         />
         <InfiniteScrollSentinel
           sentinelRef={sentinelRef}

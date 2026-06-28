@@ -11,6 +11,11 @@ const statusStyles: Record<DemandStatus, string> = {
   Cancelled:             'text-gray-500 dark:text-gray-400',
   CenterManagerRejected: 'text-red-800 dark:text-red-200',
   WaitingOnPrerequisite: 'text-indigo-600 dark:text-indigo-300',
+  AwaitingProcurement:   'text-cyan-600 dark:text-cyan-300',
+  HeldForEfficiency:     'text-amber-600 dark:text-amber-300',
+  ConditionalFootprintReduction: 'text-lime-600 dark:text-lime-300',
+  InProgress:            'text-sky-600 dark:text-sky-300',
+  TransferredTo810:      'text-teal-600 dark:text-teal-300',
 };
 
 interface StatusBadgeProps {

@@ -163,6 +163,8 @@ export interface DemandFilterParams {
   projectPriority?: Priority;
   managed?: boolean;
   createdBy?: string;
+  fromDate?: string;
+  toDate?: string;
 }
 
 export interface Capacity {

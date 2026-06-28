@@ -86,6 +86,8 @@ export const demandController = {
         relatedTo,
         emergencyOption,
         managed,
+        fromDate,
+        toDate,
         page: pageQuery,
         limit: limitQuery,
         sortBy,
@@ -144,6 +146,8 @@ export const demandController = {
           projectEmergencyOption: emergencyOption as string | undefined,
           projectPriority: req.query.priority as string | undefined,
           centerName,
+          createdFromDate: fromDate ? new Date(fromDate as string) : undefined,
+          createdToDate: toDate ? new Date(`${toDate}T23:59:59.999Z`) : undefined,
         },
         {
           page,

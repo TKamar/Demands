@@ -12,8 +12,6 @@ import {
   MdArrowDownward,
   MdUnfoldMore,
 } from 'react-icons/md';
-import MoreActionsMenu from '../common/MoreActionsMenu';
-import type { MoreAction } from '../common/MoreActionsMenu';
 import { useProjects } from '../../hooks/useProjects';
 import PriorityBadge from '../projects/PriorityBadge';
 import DemandSubTable from './DemandSubTable';

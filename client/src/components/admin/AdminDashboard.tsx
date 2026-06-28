@@ -115,9 +115,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
     count,
   }));
 
-  const statusColors = Object.entries(stats.byStatus).map(([status]) =>
-    STATUS_COLORS[status] || '#9ca3af'
-  );
 
   return (
     <div className="flex-1 overflow-auto bg-bg-default p-6" dir="rtl">
@@ -148,7 +145,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {pieChartData.map((entry, index) => (
+                    {pieChartData.map((_, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={Object.values(stats.byStatus)[index] ? STATUS_COLORS[Object.keys(stats.byStatus)[index]] || '#9ca3af' : '#9ca3af'}
