@@ -4,7 +4,7 @@
 
 **Branch:** `feature/rbac-multi-center-and-admin-crud` from `dev`  
 **Started:** 2026-06-28  
-**Status:** In Progress
+**Status:** **✅ ALL TASKS COMPLETE**
 
 ### Tasks
 - [x] A. Many-to-Many Center Managers (Prisma + Backend + Frontend)
@@ -13,10 +13,22 @@
   - A4-A5: GET /me route and authorization middleware updates
   - A6: Client types (AppUser.managedCenters, UpdateUserPayload.centerNames)
   - A7: UserManagement.tsx multi-select centers UI
-- [ ] B1. CloudResourceStatus CRUD Admin Tab
-- [ ] B2. Name/DisplayName Column Merge
-- [ ] C. Box Location Guard & Validation Engine
-- [ ] D. Service-Centric Wallet Allocation View
+- [x] B1. CloudResourceStatus CRUD Admin Tab
+  - Server: getAllFlat, create, delete handlers in cloudMonitor.controller.ts
+  - Routes: /flat (GET), POST /, DELETE /:id with proper auth guards
+  - Client: CloudResourceManagement, CloudResourceTable, CloudResourceModal components
+  - SettingsPage: wired Cloud Resources tab (ADMIN only)
+- [x] B2. Name/DisplayName Column Merge
+  - Merged Name+DisplayName columns in all admin entity tables
+  - Display name shown as bold primary, internal name as dim secondary text
+- [x] C. Box Location Guard & Validation Engine
+  - Server: cluster.isActive check + CloudResourceStatus (base/network/cluster) guard
+  - Server: location.controller hasCloudStatus filter returns only valid box locations
+  - Client: fetchValidBoxLocations() API + CreateDemandModal constraints
+- [x] D. Service-Centric Wallet Allocation View
+  - WalletTable refactored with service-grouped rendering
+  - Group headers show service name + total quota
+  - No redundant Service column in row cells
 
 ---
 
