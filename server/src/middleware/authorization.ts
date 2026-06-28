@@ -22,11 +22,19 @@ export const requireAuth = async (
   try {
     const { username, fullName, oidcRoles } = req.auth.user;
 
-    const dbUser = await prisma.user.upsert({
-      where: { username },
-      create: { username, fullName, role: UserRole.REGULAR_USER },
-      update: { fullName },
-    });
+    const [dbUser, centerAssignments] = await Promise.all([
+      prisma.user.upsert({
+        where: { username },
+        create: { username, fullName, role: UserRole.REGULAR_USER },
+        update: { fullName },
+      }),
+      prisma.userCenterManagement.findMany({
+        where: { username },
+        select: { centerName: true },
+      }),
+    ]);
+
+    const managedCenters = centerAssignments.map((c) => c.centerName);
 
     // Replace the transient token-based user with the DB-backed one
     req.auth.user = new User({
@@ -34,7 +42,8 @@ export const requireAuth = async (
       fullName,
       oidcRoles,
       role: dbUser.role,
-      centerName: dbUser.centerName,
+      centerName: managedCenters[0] ?? dbUser.centerName,
+      managedCenters,
       sub: req.auth.user.sub,
       email: req.auth.user.email,
       givenName: req.auth.user.givenName,

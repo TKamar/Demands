@@ -26,6 +26,7 @@ export interface AppUser {
   fullName: string;
   role: UserRole;
   centerName: string | null;
+  managedCenters: string[];
   managedServices: string[];
 }
 

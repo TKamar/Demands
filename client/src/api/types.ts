@@ -294,6 +294,6 @@ export interface BulkApproveMatrixPayload {
 
 export interface UpdateUserPayload {
   role: UserRole;
-  centerName?: string;
+  centerNames?: string[];
   managedServices?: string[];
 }
