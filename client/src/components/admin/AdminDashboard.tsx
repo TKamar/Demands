@@ -166,7 +166,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
                     <div className={`px-3 py-2 rounded text-sm font-medium ${
                       Object.entries(STATUS_COLORS).find(([s]) => s === status)
                         ? `text-white`
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-bg-paper text-text-primary'
                     }`}
                     style={{ backgroundColor: STATUS_COLORS[status] || '#d1d5db', color: 'white' }}
                     >
@@ -208,7 +208,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
               </thead>
               <tbody>
                 {stats.byCenter.map((item) => (
-                  <tr key={item.center} className="border-b border-divider hover:bg-gray-50">
+                  <tr key={item.center} className="border-b border-divider hover:bg-bg-default">
                     <td className="py-3 px-4 text-text-primary">{item.center}</td>
                     <td className="py-3 px-4 text-text-primary text-center font-semibold">{item.count}</td>
                   </tr>
@@ -231,7 +231,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
               </thead>
               <tbody>
                 {stats.byService.map((item) => (
-                  <tr key={item.service} className="border-b border-divider hover:bg-gray-50">
+                  <tr key={item.service} className="border-b border-divider hover:bg-bg-default">
                     <td className="py-3 px-4 text-text-primary">{item.service}</td>
                     <td className="py-3 px-4 text-text-primary text-center font-semibold">{item.count}</td>
                   </tr>
