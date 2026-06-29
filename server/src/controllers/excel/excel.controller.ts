@@ -10,27 +10,43 @@ async function importNewFormat(sheet: any, locations: any[], kindNames: Set<stri
   const projectRowsMap = new Map<string, any>();
   const demandRows: Record<string, any>[] = [];
 
+  // Column indices (1-based)
+  const COL_CENTER = 1;
+  const COL_BRANCH = 2;
+  const COL_SECTION = 3;
+  const COL_BASE = 4;
+  const COL_NETWORK = 5;
+  const COL_CLUSTER = 6;
+  const COL_ENVIRONMENT = 7;
+  const COL_SERVICE_RESOURCE = 9;
+  const COL_UNIT = 10;
+  const COL_QUANTITY = 11;
+  const COL_PRIORITY = 14;
+  const COL_CATEGORY = 15;
+  const COL_PROJECT_NAME = 16;
+  const COL_NOTES = 17;
+
   sheet.eachRow((row: any, rowNum: number) => {
     if (rowNum === 1) return;
 
-    const getCell = (key: string) => {
-      const cell = row.getCell(key);
+    const getCell = (colNum: number) => {
+      const cell = row.getCell(colNum);
       return cell?.value ?? '';
     };
 
-    const center = String(getCell('center') ?? '').trim();
-    const branch = String(getCell('branch') ?? '').trim();
-    const section = String(getCell('section') ?? '').trim();
-    const base = String(getCell('base') ?? '').trim();
-    const network = String(getCell('network') ?? '').trim();
-    const cluster = String(getCell('cluster') ?? '').trim();
-    const environment = String(getCell('environment') ?? '').trim();
-    const serviceResourceStr = String(getCell('serviceResource') ?? '').trim();
-    const quantity = String(getCell('quantity') ?? '').trim();
-    const priority = String(getCell('priority') ?? '').trim();
-    const category = String(getCell('category') ?? '').trim();
-    const projectName = String(getCell('projectName') ?? '').trim();
-    const notes = String(getCell('notes') ?? '').trim();
+    const center = String(getCell(COL_CENTER) ?? '').trim();
+    const branch = String(getCell(COL_BRANCH) ?? '').trim();
+    const section = String(getCell(COL_SECTION) ?? '').trim();
+    const base = String(getCell(COL_BASE) ?? '').trim();
+    const network = String(getCell(COL_NETWORK) ?? '').trim();
+    const cluster = String(getCell(COL_CLUSTER) ?? '').trim();
+    const environment = String(getCell(COL_ENVIRONMENT) ?? '').trim();
+    const serviceResourceStr = String(getCell(COL_SERVICE_RESOURCE) ?? '').trim();
+    const quantity = String(getCell(COL_QUANTITY) ?? '').trim();
+    const priority = String(getCell(COL_PRIORITY) ?? '').trim();
+    const category = String(getCell(COL_CATEGORY) ?? '').trim();
+    const projectName = String(getCell(COL_PROJECT_NAME) ?? '').trim();
+    const notes = String(getCell(COL_NOTES) ?? '').trim();
 
     if (!center || !branch || !section) {
       errors.push(`Row ${rowNum}: שדות חובה חסרים (center, branch, section)`);
