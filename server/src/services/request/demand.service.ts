@@ -43,6 +43,7 @@ export const demandService = {
       centerName?: string;
       createdFromDate?: Date;
       createdToDate?: Date;
+      activeOnly?: boolean;
     },
     pagination?: { page: number; limit: number; sortBy?: string; sortDir?: 'asc' | 'desc' }
   ) => {
@@ -56,7 +57,11 @@ export const demandService = {
     if (filters.resourceService) where.resourceService = filters.resourceService;
     if (filters.locationId) where.locationId = filters.locationId;
     if (filters.type) where.type = filters.type;
-    if (filters.status) where.status = filters.status;
+    if (filters.activeOnly) {
+      where.status = { in: ['Pending', 'PendingCenterManager', 'WaitingOnPrerequisite'] as DemandStatus[] };
+    } else if (filters.status) {
+      where.status = filters.status;
+    }
     if (filters.createdBy) where.createdBy = filters.createdBy;
     if (filters.serviceNames) where.serviceName = { in: filters.serviceNames };
     if (filters.centerName) where.centerName = filters.centerName;

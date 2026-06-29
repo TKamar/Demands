@@ -100,6 +100,7 @@ export const demandController = {
       const page = Number(pageQuery) || 1;
       const limit = Number(limitQuery) || 10;
       const isManagedView = managed === 'true';
+      const activeOnly = isManagedView && !status;
 
       let createdByFilter: string | undefined;
       let serviceNamesFilter: string[] | undefined;
@@ -149,6 +150,7 @@ export const demandController = {
           centerName,
           createdFromDate: fromDate ? new Date(fromDate as string) : undefined,
           createdToDate: toDate ? new Date(`${toDate}T23:59:59.999Z`) : undefined,
+          activeOnly,
         },
         {
           page,
