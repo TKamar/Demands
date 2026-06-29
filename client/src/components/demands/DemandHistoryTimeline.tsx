@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { fetchDemandHistory, type DemandHistoryEntry } from '../../api/apiService';
+import { fetchDemandAuditHistory, type DemandHistoryEntry } from '../../api/apiService';
 
 const ACTION_COLOR: Record<string, string> = {
   Created: 'bg-blue-500',
@@ -24,7 +24,7 @@ export default function DemandHistoryTimeline({ demandId }: Props) {
 
   useEffect(() => {
     setIsLoading(true);
-    fetchDemandHistory(demandId)
+    fetchDemandAuditHistory(demandId)
       .then(setEntries)
       .catch(() => setEntries([]))
       .finally(() => setIsLoading(false));

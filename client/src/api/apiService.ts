@@ -482,7 +482,7 @@ export interface DemandHistoryEntry {
   createdAt: string;
 }
 
-export async function fetchDemandHistory(demandId: number): Promise<DemandHistoryEntry[]> {
+export async function fetchDemandAuditHistory(demandId: number): Promise<DemandHistoryEntry[]> {
   const res = await api.get<DemandHistoryEntry[]>(`/api/demands/${demandId}/history`);
   return res.data;
 }
