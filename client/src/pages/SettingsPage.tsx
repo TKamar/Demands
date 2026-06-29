@@ -545,15 +545,16 @@ export default function SettingsPage() {
     if (!hasAccess) {
         return (
             <div className="max-w-[1600px] mx-auto p-6 md:p-8">
-                <div className="mb-8">
+                <div className="mb-8 flex items-start gap-3">
                     <button
                         onClick={() => navigate('/projects')}
-                        className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer p-0 mb-4 text-sm"
+                        className="mt-1 p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-default transition-colors bg-transparent border-none cursor-pointer shrink-0"
                     >
-                        <MdArrowBack size={16} />
-                        {t('common.back', 'Back')}
+                        <MdArrowBack size={20} />
                     </button>
-                    <h1 className="text-2xl font-bold text-text-primary mb-2">{t('nav.settings', 'Settings')}</h1>
+                    <div>
+                        <h1 className="text-2xl font-bold text-text-primary mb-2">{t('nav.settings', 'Settings')}</h1>
+                    </div>
                 </div>
                 <div className="bg-amber-50 border-l-4 border-amber-500 p-4">
                     <p className="text-amber-800">
@@ -566,16 +567,17 @@ export default function SettingsPage() {
 
     return (
         <div className="max-w-[1600px] mx-auto p-6 md:p-8">
-            <div className="mb-8">
+            <div className="mb-8 flex items-start gap-3">
                 <button
                     onClick={() => navigate('/projects')}
-                    className="flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer p-0 mb-4 text-sm"
+                    className="mt-1 p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-default transition-colors bg-transparent border-none cursor-pointer shrink-0"
                 >
-                    <MdArrowBack size={16} />
-                    {t('common.back', 'Back')}
+                    <MdArrowBack size={20} />
                 </button>
-                <h1 className="text-2xl font-bold text-text-primary mb-2">{t('nav.settings', 'Settings')}</h1>
-                <p className="text-text-secondary">{t('settings.subtitle', 'Manage system entities and configurations')}</p>
+                <div>
+                    <h1 className="text-2xl font-bold text-text-primary mb-2">{t('nav.settings', 'Settings')}</h1>
+                    <p className="text-text-secondary text-sm">{t('settings.subtitle', 'Manage system entities and configurations')}</p>
+                </div>
             </div>
 
             {/* Main Tabs Header */}
