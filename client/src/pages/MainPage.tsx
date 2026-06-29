@@ -17,7 +17,7 @@ const DEFAULT_SUBVIEWS: Record<TopNavTabId, SubViewId> = {
   approvalRequests: 'projects',
   myRequests: 'projects',
   history: 'requirements',
-  dashboard: 'projects' as SubViewId,
+  dashboard: 'projects',
 };
 
 export default function MainPage() {
@@ -84,7 +84,7 @@ export default function MainPage() {
               selectedCenters={selectedCenters}
             />
           )}
-          {topNavTab === 'dashboard' && <AdminDashboard selectedCenters={selectedCenters} />}
+          {topNavTab === 'dashboard' && <AdminDashboard selectedCenters={selectedCenters} currentUser={currentUser} />}
         </div>
       </div>
     </NavigationContext.Provider>

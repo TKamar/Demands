@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAdminStats, type AdminStats } from '../../api/apiService';
 import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import type { AppUser } from '../../types/domain';
 
 const STATUS_LABELS: Record<string, string> = {
   Pending: 'בהמתנה',
@@ -19,6 +20,11 @@ const STATUS_LABELS: Record<string, string> = {
   CenterManagerRejected: 'נדחה - מנהל מרכז',
   ApprovedAndAssigned: 'אושר וחילק',
 };
+
+const SERVICE_COLORS = [
+  '#3b82f6', '#ef4444', '#10b981', '#f59e0b',
+  '#8b5cf6', '#06b6d4', '#ec4899', '#f97316',
+];
 
 const STATUS_COLORS: Record<string, string> = {
   Pending: '#fbbf24',
@@ -55,19 +61,26 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, description, clas
 
 interface AdminDashboardProps {
   selectedCenters?: string[];
+  currentUser: AppUser | null;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [], currentUser }) => {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [availableServices, setAvailableServices] = useState<string[]>([]);
+  const isAdmin = currentUser?.role === 'ADMIN';
 
   useEffect(() => {
     const loadStats = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await fetchAdminStats(selectedCenters.length > 0 ? selectedCenters : undefined);
+        const data = await fetchAdminStats(
+          selectedCenters.length > 0 ? selectedCenters : undefined,
+          isAdmin && selectedServices.length > 0 ? selectedServices : undefined,
+        );
         setStats(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load dashboard stats');
@@ -77,7 +90,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
     };
 
     loadStats();
-  }, [selectedCenters]);
+  }, [selectedCenters, selectedServices, isAdmin]);
+
+  useEffect(() => {
+    if (stats?.byService) {
+      setAvailableServices(stats.byService.map((s) => s.service));
+    }
+  }, [stats]);
 
   if (loading) {
     return (
@@ -115,11 +134,48 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
     count,
   }));
 
+  // Prepare service pie chart data
+  const servicePieData = stats.byService.map((item) => ({
+    name: item.service,
+    value: item.count,
+  }));
+
 
   return (
     <div className="flex-1 overflow-auto bg-bg-default p-6" dir="rtl">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold text-text-primary mb-8">דאשבוארד מנהל</h1>
+        <h1 className="text-2xl font-bold text-text-primary mb-6">סטטיסטיקות</h1>
+
+        {isAdmin && availableServices.length > 0 && (
+          <div className="flex items-center gap-3 mb-6 flex-wrap" dir="rtl">
+            <span className="text-sm text-text-secondary font-medium">סינון לפי שירות:</span>
+            {availableServices.map((svc) => (
+              <button
+                key={svc}
+                onClick={() =>
+                  setSelectedServices((prev) =>
+                    prev.includes(svc) ? prev.filter((s) => s !== svc) : [...prev, svc]
+                  )
+                }
+                className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                  selectedServices.includes(svc)
+                    ? 'bg-primary text-white border-primary'
+                    : 'bg-bg-paper text-text-secondary border-divider hover:border-primary'
+                }`}
+              >
+                {svc}
+              </button>
+            ))}
+            {selectedServices.length > 0 && (
+              <button
+                onClick={() => setSelectedServices([])}
+                className="px-3 py-1 text-xs rounded-full text-danger border border-danger hover:bg-danger hover:text-white transition-colors"
+              >
+                נקה
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -179,6 +235,32 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [] })
             </div>
           </div>
         </div>
+
+        {/* Service Distribution */}
+        {servicePieData.length > 0 && (
+          <div className="bg-bg-paper border border-divider rounded-lg p-6 mb-8">
+            <h2 className="text-lg font-semibold text-text-primary mb-6">התפלגות לפי שירות</h2>
+            <div className="flex justify-center">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={servicePieData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={110}
+                    dataKey="value"
+                  >
+                    {servicePieData.map((_, index) => (
+                      <Cell key={`svc-cell-${index}`} fill={SERVICE_COLORS[index % SERVICE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => value} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
 
         {/* Open Conditional Statuses Bar Chart */}
         {barChartData.length > 0 && (
