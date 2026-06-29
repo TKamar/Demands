@@ -6,6 +6,7 @@ export interface SubDecisionOption {
   requiresQuantity: boolean;
   requiresDate: boolean;
   requiresUser: boolean;
+  requiresTargetUser?: boolean;
 }
 
 export const SUB_DECISIONS: SubDecisionOption[] = [
@@ -16,7 +17,7 @@ export const SUB_DECISIONS: SubDecisionOption[] = [
   { value: 'footprint', label: 'מאושר בתנאי הורדת רגל', status: 'ConditionalFootprintReduction', requiresReason: true, requiresQuantity: false, requiresDate: false, requiresUser: false },
   { value: 'partial', label: 'כמות חלקית', status: 'PartiallyApproved', requiresReason: false, requiresQuantity: true, requiresDate: false, requiresUser: false },
   { value: 'commander', label: 'מחכה להתייחסות מפקד', status: 'InProgress', requiresReason: true, requiresQuantity: false, requiresDate: false, requiresUser: true },
-  { value: 'transfer810', label: 'בתהליך – הועבר ל-810', status: 'TransferredTo810', requiresReason: true, requiresQuantity: false, requiresDate: false, requiresUser: false },
+  { value: 'transfer810', label: 'בתהליך – הועבר ל-810', status: 'TransferredTo810', requiresReason: true, requiresQuantity: false, requiresDate: false, requiresUser: false, requiresTargetUser: true },
   { value: 'dcInstall', label: 'מחכה להתקנה ב-DC', status: 'InProgress', requiresReason: true, requiresQuantity: false, requiresDate: true, requiresUser: false },
   { value: 'budget', label: 'מחכה לשורת תקציב', status: 'InProgress', requiresReason: true, requiresQuantity: false, requiresDate: false, requiresUser: true },
 ];

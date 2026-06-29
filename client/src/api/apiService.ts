@@ -468,6 +468,11 @@ export async function updateUser(username: string, payload: UpdateUserPayload): 
   return res.data;
 }
 
+export async function searchUsersAndGroups(query: string): Promise<{ users: {username: string; fullName?: string}[] }> {
+  const res = await api.get('/api/users-groups', { params: { search: query } });
+  return res.data;
+}
+
 // --- Service Admin ---
 
 export async function updateService(name: string, data: { moderators: string[] }): Promise<any> {
