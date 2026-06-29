@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { MdStorage, MdPersonOutline, MdLogout, MdExpandMore, MdOutlineSettings, MdDarkMode, MdLightMode, MdDns } from 'react-icons/md';
+import { MdPersonOutline, MdLogout, MdExpandMore, MdOutlineSettings, MdDarkMode, MdLightMode, MdDns } from 'react-icons/md';
 import ResourceAvailabilityModal from './ResourceAvailabilityModal';
 import { GiQueenCrown } from 'react-icons/gi';
 import type { UserProfile } from '../../types/navigation';
@@ -11,6 +11,7 @@ import LanguageSwitcher from '../LanguageSwitcher';
 import NotificationBell from '../notifications/NotificationBell';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useNavigation } from '../../contexts/NavigationContext';
+import logo from '../../assets/logo.png';
 
 interface TopBarProps {
   userProfile: UserProfile;
@@ -48,9 +49,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
         className="flex items-center gap-3 cursor-pointer bg-transparent border-none p-0 hover:opacity-80 transition-opacity"
         aria-label={t('nav.backToHome')}
       >
-        <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-          <MdStorage size={20} className="text-white" />
-        </div>
+        <img src={logo} alt="Logo" className="h-9 w-9 object-contain" />
         <span className="text-base font-bold text-text-primary">{t('app.title')}</span>
       </button>
 
