@@ -8,7 +8,8 @@
     "create": "Create New",
     "project": "Project",
     "demand": "Demand",
-    "back": "Back"
+    "back": "Back",
+    "backToHome": "Back to Home"
   },
   "management": {
     "demandsTitle": "Demands Management",
@@ -172,7 +173,8 @@
     "loading": "Loading...",
     "selected": "Selected",
     "selectAll": "Select All",
-    "clearSelection": "Clear Selection"
+    "clearSelection": "Clear Selection",
+    "close": "Close"
   },
   "settings": {
     "subtitle": "Manage system entities and configurations",
@@ -541,7 +543,12 @@
       "location": "Location",
       "timeline": "Timeline",
       "other": "Other"
-    }
+    },
+    "center": "Center",
+    "service": "Service",
+    "status": "Status",
+    "fromDate": "From Date",
+    "toDate": "To Date"
   },
   "tabs": {
     "myApprovalRequests": "My Approval Requests",
@@ -581,6 +588,8 @@
     "markAllRead": "Mark all as read",
     "empty": "No notifications",
     "loading": "Loading...",
+    "ariaLabel": "Notifications",
+    "ariaLabelUnread": "Notifications ({{count}} unread)",
     "types": {
       "NewDemand": "New Demand",
       "DemandDecision": "Decision Received",
@@ -589,7 +598,16 @@
       "NewProject": "New Project",
       "ProjectDeleted": "Project Deleted",
       "ProjectEdited": "Project Edited"
-    }
+    },
+    "newDemandMessage": "New demand for {{resource}} in project {{project}} was submitted.",
+    "demandDecisionApproved": "Your demand for {{resource}} was approved.",
+    "demandDecisionRejected": "Your demand for {{resource}} was rejected.",
+    "demandCancelled": "The demand for {{resource}} was cancelled by {{creator}}.",
+    "demandEdited": "The demand for {{resource}} was updated.",
+    "projectCreated": "Project \"{{project}}\" was created by {{creator}}.",
+    "projectEdited": "Project \"{{project}}\" was edited by {{creator}}.",
+    "projectDeleted": "Project \"{{project}}\" was deleted by {{creator}}.",
+    "projectMixedResults": "Project \"{{project}}\" received mixed results."
   },
   "bulk": {
     "selected": "requirements selected",
@@ -649,6 +667,28 @@
       "overrideLocation": "Override from project location",
       "locationTooltip": "Location is derived from the project location unless you request a change"
     }
+  },
+  "cloudMonitor": {
+    "noData": "No data to display",
+    "siteNetworkCluster": "Site / Network / Cluster",
+    "editStatus": "Edit Status",
+    "available": "Available",
+    "limited": "Limited",
+    "unavailable": "Unavailable",
+    "reason": "Reason",
+    "reasonPlaceholder": "Enter reason...",
+    "tag": "Tag",
+    "tagOk": "OK",
+    "tagCapacity": "Capacity Bottleneck",
+    "tagClientProcess": "Client Process",
+    "tagMaintenance": "Maintenance",
+    "loadError": "Error loading availability data. Please try again.",
+    "loading": "Loading availability data...",
+    "retry": "Retry",
+    "customerView": "Customer View",
+    "opsView": "Ops View",
+    "exitEdit": "Exit Edit",
+    "editData": "Edit Data"
   },
   "service": {
     "resources": "Resources",

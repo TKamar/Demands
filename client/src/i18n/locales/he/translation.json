@@ -8,7 +8,8 @@
     "demand": "דרישה",
     "moderator": "ניהול",
     "settings": "הגדרות",
-    "back": "חזרה"
+    "back": "חזרה",
+    "backToHome": "חזרה לדף הבית"
   },
   "management": {
     "demandsTitle": "ניהול דרישות",
@@ -172,7 +173,8 @@
     "loading": "טוען...",
     "selected": "נבחר",
     "selectAll": "בחר הכל",
-    "clearSelection": "ביטול בחירה"
+    "clearSelection": "ביטול בחירה",
+    "close": "סגור"
   },
   "settings": {
     "subtitle": "ניהול ישויות מערכת והגדרות",
@@ -541,7 +543,12 @@
       "location": "מיקום",
       "timeline": "לוח זמנים",
       "other": "אחר"
-    }
+    },
+    "center": "גוף (מרכז)",
+    "service": "שירות",
+    "status": "סטטוס",
+    "fromDate": "מתאריך",
+    "toDate": "עד תאריך"
   },
   "tabs": {
     "myApprovalRequests": "בקשות לאישור שלי",
@@ -581,6 +588,8 @@
     "markAllRead": "סמן הכל כנקרא",
     "empty": "אין התראות",
     "loading": "טוען...",
+    "ariaLabel": "התראות",
+    "ariaLabelUnread": "התראות ({{count}} לא נקראו)",
     "types": {
       "NewDemand": "דרישה חדשה",
       "DemandDecision": "קבלת תשובה על הדרישה",
@@ -589,7 +598,16 @@
       "NewProject": "פרויקט חדש",
       "ProjectDeleted": "מחיקת פרויקט",
       "ProjectEdited": "עריכת פרויקט"
-    }
+    },
+    "newDemandMessage": "דרישה חדשה עבור {{resource}} בפרויקט {{project}} הוגשה.",
+    "demandDecisionApproved": "הדרישה שלך עבור {{resource}} אושרה.",
+    "demandDecisionRejected": "הדרישה שלך עבור {{resource}} נדחתה.",
+    "demandCancelled": "הדרישה עבור {{resource}} בוטלה על ידי {{creator}}.",
+    "demandEdited": "הדרישה עבור {{resource}} עודכנה.",
+    "projectCreated": "פרויקט \"{{project}}\" נוצר על ידי {{creator}}.",
+    "projectEdited": "פרויקט \"{{project}}\" עודכן על ידי {{creator}}.",
+    "projectDeleted": "פרויקט \"{{project}}\" נמחק על ידי {{creator}}.",
+    "projectMixedResults": "פרויקט \"{{project}}\" קיבל תוצאות מעורבות."
   },
   "bulk": {
     "selected": "דרישות נבחרו",
@@ -649,6 +667,28 @@
       "overrideLocation": "החרג מיקום ממיקום הפרויקט",
       "locationTooltip": "המיקום נגזר ממיקום הפרויקט כל עוד לא ביקשתם לשנות מיקום"
     }
+  },
+  "cloudMonitor": {
+    "noData": "אין נתונים להצגה",
+    "siteNetworkCluster": "אתר / רשת / קלאסטר",
+    "editStatus": "עריכת סטטוס",
+    "available": "זמין",
+    "limited": "מוגבל",
+    "unavailable": "לא זמין",
+    "reason": "סיבה",
+    "reasonPlaceholder": "הזן סיבה...",
+    "tag": "תג",
+    "tagOk": "תקין",
+    "tagCapacity": "צוואר בקבוק",
+    "tagClientProcess": "תהליך לקוח",
+    "tagMaintenance": "תחזוקה",
+    "loadError": "שגיאה בטעינת נתוני הזמינות. אנא נסה שוב.",
+    "loading": "טוען נתוני זמינות...",
+    "retry": "נסה שוב",
+    "customerView": "תצוגת לקוח",
+    "opsView": "תצוגת Ops",
+    "exitEdit": "יציאה מעריכה",
+    "editData": "עריכת נתונים"
   },
   "service": {
     "resources": "משאבים",
