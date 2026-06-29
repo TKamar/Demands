@@ -49,7 +49,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
         className="flex items-center gap-3 cursor-pointer bg-transparent border-none p-0 hover:opacity-80 transition-opacity"
         aria-label={t('nav.backToHome')}
       >
-        <img src={logo} alt="Logo" className="h-9 w-9 object-contain" />
+        <img src={logo} alt="Logo" className="h-12 w-12 object-contain" />
         <span className="text-base font-bold text-text-primary">{t('app.title')}</span>
       </button>
 
