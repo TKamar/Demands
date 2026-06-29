@@ -89,6 +89,7 @@ function mapProject(raw: any): Project {
     centerName: raw.centerName,
     branchName: raw.branchName,
     sectionName: raw.sectionName,
+    networkLeg: raw.networkLeg ?? undefined,
   };
 }
 

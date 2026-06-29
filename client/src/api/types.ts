@@ -54,6 +54,7 @@ export interface CreateProjectPayload {
   centerName?: string;
   branchName?: string;
   sectionName?: string;
+  networkLeg?: 'Leg1' | 'Leg2';
 }
 
 export interface UpdateProjectPayload {
@@ -69,6 +70,7 @@ export interface UpdateProjectPayload {
   centerName?: string;
   branchName?: string;
   sectionName?: string;
+  networkLeg?: 'Leg1' | 'Leg2';
 }
 
 export interface DuplicateProjectPayload {
@@ -85,6 +87,7 @@ export interface DuplicateProjectPayload {
   centerName?: string;
   branchName?: string;
   sectionName?: string;
+  networkLeg?: 'Leg1' | 'Leg2';
   demands: { id: number; value: number }[];
 }
 

@@ -41,6 +41,7 @@ export interface Project {
   median?: Median;
   priority?: Priority;
   emergencyOption?: string;
+  networkLeg?: 'Leg1' | 'Leg2';
   centerName?: string;
   branchName?: string;
   sectionName?: string;
