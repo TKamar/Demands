@@ -4,25 +4,55 @@ import prisma from '../../lib/prisma';
 export const statsController = {
   getDashboardStats: async (req: Request, res: Response) => {
     const user = req.auth!.user;
-    if (user.role !== 'ADMIN') {
-      return res.status(403).json({ message: 'Forbidden: Admin role required' });
+    const { role, username, managedCenters } = user;
+
+    if (role === 'REGULAR_USER') {
+      return res.status(403).json({ message: 'Forbidden' });
     }
 
     try {
-      const rawCenters = req.query.centers;
-      const centers: string[] = Array.isArray(rawCenters)
-        ? (rawCenters as string[]).filter(Boolean)
-        : typeof rawCenters === 'string' && rawCenters
-        ? [rawCenters]
-        : [];
+      // Build the Prisma where clause based on role
+      let demandWhere: object | undefined;
 
-      const where = centers.length > 0 ? { centerName: { in: centers } } : undefined;
+      if (role === 'ADMIN') {
+        const rawCenters = req.query.centers;
+        const centers: string[] = Array.isArray(rawCenters)
+          ? (rawCenters as string[]).filter(Boolean)
+          : typeof rawCenters === 'string' && rawCenters ? [rawCenters] : [];
+
+        const rawServices = req.query.services;
+        const services: string[] = Array.isArray(rawServices)
+          ? (rawServices as string[]).filter(Boolean)
+          : typeof rawServices === 'string' && rawServices ? [rawServices] : [];
+
+        const conditions: object[] = [];
+        if (centers.length > 0) conditions.push({ centerName: { in: centers } });
+        if (services.length > 0) conditions.push({ serviceName: { in: services } });
+        demandWhere = conditions.length > 0 ? { AND: conditions } : undefined;
+
+      } else if (role === 'CENTER_MANAGER') {
+        demandWhere = managedCenters.length > 0
+          ? { centerName: { in: managedCenters } }
+          : { centerName: '__no_center__' };
+
+      } else if (role === 'MODERATOR') {
+        const modServices = await prisma.service.findMany({
+          where: { moderators: { has: username } },
+          select: { name: true },
+        });
+        const serviceNames = modServices.map((s) => s.name);
+        demandWhere = serviceNames.length > 0
+          ? { serviceName: { in: serviceNames } }
+          : { serviceName: '__no_service__' };
+      }
 
       const [byStatus, byCenter, byService, totalProjects] = await Promise.all([
-        prisma.demand.groupBy({ by: ['status'], _count: { id: true }, where }),
-        prisma.demand.groupBy({ by: ['centerName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, where }),
-        prisma.demand.groupBy({ by: ['serviceName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, where }),
-        prisma.project.count({ where }),
+        prisma.demand.groupBy({ by: ['status'], _count: { id: true }, where: demandWhere }),
+        prisma.demand.groupBy({ by: ['centerName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, where: demandWhere }),
+        prisma.demand.groupBy({ by: ['serviceName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, where: demandWhere }),
+        prisma.project.count({
+          where: demandWhere ? { demands: { some: demandWhere as object } } : undefined,
+        }),
       ]);
 
       const totalDemands = byStatus.reduce((sum, r) => sum + r._count.id, 0);
