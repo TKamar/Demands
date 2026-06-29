@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCurrentUser } from '../../../hooks/useCurrentUser';
 import { isModeratorOrAdmin } from '../../../utils/roleUtils';
 import { getCloudMonitor, updateCloudMonitorStatus } from '../../../api/apiService';
@@ -88,11 +89,12 @@ interface ViewProps {
   data:     CloudMonitorData;
   editMode: boolean;
   onEdit:   (entry: CloudResourceStatusEntry, anchor: HTMLElement) => void;
+  t:        (key: string) => string;
 }
 
-function CustomerView({ data, editMode, onEdit }: ViewProps) {
+function CustomerView({ data, editMode, onEdit, t }: ViewProps) {
   if (Object.keys(data).length === 0) {
-    return <div className="flex items-center justify-center p-12 text-text-secondary text-sm">אין נתונים להצגה</div>;
+    return <div className="flex items-center justify-center p-12 text-text-secondary text-sm">{t('cloudMonitor.noData')}</div>;
   }
   return (
     <div className="overflow-x-auto" dir="rtl">
@@ -100,7 +102,7 @@ function CustomerView({ data, editMode, onEdit }: ViewProps) {
         <thead>
           <tr className="bg-bg-paper border-b border-divider">
             <th className="px-4 py-2 text-right text-text-secondary font-medium min-w-[160px] sticky right-0 bg-bg-paper z-10">
-              אתר / רשת / קלאסטר
+              {t('cloudMonitor.siteNetworkCluster')}
             </th>
             {SERVICES.map((svc) => (
               <th key={svc} className="px-3 py-2 text-center text-text-secondary font-medium whitespace-nowrap">
@@ -164,13 +166,13 @@ function CustomerView({ data, editMode, onEdit }: ViewProps) {
   );
 }
 
-function OpsTree({ data, editMode, onEdit }: ViewProps) {
+function OpsTree({ data, editMode, onEdit, t }: ViewProps) {
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const isOpen = (key: string) => open[key] !== false;
   const toggle = (key: string) => setOpen((prev) => ({ ...prev, [key]: !isOpen(key) }));
 
   if (Object.keys(data).length === 0) {
-    return <div className="flex items-center justify-center p-12 text-text-secondary text-sm">אין נתונים להצגה</div>;
+    return <div className="flex items-center justify-center p-12 text-text-secondary text-sm">{t('cloudMonitor.noData')}</div>;
   }
 
   return (
@@ -289,40 +291,40 @@ function EditPopover({ popover, onSave, onClose }: EditPopoverProps) {
   return (
     <div ref={ref} style={style}
       className="bg-bg-paper border border-divider rounded-xl shadow-xl p-4 w-60 space-y-3" dir="rtl">
-      <p className="text-xs font-semibold text-text-primary">עריכת סטטוס</p>
+      <p className="text-xs font-semibold text-text-primary">{t('cloudMonitor.editStatus')}</p>
       <div className="space-y-1">
-        <label className="text-xs text-text-secondary">סטטוס</label>
+        <label className="text-xs text-text-secondary">{t('filters.status')}</label>
         <select value={status} onChange={(e) => setStatus(e.target.value as CloudStatus)}
           className="w-full rounded-lg border border-divider bg-bg-default text-text-primary text-sm px-2 py-1.5">
-          <option value="green">זמין</option>
-          <option value="yellow">מוגבל</option>
-          <option value="red">לא זמין</option>
+          <option value="green">{t('cloudMonitor.available')}</option>
+          <option value="yellow">{t('cloudMonitor.limited')}</option>
+          <option value="red">{t('cloudMonitor.unavailable')}</option>
         </select>
       </div>
       <div className="space-y-1">
-        <label className="text-xs text-text-secondary">סיבה</label>
+        <label className="text-xs text-text-secondary">{t('cloudMonitor.reason')}</label>
         <input value={reason} onChange={(e) => setReason(e.target.value)}
-          placeholder="הזן סיבה..."
+          placeholder={t('cloudMonitor.reasonPlaceholder')}
           className="w-full rounded-lg border border-divider bg-bg-default text-text-primary text-sm px-2 py-1.5" />
       </div>
       <div className="space-y-1">
-        <label className="text-xs text-text-secondary">תג</label>
+        <label className="text-xs text-text-secondary">{t('cloudMonitor.tag')}</label>
         <select value={tag} onChange={(e) => setTag(e.target.value as CloudTag)}
           className="w-full rounded-lg border border-divider bg-bg-default text-text-primary text-sm px-2 py-1.5">
-          <option value="OK">תקין</option>
-          <option value="CAPACITY">צוואר בקבוק</option>
-          <option value="CLIENT_PROCESS">תהליך לקוח</option>
-          <option value="MAINTENANCE">תחזוקה</option>
+          <option value="OK">{t('cloudMonitor.tagOk')}</option>
+          <option value="CAPACITY">{t('cloudMonitor.tagCapacity')}</option>
+          <option value="CLIENT_PROCESS">{t('cloudMonitor.tagClientProcess')}</option>
+          <option value="MAINTENANCE">{t('cloudMonitor.tagMaintenance')}
         </select>
       </div>
       <div className="flex gap-2">
         <button onClick={handleSave} disabled={saving}
           className="flex-1 py-1.5 text-sm bg-primary text-white rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity">
-          {saving ? '...' : 'שמור'}
+          {saving ? '...' : t('common.save')}
         </button>
         <button onClick={onClose}
           className="flex-1 py-1.5 text-sm border border-divider text-text-secondary rounded-lg hover:bg-bg-default transition-colors">
-          בטל
+          {t('common.cancel')}
         </button>
       </div>
     </div>
@@ -330,6 +332,7 @@ function EditPopover({ popover, onSave, onClose }: EditPopoverProps) {
 }
 
 export default function CloudMonitorPanel() {
+  const { t } = useTranslation();
   const currentUser = useCurrentUser();
   const canEdit = isModeratorOrAdmin(currentUser?.role ?? 'REGULAR_USER');
 
@@ -347,7 +350,7 @@ export default function CloudMonitorPanel() {
       setData(result);
     } catch (err) {
       console.error('Failed to fetch cloud monitor data', err);
-      setError('שגיאה בטעינת נתוני הזמינות. אנא נסה שוב.');
+      setError(t('cloudMonitor.loadError'));
     } finally {
       setLoading(false);
     }
@@ -372,7 +375,7 @@ export default function CloudMonitorPanel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full text-text-secondary text-sm">
-        טוען נתוני זמינות...
+        {t('cloudMonitor.loading')}
       </div>
     );
   }
@@ -384,7 +387,7 @@ export default function CloudMonitorPanel() {
           <p className="text-red-600 text-sm">{error}</p>
           <button onClick={fetchData}
             className="px-3 py-1.5 text-xs border border-divider rounded-lg text-text-secondary hover:bg-bg-paper">
-            נסה שוב
+            {t('cloudMonitor.retry')}
           </button>
         </div>
       </div>
@@ -405,7 +408,7 @@ export default function CloudMonitorPanel() {
                     ? 'bg-primary text-white'
                     : 'bg-bg-default text-text-secondary hover:bg-bg-paper'
                 }`}>
-                {v === 'customer' ? 'תצוגת לקוח' : 'תצוגת Ops'}
+                {v === 'customer' ? t('cloudMonitor.customerView') : t('cloudMonitor.opsView')}
               </button>
             ))}
           </div>
@@ -416,7 +419,7 @@ export default function CloudMonitorPanel() {
                   ? 'bg-primary text-white border-primary'
                   : 'bg-bg-default text-text-secondary border-divider hover:bg-bg-paper'
               }`}>
-              {editMode ? 'יציאה מעריכה' : 'עריכת נתונים'}
+              {editMode ? t('cloudMonitor.exitEdit') : t('cloudMonitor.editData')}
             </button>
           )}
         </div>
@@ -424,9 +427,9 @@ export default function CloudMonitorPanel() {
 
       <div className="flex-1 overflow-auto">
         {view === 'customer' ? (
-          <CustomerView data={data} editMode={editMode} onEdit={handleEdit} />
+          <CustomerView data={data} editMode={editMode} onEdit={handleEdit} t={t} />
         ) : (
-          <OpsTree data={data} editMode={editMode} onEdit={handleEdit} />
+          <OpsTree data={data} editMode={editMode} onEdit={handleEdit} t={t} />
         )}
       </div>
 
