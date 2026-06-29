@@ -1,12 +1,28 @@
 # Work Log — Demands Monorepo
 
-## 2026-06-29 — feature/analytics-scoping-and-ui-revisions
+## 2026-06-29 — feature/analytics-scoping-and-ui-revisions — ✅ COMPLETE
 
-### In progress
-- Analytics expansion, tenant scoping, Project Leg field, Cloud Monitor relocation, theme fixes
+### Completed
+- Theme token fixes in AdminDashboard (hover:bg-gray-50 → hover:bg-bg-default)
+- Prisma: NetworkLeg enum + optional field on Project; client regenerated (migration pending Docker)
+- Backend: project service + controller accept networkLeg in create/update/duplicate
+- Frontend types + mapProject updated for networkLeg
+- i18n: analytics tab label (סטטיסטיקות / Analytics) and networkLeg keys (he + en)
+- CreateProjectModal: mandatory "רגל" select with validation (Leg1 / Leg2)
+- ProjectDetailSidebar: shows networkLeg when set; graceful for legacy projects
+- Backend stats controller: MODERATOR scoped to managed services, CENTER_MANAGER scoped to managed centers, ADMIN gets services[] filter; REGULAR_USER → 403; unknown role → 403
+- Frontend fetchAdminStats: added services[] query param
+- TopNavTabs: cloudMonitor tab removed; dashboard tab renamed to t('tabs.analytics'); MODERATOR and CENTER_MANAGER now see dashboard
+- MainPage: CenterFilter admin-only; cloudMonitor panel removed
+- AdminDashboard: service pie chart, admin-only service filter chips, currentUser prop, heading → "סטטיסטיקות"
+- ResourceAvailabilityModal: slide-in overlay (createPortal) wrapping CloudMonitorPanel
+- TopBar: MdDns icon opens ResourceAvailabilityModal
+
+### State
+All features implemented. TypeScript clean (client + server). Pending: run prisma migrate dev when Docker is available.
 
 ### Next
-- Task 2: Theme token fixes in AdminDashboard
+PR to dev: feature/analytics-scoping-and-ui-revisions
 
 ## Sprint: Multi-Center RBAC & Admin CRUD Features
 

@@ -1,5 +1,5 @@
 import prisma from "../../lib/prisma";
-import { ProjectType, Median, Prisma, Priority } from "@prisma/client";
+import { ProjectType, Median, Prisma, Priority, NetworkLeg } from "@prisma/client";
 import { NotFoundError } from "../../lib/errors";
 import { notificationService } from "../notification/notification.service";
 
@@ -120,6 +120,7 @@ export const projectService = {
     sectionName: string;
     createdBy?: string;
     createdByName?: string;
+    networkLeg?: NetworkLeg;
   }) => {
     const project = await prisma.project.create({
       data,
@@ -157,6 +158,7 @@ export const projectService = {
       centerName?: string;
       branchName?: string;
       sectionName?: string;
+      networkLeg?: NetworkLeg;
     },
     createdBy?: string
   ) => {
@@ -245,6 +247,7 @@ export const projectService = {
       sectionName: string;
       createdBy?: string;
       createdByName?: string;
+      networkLeg?: NetworkLeg;
     },
     demands: { id: number; value: number }[]
   ) => {
