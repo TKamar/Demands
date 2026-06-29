@@ -444,7 +444,7 @@ export const demandController = {
         return res.status(400).json({ error: "reason is required for rejection" });
       }
 
-      const demand = await demandService.reject(Number(req.params.id), reason.trim());
+      const demand = await demandService.reject(Number(req.params.id), reason.trim(), req.auth?.user.username);
       res.json(demand);
     } catch (error) {
       console.error("demandController.reject error:", error);
@@ -576,6 +576,7 @@ export const demandController = {
         status,
         approvedValue: requiresValueAndReason ? approvedValue : undefined,
         reason: requiresValueAndReason ? reason?.trim() : undefined,
+        actorUsername: username,
       });
 
       res.json({ count: result.count });
@@ -639,7 +640,7 @@ export const demandController = {
         return res.status(400).json({ error: "Either ids or selectAll+filters must be provided" });
       }
 
-      const result = await demandService.bulkReject(where, reason.trim());
+      const result = await demandService.bulkReject(where, reason.trim(), username);
       res.json({ count: result.count });
     } catch (error) {
       console.error("demandController.bulkReject error:", error);
@@ -716,6 +717,7 @@ export const demandController = {
         reason,
         procurementDate: procurementDate ? new Date(procurementDate) : undefined,
         assignedToUser,
+        actorUsername: req.auth?.user.username,
       });
       res.json(demand);
     } catch (error) {

@@ -2,6 +2,7 @@ import prisma from "../../lib/prisma";
 import { DemandType, DemandStatus, ProjectType, Median } from "@prisma/client";
 import { NotFoundError } from "../../lib/errors";
 import { notificationService } from "../notification/notification.service";
+import { syncProjectStatus } from "./projectStatus.service";
 
 export const demandService = {
 
@@ -268,7 +269,7 @@ export const demandService = {
     });
   },
 
-  reject: async (id: number, reason: string) => {
+  reject: async (id: number, reason: string, actorUsername?: string) => {
     const demand = await prisma.$transaction(async (tx) => {
       const updated = await tx.demand.update({
         where: { id },
@@ -309,6 +310,10 @@ export const demandService = {
         }
       });
     }
+
+    setImmediate(() => {
+      syncProjectStatus(demand.projectName, actorUsername ?? '').catch(() => {});
+    });
 
     return demand;
   },
@@ -391,6 +396,7 @@ export const demandService = {
       reason?: string;
       procurementDate?: Date;
       assignedToUser?: string;
+      actorUsername?: string;
     }
   ) => {
     const openStatuses = ['AwaitingProcurement', 'HeldForEfficiency', 'ConditionalFootprintReduction', 'InProgress', 'TransferredTo810'];
@@ -449,6 +455,10 @@ export const demandService = {
       });
     }
 
+    setImmediate(() => {
+      syncProjectStatus(demand.projectName, data.actorUsername ?? '').catch(() => {});
+    });
+
     return demand;
   },
 
@@ -458,10 +468,16 @@ export const demandService = {
       status: "Approved" | "PartiallyApproved" | "ApprovedWithCondition";
       approvedValue?: number;
       reason?: string;
+      actorUsername?: string;
     }
   ) => {
-    // Bulk operations skip per-demand notifications intentionally — too noisy for batch decisions.
-    return prisma.demand.updateMany({
+    const projectNames = await prisma.demand.findMany({
+      where: { ...where, status: "Pending" },
+      select: { projectName: true },
+      distinct: ['projectName'],
+    });
+
+    const result = await prisma.demand.updateMany({
       where: { ...where, status: "Pending" },
       data: {
         status: data.status,
@@ -470,17 +486,34 @@ export const demandService = {
         ...(data.reason !== undefined && { reason: data.reason }),
       },
     });
+
+    setImmediate(() => {
+      Promise.all(projectNames.map(p => syncProjectStatus(p.projectName, data.actorUsername ?? ''))).catch(() => {});
+    });
+
+    return result;
   },
 
-  bulkReject: async (where: any, reason: string) => {
-    // Bulk operations skip per-demand notifications intentionally — too noisy for batch decisions.
-    return prisma.demand.updateMany({
+  bulkReject: async (where: any, reason: string, actorUsername?: string) => {
+    const projectNames = await prisma.demand.findMany({
+      where: { ...where, status: "Pending" },
+      select: { projectName: true },
+      distinct: ['projectName'],
+    });
+
+    const result = await prisma.demand.updateMany({
       where: { ...where, status: "Pending" },
       data: {
         status: "Rejected",
         reason,
       },
     });
+
+    setImmediate(() => {
+      Promise.all(projectNames.map(p => syncProjectStatus(p.projectName, actorUsername ?? ''))).catch(() => {});
+    });
+
+    return result;
   },
 
   getDemandsByCenterAndStatus: async (centerName: string, status: DemandStatus) => {
