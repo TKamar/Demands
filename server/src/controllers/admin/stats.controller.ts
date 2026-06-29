@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import prisma from '../../lib/prisma';
 
 export const statsController = {
@@ -12,7 +13,7 @@ export const statsController = {
 
     try {
       // Build the Prisma where clause based on role
-      let demandWhere: object | undefined;
+      let demandWhere: Prisma.DemandWhereInput | undefined;
 
       if (role === 'ADMIN') {
         const rawCenters = req.query.centers;
@@ -44,6 +45,8 @@ export const statsController = {
         demandWhere = serviceNames.length > 0
           ? { serviceName: { in: serviceNames } }
           : { serviceName: '__no_service__' };
+      } else {
+        return res.status(403).json({ message: 'Forbidden' });
       }
 
       const [byStatus, byCenter, byService, totalProjects] = await Promise.all([
@@ -51,7 +54,7 @@ export const statsController = {
         prisma.demand.groupBy({ by: ['centerName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, where: demandWhere }),
         prisma.demand.groupBy({ by: ['serviceName'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, where: demandWhere }),
         prisma.project.count({
-          where: demandWhere ? { demands: { some: demandWhere as object } } : undefined,
+          where: demandWhere ? { demands: { some: demandWhere } } : undefined,
         }),
       ]);
 
