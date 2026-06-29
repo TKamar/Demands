@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdExpandMore, MdChevronLeft, MdEdit, MdDelete, MdGavel } from 'react-icons/md';
+import { MdExpandMore, MdChevronLeft, MdEdit, MdDelete, MdGavel, MdBolt } from 'react-icons/md';
 import ConfirmDialog from '../common/ConfirmDialog';
 import DemandDetailSidebar from '../demands/DemandDetailSidebar';
 import ManageServiceDemandsModal from '../projects/ManageServiceDemandsModal';
@@ -210,9 +210,9 @@ export default function DemandSubTable({
                     <span className="relative group">
                       <button
                         onClick={() => setQuickApproveTarget(svcName)}
-                        className="px-2 py-0.5 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 rounded border-none cursor-pointer transition-colors"
+                        className="p-1 text-text-secondary hover:text-green-600 transition-colors bg-transparent border-none cursor-pointer rounded"
                       >
-                        ⚡
+                        <MdBolt size={14} />
                       </button>
                       <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
                         {t('service.quickApprove', 'Quick Approve')}
@@ -221,9 +221,9 @@ export default function DemandSubTable({
                     <span className="relative group">
                       <button
                         onClick={() => setDecidingServiceName(svcName)}
-                        className="px-2 py-0.5 text-xs font-semibold text-white bg-indigo-900 hover:bg-indigo-950 rounded border-none cursor-pointer transition-colors flex items-center"
+                        className="p-1 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer rounded"
                       >
-                        <MdGavel size={12} />
+                        <MdGavel size={14} />
                       </button>
                       <span className="invisible group-hover:visible absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-xs bg-gray-800 text-white rounded whitespace-nowrap shadow-lg pointer-events-none">
                         {t('service.deepDecision', 'Deep Decision')}
