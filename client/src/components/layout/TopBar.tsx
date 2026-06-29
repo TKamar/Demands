@@ -40,6 +40,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
   const hasSettingsAccess = isAdmin || isModerator;
 
   return (
+    <>
     <header className="h-14 bg-bg-paper border-b border-divider flex items-center justify-between px-6 shrink-0">
       {/* Logo */}
       <button
@@ -135,5 +136,6 @@ export default function TopBar({ userProfile }: TopBarProps) {
       isOpen={resourceModalOpen}
       onClose={() => setResourceModalOpen(false)}
     />
+    </>
   );
 }
