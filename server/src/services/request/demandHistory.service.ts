@@ -14,7 +14,7 @@ export const demandHistoryService = {
     metadata?: Record<string, unknown>,
   ): Promise<void> {
     await prisma.demandHistoryLog.create({
-      data: { demandId, action, actorUsername, metadata },
+      data: { demandId, action, actorUsername, metadata: metadata as any },
     });
   },
 
