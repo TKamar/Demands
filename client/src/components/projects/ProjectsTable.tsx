@@ -73,7 +73,7 @@ export default function ProjectsTable({
       case 'type':
         return (
           <td key={columnKey} className="px-4 py-3 whitespace-nowrap">
-            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">
+            <span className="px-2 py-0.5 rounded-full bg-bg-default text-xs">
               {t(`projects.type.${project.type}`)}
             </span>
           </td>

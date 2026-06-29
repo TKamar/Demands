@@ -77,7 +77,7 @@ export default function ResourceRow({
           value={entry.unit}
           readOnly
           disabled
-          className={`${inputClass} bg-gray-50 text-text-secondary`}
+          className={`${inputClass} bg-bg-default text-text-secondary`}
         />
       </div>
 

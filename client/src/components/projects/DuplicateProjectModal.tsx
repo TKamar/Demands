@@ -460,7 +460,7 @@ export default function DuplicateProjectModal({
                   {approvedDemands.length > 0 && (
                     <>
                       <tr>
-                        <td colSpan={7} className="px-3 py-1.5 text-xs font-semibold text-text-secondary bg-gray-50">
+                        <td colSpan={7} className="px-3 py-1.5 text-xs font-semibold text-text-secondary bg-bg-default">
                           {t('projects.duplicateProject.approvedDemands')}
                         </td>
                       </tr>
@@ -479,7 +479,7 @@ export default function DuplicateProjectModal({
                   {optionalDemands.length > 0 && (
                     <>
                       <tr>
-                        <td colSpan={7} className="px-3 py-1.5 text-xs font-semibold text-text-secondary bg-gray-50">
+                        <td colSpan={7} className="px-3 py-1.5 text-xs font-semibold text-text-secondary bg-bg-default">
                           {t('projects.duplicateProject.optionalDemands')}
                         </td>
                       </tr>
@@ -549,7 +549,7 @@ function DemandRow({ demand, checked, value, onToggle, onValueChange }: DemandRo
       <td className="px-3 py-2 whitespace-nowrap text-text-secondary">{location}</td>
       <td className="px-3 py-2 whitespace-nowrap">{demand.type}</td>
       <td className="px-3 py-2 whitespace-nowrap">
-        <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">{demand.status}</span>
+        <span className="px-2 py-0.5 rounded-full bg-bg-default text-xs">{demand.status}</span>
       </td>
       <td className="px-3 py-2">
         <input
@@ -558,7 +558,7 @@ function DemandRow({ demand, checked, value, onToggle, onValueChange }: DemandRo
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
           disabled={!checked}
-          className="w-24 px-2 py-1 border border-divider rounded-lg text-xs bg-bg-paper focus:outline-none focus:border-primary disabled:bg-gray-50 disabled:text-text-secondary"
+          className="w-24 px-2 py-1 border border-divider rounded-lg text-xs bg-bg-paper focus:outline-none focus:border-primary disabled:bg-bg-default disabled:text-text-secondary"
         />
       </td>
     </tr>

@@ -340,7 +340,7 @@ export default function EntityManager({
                 dir="ltr"
             >
                 <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    className={`inline-block h-4 w-4 transform rounded-full bg-bg-paper transition-transform ${
                         isActive ? 'translate-x-6' : 'translate-x-1'
                     }`}
                 />
@@ -377,7 +377,7 @@ export default function EntityManager({
             <div className="bg-bg-paper rounded-xl shadow-sm border border-divider overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-start">
-                        <thead className="text-xs text-text-secondary uppercase bg-gray-50 border-b border-divider">
+                        <thead className="text-xs text-text-secondary uppercase bg-bg-default border-b border-divider">
                             <tr>
                                 {columns.map(col => (
                                     <th key={col.key} className="px-6 py-3 font-semibold whitespace-nowrap text-start">
@@ -486,7 +486,7 @@ export default function EntityManager({
                                         onChange={e => handleFieldChange(field, e.target.value)}
                                         disabled={isDisabled}
                                         className={`px-4 py-2 border rounded-xl outline-none focus:border-primary transition-colors ${errors[field.key] ? 'border-red-500' : 'border-divider'
-                                            } ${isDisabled ? 'bg-gray-100 text-text-secondary' : 'bg-bg-paper text-text-primary'
+                                            } ${isDisabled ? 'bg-bg-default text-text-secondary' : 'bg-bg-paper text-text-primary'
                                             }`}
                                     />
                                 )}

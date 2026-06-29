@@ -315,7 +315,7 @@ export default function WalletModal({ open, onClose, onSubmit, wallet, isLoading
                         </label>
                         <input
                             type="number"
-                            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+                            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-bg-paper focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
                             value={value}
                             onChange={(e) => setValue(Number(e.target.value))}
                             min="0"
@@ -329,7 +329,7 @@ export default function WalletModal({ open, onClose, onSubmit, wallet, isLoading
                         </label>
                         <input
                             type="text"
-                            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-gray-100 text-text-secondary cursor-not-allowed font-medium text-sm"
+                            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-bg-default text-text-secondary cursor-not-allowed font-medium text-sm"
                             value={selectedCapacity?.resource?.unit || ''}
                             disabled
                         />

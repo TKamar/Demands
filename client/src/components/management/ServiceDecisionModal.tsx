@@ -142,7 +142,7 @@ export default function ServiceDecisionModal({
   );
 
   const serviceInfo = (
-    <div className="bg-gray-50 rounded-xl p-4 mb-5">
+    <div className="bg-bg-default rounded-xl p-4 mb-5">
       <div className="grid grid-cols-2 gap-2 text-sm">
         <div>
           <span className="text-text-secondary">{t('projects.columns.project')}:</span>{' '}
@@ -197,7 +197,7 @@ export default function ServiceDecisionModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 px-4 bg-gray-100 text-text-primary rounded-xl font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
+            className="w-full py-2.5 px-4 bg-bg-default text-text-primary rounded-xl font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
           >
             {t('common.cancel')}
           </button>
@@ -286,7 +286,7 @@ export default function ServiceDecisionModal({
             <button
               type="button"
               onClick={() => setPath('select')}
-              className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
+              className="px-5 py-2.5 bg-bg-default text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
             >
               {t('common.back', 'חזור')}
             </button>
@@ -343,7 +343,7 @@ export default function ServiceDecisionModal({
             <button
               type="button"
               onClick={() => setPath('select')}
-              className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
+              className="px-5 py-2.5 bg-bg-default text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
             >
               {t('common.back', 'חזור')}
             </button>

@@ -31,14 +31,14 @@ export default function ProjectCard({ project, demandCount }: ProjectCardProps) 
         </p>
 
         <div className="flex items-center gap-3 text-xs text-text-secondary mb-3">
-          <span className="px-2 py-0.5 rounded-full bg-gray-100">
+          <span className="px-2 py-0.5 rounded-full bg-bg-default">
             {t(`projects.type.${project.type}`)}
           </span>
-          <span className="px-2 py-0.5 rounded-full bg-gray-100">
+          <span className="px-2 py-0.5 rounded-full bg-bg-default">
             {t(`projects.kind.${project.kind}`)}
           </span>
           {project.year && (
-            <span className="px-2 py-0.5 rounded-full bg-gray-100">
+            <span className="px-2 py-0.5 rounded-full bg-bg-default">
               {project.year} {project.median}
             </span>
           )}

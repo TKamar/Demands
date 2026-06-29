@@ -46,14 +46,14 @@ export default function ArrayInput({ value = [], onChange, placeholder, disabled
                     type="button"
                     onClick={handleAdd}
                     disabled={disabled || !input.trim()}
-                    className="px-3 py-2 bg-gray-100 hover:bg-bg-default text-text-secondary rounded-xl transition-colors disabled:opacity-50 border-none cursor-pointer"
+                    className="px-3 py-2 bg-bg-default hover:bg-bg-default text-text-secondary rounded-xl transition-colors disabled:opacity-50 border-none cursor-pointer"
                 >
                     <MdAdd size={20} />
                 </button>
             </div>
             <div className="flex flex-wrap gap-2">
                 {(value || []).map((item, index) => (
-                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm text-text-primary">
+                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-bg-default rounded-full text-sm text-text-primary">
                         <span>{item}</span>
                         <button
                             type="button"

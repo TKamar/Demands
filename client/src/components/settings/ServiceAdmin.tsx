@@ -101,7 +101,7 @@ export const ServiceAdmin = () => {
       <div className="overflow-x-auto border rounded">
         <table className="w-full min-w-full">
           <thead>
-            <tr className="bg-gray-100 border-b">
+            <tr className="bg-bg-default border-b">
               <th className="p-3 text-left font-medium">Service</th>
               <th className="p-3 text-left font-medium">Assigned Moderators</th>
               <th className="p-3 text-center font-medium">Actions</th>
@@ -156,7 +156,7 @@ export const ServiceAdmin = () => {
                         </button>
                         <button
                           onClick={handleCancel}
-                          className="px-3 py-1 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition"
+                          className="px-3 py-1 bg-bg-default0 text-white text-sm rounded hover:bg-gray-600 transition"
                         >
                           Cancel
                         </button>

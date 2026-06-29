@@ -77,7 +77,7 @@ export default function BulkDecisionModal({
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5" dir="rtl">
         {/* Summary header */}
-        <div className="bg-gray-50 rounded-xl p-4 text-sm text-text-secondary flex flex-col gap-1">
+        <div className="bg-bg-default rounded-xl p-4 text-sm text-text-secondary flex flex-col gap-1">
           <span className="font-medium text-text-primary">
             {t('management.bulkDecision.summary', { count: selectedCount })}
           </span>
@@ -91,7 +91,7 @@ export default function BulkDecisionModal({
           <select
             value={decisionType}
             onChange={(e) => setDecisionType(e.target.value as BulkDecisionType)}
-            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-bg-paper focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
           >
             {decisionOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -113,7 +113,7 @@ export default function BulkDecisionModal({
               value={approvedValue}
               onChange={(e) => setApprovedValue(e.target.value)}
               placeholder={t('management.decisionModal.approvedValuePlaceholder', 'השאר ריק לאישור מלא')}
-              className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
+              className="w-full px-4 py-2.5 rounded-xl border border-divider bg-bg-paper focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
             />
           </div>
         )}
@@ -125,7 +125,7 @@ export default function BulkDecisionModal({
             {decisionType === 'Rejected' && <span className="text-danger"> *</span>}
           </label>
           <textarea
-            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm resize-none"
+            className="w-full px-4 py-2.5 rounded-xl border border-divider bg-bg-paper focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm resize-none"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder={t('management.decisionModal.reasonPlaceholder', 'הוסף הערה...')}
@@ -139,7 +139,7 @@ export default function BulkDecisionModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
+            className="px-6 py-2.5 bg-bg-default text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
           >
             {t('common.cancel')}
           </button>

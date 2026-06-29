@@ -78,7 +78,7 @@ export default function ProjectDetailSidebar({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           {/* Type Badge */}
-          <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs">
+          <span className="px-2 py-0.5 rounded-full bg-bg-default text-xs">
             {t(`projects.type.${project.type}`)}
           </span>
 

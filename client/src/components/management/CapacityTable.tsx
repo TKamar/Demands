@@ -30,7 +30,7 @@ export default function CapacityTable({ capacities, onEdit, onDelete, isLoading 
         <div className="bg-bg-paper rounded-xl shadow-sm border border-divider overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm text-start">
-                    <thead className="text-xs text-text-secondary uppercase bg-gray-50 border-b border-divider">
+                    <thead className="text-xs text-text-secondary uppercase bg-bg-default border-b border-divider">
                         <tr>
                             <th className="px-6 py-3 font-semibold">{t('management.capacity.columns.service')}</th>
                             <th className="px-6 py-3 font-semibold">{t('management.capacity.columns.resource')}</th>

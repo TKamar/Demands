@@ -131,7 +131,7 @@ export default function HierarchicalBulkDecisionModal({
                       placeholder={t('bulkDecision.conditionPlaceholder', 'הזן תנאי / סיבה...')}
                       value={projectConditions[projectName] ?? ''}
                       onChange={(e) => setProjectConditions((prev) => ({ ...prev, [projectName]: e.target.value }))}
-                      className="flex-1 text-sm px-3 py-1.5 border border-divider rounded-lg bg-white focus:outline-none focus:border-primary"
+                      className="flex-1 text-sm px-3 py-1.5 border border-divider rounded-lg bg-bg-paper focus:outline-none focus:border-primary"
                     />
                     <button
                       type="button"
@@ -187,7 +187,7 @@ export default function HierarchicalBulkDecisionModal({
                                       value={inputValue}
                                       onChange={(e) => handleApprovalChange(demand.id, e.target.value)}
                                       placeholder="0"
-                                      className="w-20 px-2 py-1 text-xs border border-divider rounded bg-white text-text-primary"
+                                      className="w-20 px-2 py-1 text-xs border border-divider rounded bg-bg-paper text-text-primary"
                                     />
                                     {demandReasons[demand.id] && (
                                       <p className="text-xs text-amber-700 italic font-medium">

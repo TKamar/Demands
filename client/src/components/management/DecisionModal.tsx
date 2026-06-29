@@ -122,7 +122,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
   };
 
   const demandSummary = (
-    <div className="bg-gray-50 rounded-xl p-4 mb-5">
+    <div className="bg-bg-default rounded-xl p-4 mb-5">
       <div className="grid grid-cols-2 gap-2 text-sm">
         <div>
           <span className="text-text-secondary">{t('projects.columns.project')}:</span>{' '}
@@ -180,7 +180,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
             <button
               type="button"
               onClick={() => setShowTransferPath(false)}
-              className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
+              className="px-5 py-2.5 bg-bg-default text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
             >
               {t('common.back', 'חזור')}
             </button>
@@ -345,7 +345,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
               <button
                 type="button"
                 onClick={() => setSubDecision('')}
-                className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
+                className="px-5 py-2.5 bg-bg-default text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
               >
                 {t('common.back', 'חזור')}
               </button>

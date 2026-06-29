@@ -29,7 +29,7 @@ export default function CloudResourceTable({ resources, onEdit, onDelete, isLoad
             case 'red':
                 return 'text-red-600 bg-red-50';
             default:
-                return 'text-gray-600 bg-gray-50';
+                return 'text-text-secondary bg-bg-default';
         }
     };
 
@@ -37,7 +37,7 @@ export default function CloudResourceTable({ resources, onEdit, onDelete, isLoad
         <div className="bg-bg-paper rounded-xl shadow-sm border border-divider overflow-hidden">
             <div className="overflow-x-auto">
                 <table className="w-full text-sm text-start">
-                    <thead className="text-xs text-text-secondary uppercase bg-gray-50 border-b border-divider">
+                    <thead className="text-xs text-text-secondary uppercase bg-bg-default border-b border-divider">
                         <tr>
                             <th className="px-6 py-3 font-semibold">{t('projects.createProject.base', 'Base')}</th>
                             <th className="px-6 py-3 font-semibold">{t('management.capacity.columns.network', 'Network')}</th>

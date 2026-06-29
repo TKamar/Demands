@@ -185,7 +185,7 @@ export default function CloudResourceModal({ open, onClose, onSubmit, resource, 
                             placeholder={t('common.enterService', 'Enter service name')}
                             disabled={isEditMode}
                             className={`w-full px-4 py-2.5 rounded-xl border border-divider text-text-primary text-sm ${
-                                isEditMode ? 'bg-gray-100 text-text-secondary cursor-not-allowed' : 'bg-white'
+                                isEditMode ? 'bg-bg-default text-text-secondary cursor-not-allowed' : 'bg-bg-paper'
                             }`}
                         />
                     </div>
@@ -231,7 +231,7 @@ export default function CloudResourceModal({ open, onClose, onSubmit, resource, 
                         onChange={(e) => setReason(e.target.value)}
                         placeholder={t('common.enterReason', 'Enter reason')}
                         rows={3}
-                        className="w-full px-4 py-2.5 rounded-xl border border-divider bg-white text-text-primary text-sm resize-none"
+                        className="w-full px-4 py-2.5 rounded-xl border border-divider bg-bg-paper text-text-primary text-sm resize-none"
                     />
                 </div>
 
@@ -240,7 +240,7 @@ export default function CloudResourceModal({ open, onClose, onSubmit, resource, 
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-2.5 rounded-xl border border-divider bg-white text-text-primary hover:bg-bg-default font-medium text-sm transition-colors"
+                        className="px-6 py-2.5 rounded-xl border border-divider bg-bg-paper text-text-primary hover:bg-bg-default font-medium text-sm transition-colors"
                     >
                         {t('common.cancel', 'Cancel')}
                     </button>

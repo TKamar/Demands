@@ -14,7 +14,7 @@ const ROLE_BADGE: Record<UserRole, string> = {
   ADMIN: 'bg-amber-100 text-amber-700',
   MODERATOR: 'bg-blue-100 text-blue-700',
   CENTER_MANAGER: 'bg-green-100 text-green-700',
-  REGULAR_USER: 'bg-gray-100 text-gray-600',
+  REGULAR_USER: 'bg-bg-default text-gray-600',
 };
 
 const ROLE_LABEL_DEFAULTS: Record<UserRole, string> = {
@@ -185,13 +185,13 @@ export const UserManagement: React.FC = () => {
             </button>
             <button
               onClick={() => handleBulkRoleChange('REGULAR_USER')}
-              className="px-3 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600 transition"
+              className="px-3 py-2 bg-bg-default text-white text-sm rounded hover:bg-primary-light transition"
             >
               Set Role → Regular User
             </button>
             <button
               onClick={() => setSelectedUsers(new Set())}
-              className="px-3 py-2 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400 transition"
+              className="px-3 py-2 bg-bg-default text-text-primary text-sm rounded hover:bg-primary-light transition"
             >
               Clear Selection
             </button>
@@ -203,7 +203,7 @@ export const UserManagement: React.FC = () => {
       <div className="bg-bg-paper rounded-xl shadow-sm border border-divider overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-start min-w-full">
-            <thead className="text-xs text-text-secondary uppercase bg-gray-50 border-b border-divider">
+            <thead className="text-xs text-text-secondary uppercase bg-bg-default border-b border-divider">
               <tr>
                 <th className="p-2 border text-center w-12">
                   <input

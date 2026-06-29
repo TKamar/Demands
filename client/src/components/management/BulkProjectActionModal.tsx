@@ -38,7 +38,7 @@ export default function BulkProjectActionModal({
         </div>
 
         {/* Project list */}
-        <div className="max-h-48 overflow-y-auto border border-divider rounded-lg p-3 bg-gray-50">
+        <div className="max-h-48 overflow-y-auto border border-divider rounded-lg p-3 bg-bg-default">
           <ul className="text-xs space-y-1">
             {selectedNames.map((name) => (
               <li key={name} className="text-text-secondary">
