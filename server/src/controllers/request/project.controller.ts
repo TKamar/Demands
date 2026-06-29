@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { projectService } from "../../services/request/project.service";
-import { ProjectType, Median } from "@prisma/client";
+import { ProjectType, Median, NetworkLeg } from "@prisma/client";
 import { settings } from "../../lib/settings";
 import { NotFoundError } from "../../lib/errors";
 import prisma from "../../lib/prisma";
@@ -89,7 +89,9 @@ export const projectController = {
   create: async (req: Request, res: Response) => {
     try {
       const { username, fullName } = getUserContext(req);
-      const { name, purpose, relatedTo, type, kind, locationId, emergencyOption, centerName, branchName, sectionName, americaSystemName } = req.body;
+      const { name, purpose, relatedTo, type, kind, locationId,
+              emergencyOption, centerName, branchName, sectionName,
+              americaSystemName, networkLeg } = req.body;
 
       // Auto-derive year and median for Semiannual projects
       let year: number | undefined;
@@ -186,6 +188,7 @@ export const projectController = {
         sectionName,
         createdBy: username,
         createdByName: fullName,
+        ...(networkLeg && { networkLeg: networkLeg as NetworkLeg }),
       });
       res.status(201).json(project);
     } catch (error) {
@@ -197,7 +200,9 @@ export const projectController = {
   update: async (req: Request, res: Response) => {
     try {
       const { username, isPrivileged } = getUserContext(req);
-      const { purpose, relatedTo, type, kind, locationId, year, median, emergencyOption, centerName, branchName, sectionName, americaSystemName } = req.body;
+      const { purpose, relatedTo, type, kind, locationId, year, median,
+              emergencyOption, centerName, branchName, sectionName,
+              americaSystemName, networkLeg } = req.body;
 
       // If type is being updated to Semiannual, validate year and median
       if (type === ProjectType.Semiannual) {
@@ -282,6 +287,7 @@ export const projectController = {
         centerName?: string;
         branchName?: string;
         sectionName?: string;
+        networkLeg?: NetworkLeg;
       } = {};
 
       if (purpose !== undefined) updateData.purpose = purpose;
@@ -313,6 +319,7 @@ export const projectController = {
       if (branchName !== undefined) updateData.branchName = branchName;
       if (sectionName !== undefined) updateData.sectionName = sectionName;
       if (americaSystemName !== undefined) updateData.americaSystemName = americaSystemName || null;
+      if (networkLeg !== undefined) updateData.networkLeg = networkLeg as NetworkLeg;
 
       const project = await projectService.update(
         req.params.name,
@@ -468,6 +475,7 @@ export const projectController = {
           sectionName,
           createdBy: username,
           createdByName: fullName,
+          networkLeg: sourceProject.networkLeg ?? undefined,
         },
         demands || []
       );
