@@ -286,6 +286,7 @@ export interface MatrixDecision {
   id: number;
   approvedValue: number;
   status: 'Approved' | 'PartiallyApproved';
+  reason?: string;
 }
 
 export interface BulkApproveMatrixPayload {
