@@ -139,7 +139,7 @@ export default function BulkDecisionModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer border-none"
+            className="px-6 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
           >
             {t('common.cancel')}
           </button>

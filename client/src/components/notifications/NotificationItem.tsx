@@ -46,7 +46,7 @@ export default function NotificationItem({ notification, onMarkRead, onClose }: 
     <button
       type="button"
       onClick={handleClick}
-      className={`w-full text-start px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors border-b border-divider last:border-b-0 cursor-pointer bg-transparent ${
+      className={`w-full text-start px-4 py-3 flex items-start gap-3 hover:bg-bg-default transition-colors border-b border-divider last:border-b-0 cursor-pointer bg-transparent ${
         !notification.isRead ? 'border-s-2 border-s-blue-500 bg-blue-50/30' : ''
       }`}
     >

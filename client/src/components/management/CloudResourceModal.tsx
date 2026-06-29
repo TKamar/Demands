@@ -240,7 +240,7 @@ export default function CloudResourceModal({ open, onClose, onSubmit, resource, 
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-2.5 rounded-xl border border-divider bg-white text-text-primary hover:bg-gray-50 font-medium text-sm transition-colors"
+                        className="px-6 py-2.5 rounded-xl border border-divider bg-white text-text-primary hover:bg-bg-default font-medium text-sm transition-colors"
                     >
                         {t('common.cancel', 'Cancel')}
                     </button>

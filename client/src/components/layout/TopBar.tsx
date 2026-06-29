@@ -79,7 +79,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
         {hasSettingsAccess && (
           <button
             onClick={() => navigate('/settings')}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
+            className="p-1.5 rounded-lg hover:bg-bg-default text-text-secondary hover:text-primary transition-colors bg-transparent border-none cursor-pointer"
             title={t('nav.settings', 'Settings')}
             aria-label={t('nav.settings', 'Settings')}
           >
@@ -95,7 +95,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors bg-transparent border-none cursor-pointer"
+            className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-bg-default transition-colors bg-transparent border-none cursor-pointer"
             aria-expanded={menuOpen}
             aria-haspopup="menu"
           >
@@ -115,14 +115,14 @@ export default function TopBar({ userProfile }: TopBarProps) {
             <div className="absolute end-0 top-full mt-1 w-44 bg-bg-paper rounded-xl shadow-lg border border-divider overflow-hidden z-[9999]">
               <button
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-transparent border-none cursor-pointer text-start"
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-bg-default transition-colors bg-transparent border-none cursor-pointer text-start"
               >
                 <MdPersonOutline size={18} />
                 {t('user.profile')}
               </button>
               <button
                 onClick={() => { setMenuOpen(false); auth.signoutRedirect(); }}
-                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-danger hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-transparent border-none cursor-pointer text-start"
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-danger hover:bg-bg-default transition-colors bg-transparent border-none cursor-pointer text-start"
               >
                 <MdLogout size={18} />
                 {t('user.logout')}

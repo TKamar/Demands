@@ -59,7 +59,7 @@ export default function CloudResourceTable({ resources, onEdit, onDelete, isLoad
                             </tr>
                         ) : (
                             resources.map((resource) => (
-                                <tr key={resource.id} className="bg-white hover:bg-gray-50 transition-colors">
+                                <tr key={resource.id} className="bg-bg-paper hover:bg-bg-default transition-colors">
                                     <td className="px-6 py-4 font-medium text-text-primary">{resource.baseName}</td>
                                     <td className="px-6 py-4 text-text-secondary">{resource.networkName}</td>
                                     <td className="px-6 py-4 text-text-secondary">{resource.clusterName}</td>

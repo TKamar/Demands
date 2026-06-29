@@ -116,7 +116,7 @@ export const ServiceAdmin = () => {
               </tr>
             ) : (
               services.map(service => (
-                <tr key={service.name} className="border-b hover:bg-gray-50">
+                <tr key={service.name} className="border-b hover:bg-bg-default">
                   <td className="p-3 font-mono text-sm">
                     {service.displayName || service.name}
                   </td>

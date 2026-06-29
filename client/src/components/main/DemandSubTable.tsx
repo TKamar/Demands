@@ -19,10 +19,10 @@ type QuickApproveDemandPayload = {
 };
 
 function statusColor(status: string): string {
-  if (['Approved', 'PartiallyApproved', 'ApprovedWithCondition'].includes(status)) return 'text-green-700';
-  if (['Rejected', 'CenterManagerRejected'].includes(status)) return 'text-red-600';
-  if (['Pending', 'PendingCenterManager', 'WaitingOnPrerequisite'].includes(status)) return 'text-amber-600';
-  if (status === 'Cancelled') return 'text-gray-400';
+  if (['Approved', 'PartiallyApproved', 'ApprovedWithCondition'].includes(status)) return 'text-green-700 dark:text-green-400';
+  if (['Rejected', 'CenterManagerRejected'].includes(status)) return 'text-red-600 dark:text-red-400';
+  if (['Pending', 'PendingCenterManager', 'WaitingOnPrerequisite'].includes(status)) return 'text-amber-600 dark:text-amber-400';
+  if (status === 'Cancelled') return 'text-gray-400 dark:text-gray-500';
   return 'text-text-secondary';
 }
 

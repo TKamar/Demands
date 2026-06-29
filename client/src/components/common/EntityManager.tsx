@@ -404,7 +404,7 @@ export default function EntityManager({
                                 </tr>
                             ) : (
                                 filteredData.map((item, idx) => (
-                                    <tr key={getRowId(item) || idx} className="bg-white hover:bg-gray-50 transition-colors">
+                                    <tr key={getRowId(item) || idx} className="bg-bg-paper hover:bg-bg-default transition-colors">
                                         {columns.map(col => (
                                             <td key={col.key} className="px-6 py-4 text-text-primary whitespace-nowrap text-start">
                                                 {col.type === 'toggle'
@@ -505,7 +505,7 @@ export default function EntityManager({
                     <div className="flex justify-end gap-3 mt-4">
                         <button
                             onClick={() => setIsModalOpen(false)}
-                            className="px-4 py-2 text-text-secondary hover:bg-gray-100 rounded-xl transition-colors border-none cursor-pointer bg-transparent"
+                            className="px-4 py-2 text-text-secondary hover:bg-bg-default rounded-xl transition-colors border-none cursor-pointer bg-transparent"
                             disabled={isSubmitting}
                         >
                             {t('common.cancel', 'Cancel')}

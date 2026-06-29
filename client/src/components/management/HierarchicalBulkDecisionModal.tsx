@@ -171,7 +171,7 @@ export default function HierarchicalBulkDecisionModal({
                             const percent = inputValue ? computeApprovalPercent(demand.id, approvedValue) : 0;
 
                             return (
-                              <tr key={demand.id} className="border-b border-divider hover:bg-gray-50">
+                              <tr key={demand.id} className="border-b border-divider hover:bg-bg-default">
                                 <td className="py-2 px-2 text-xs text-text-primary font-medium">
                                   {demand.resourceName}
                                 </td>

@@ -94,7 +94,7 @@ export const ResourcesForAssignment: React.FC = () => {
                 onClick={() => toggleGroup(resourceName)}
                 aria-expanded={isExpanded}
                 aria-controls={`resource-group-${resourceName.replace(/\s+/g, '-')}`}
-                className="w-full flex items-center justify-between px-4 py-3 bg-bg-paper hover:bg-gray-50 transition-colors cursor-pointer border-none text-start"
+                className="w-full flex items-center justify-between px-4 py-3 bg-bg-paper hover:bg-bg-default transition-colors cursor-pointer border-none text-start"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-text-primary">{resourceName}</span>

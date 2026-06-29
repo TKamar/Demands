@@ -443,7 +443,7 @@ export default function CreateDemandModal({
                 value={form.project}
                 readOnly
                 disabled
-                className={`${inputClass} bg-gray-50 text-text-secondary`}
+                className={`${inputClass} bg-bg-default text-text-secondary`}
               />
             ) : (
               <SearchableSelect
@@ -488,7 +488,7 @@ export default function CreateDemandModal({
                 <label className="block text-sm font-medium text-text-primary mb-1.5">
                   {t('projects.createDemand.unit')}
                 </label>
-                <input type="text" value={form.unit} readOnly disabled className={`${inputClass} bg-gray-50 text-text-secondary`} />
+                <input type="text" value={form.unit} readOnly disabled className={`${inputClass} bg-bg-default text-text-secondary`} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-1.5">
@@ -602,7 +602,7 @@ export default function CreateDemandModal({
                 value={selectedProject?.centerName ?? ''}
                 readOnly
                 disabled
-                className={`${inputClass} bg-gray-50 text-text-secondary`}
+                className={`${inputClass} bg-bg-default text-text-secondary`}
               />
             )}
           </div>
@@ -627,7 +627,7 @@ export default function CreateDemandModal({
                 value={selectedProject?.branchName ?? ''}
                 readOnly
                 disabled
-                className={`${inputClass} bg-gray-50 text-text-secondary`}
+                className={`${inputClass} bg-bg-default text-text-secondary`}
               />
             )}
           </div>
@@ -652,7 +652,7 @@ export default function CreateDemandModal({
                 value={selectedProject?.sectionName ?? ''}
                 readOnly
                 disabled
-                className={`${inputClass} bg-gray-50 text-text-secondary`}
+                className={`${inputClass} bg-bg-default text-text-secondary`}
               />
             )}
           </div>
@@ -692,7 +692,7 @@ export default function CreateDemandModal({
                 value={selectedProject?.location.network ?? ''}
                 readOnly
                 disabled
-                className={`${inputClass} bg-gray-50 text-text-secondary`}
+                className={`${inputClass} bg-bg-default text-text-secondary`}
               />
             )}
           </div>
@@ -717,7 +717,7 @@ export default function CreateDemandModal({
                 value={selectedProject?.location.base ?? ''}
                 readOnly
                 disabled
-                className={`${inputClass} bg-gray-50 text-text-secondary`}
+                className={`${inputClass} bg-bg-default text-text-secondary`}
               />
             )}
           </div>
@@ -742,7 +742,7 @@ export default function CreateDemandModal({
                 value={selectedProject?.location.environment ?? ''}
                 readOnly
                 disabled
-                className={`${inputClass} bg-gray-50 text-text-secondary`}
+                className={`${inputClass} bg-bg-default text-text-secondary`}
               />
             )}
           </div>
@@ -767,7 +767,7 @@ export default function CreateDemandModal({
                 value={selectedProject?.location.cluster ?? ''}
                 readOnly
                 disabled
-                className={`${inputClass} bg-gray-50 text-text-secondary`}
+                className={`${inputClass} bg-bg-default text-text-secondary`}
               />
             )}
           </div>

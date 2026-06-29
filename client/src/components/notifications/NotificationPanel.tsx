@@ -21,7 +21,7 @@ export default function NotificationPanel({ onClose }: Props) {
         <button
           type="button"
           onClick={onClose}
-          className="p-1 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer bg-transparent border-none text-gray-500"
+          className="p-1 rounded-lg hover:bg-bg-default transition-colors cursor-pointer bg-transparent border-none text-text-secondary"
           aria-label={t('common.cancel')}
         >
           <MdClose size={18} />

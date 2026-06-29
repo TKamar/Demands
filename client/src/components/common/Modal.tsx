@@ -52,7 +52,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="p-1 rounded-lg text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer"
+              className="p-1 rounded-lg text-text-secondary hover:bg-bg-default dark:hover:bg-gray-700 hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer"
             >
               <MdClose size={22} />
             </button>

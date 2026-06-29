@@ -72,7 +72,7 @@ export default function SearchableSelect({
                 <div className="flex items-center gap-1">
                     {selected && !disabled && (
                         <div
-                            className="p-0.5 rounded-full hover:bg-gray-200 text-text-secondary cursor-pointer"
+                            className="p-0.5 rounded-full hover:bg-bg-default text-text-secondary cursor-pointer"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onChange('');
@@ -90,7 +90,7 @@ export default function SearchableSelect({
 
             {open && (
                 <div className="absolute z-50 mt-1 w-full max-h-60 bg-bg-paper border border-divider rounded-xl shadow-lg flex flex-col overflow-hidden">
-                    <div className="p-2 border-b border-divider bg-gray-50">
+                    <div className="p-2 border-b border-divider bg-bg-default">
                         <div className="relative">
                             <MdSearch
                                 size={18}
@@ -102,7 +102,7 @@ export default function SearchableSelect({
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder={t('common.search', 'Search...')}
-                                className="w-full ps-9 pe-3 py-2 text-sm border border-divider rounded-lg bg-white focus:outline-none focus:border-primary text-text-primary"
+                                className="w-full ps-9 pe-3 py-2 text-sm border border-divider rounded-lg bg-bg-paper focus:outline-none focus:border-primary text-text-primary"
                             />
                         </div>
                     </div>
@@ -123,7 +123,7 @@ export default function SearchableSelect({
                                     }}
                                     className={`w-full px-4 py-2 text-sm text-start rounded-lg border-none cursor-pointer transition-colors ${option.value === value
                                         ? 'bg-primary-light text-primary font-medium'
-                                        : 'text-text-primary hover:bg-gray-100'
+                                        : 'text-text-primary hover:bg-bg-default'
                                         }`}
                                 >
                                     {option.label}

@@ -104,7 +104,7 @@ export default function CmDecisionModal({ open, onClose, demand, onSuccess }: Cm
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-2.5 px-4 bg-gray-100 text-text-primary rounded-xl font-medium hover:bg-gray-200 transition-colors cursor-pointer border-none"
+            className="w-full py-2.5 px-4 bg-gray-100 text-text-primary rounded-xl font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
           >
             {t('common.cancel')}
           </button>
@@ -131,7 +131,7 @@ export default function CmDecisionModal({ open, onClose, demand, onSuccess }: Cm
             <button
               type="button"
               onClick={() => setStep('choice')}
-              className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer border-none"
+              className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
             >
               {t('common.back', 'חזור')}
             </button>

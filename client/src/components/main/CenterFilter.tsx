@@ -68,7 +68,7 @@ export default function CenterFilter({ selectedCenters, onChange }: CenterFilter
           {/* Select All */}
           <button
             onClick={selectAll}
-            className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-gray-50 transition-colors bg-transparent border-none cursor-pointer text-start"
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-bg-default transition-colors bg-transparent border-none cursor-pointer text-start"
           >
             <input
               type="checkbox"
@@ -83,7 +83,7 @@ export default function CenterFilter({ selectedCenters, onChange }: CenterFilter
             <button
               key={center.name}
               onClick={() => toggleCenter(center.name)}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-gray-50 transition-colors bg-transparent border-none cursor-pointer text-start"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-bg-default transition-colors bg-transparent border-none cursor-pointer text-start"
             >
               <input
                 type="checkbox"

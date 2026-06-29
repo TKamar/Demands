@@ -71,7 +71,7 @@ export default function Select({
               className={`w-full px-4 py-2.5 text-sm text-start bg-transparent border-none cursor-pointer transition-colors ${
                 option.value === value
                   ? 'bg-gray-100 text-text-primary font-medium'
-                  : 'text-text-primary hover:bg-gray-50'
+                  : 'text-text-primary hover:bg-bg-default'
               }`}
             >
               {option.label}

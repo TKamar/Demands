@@ -34,7 +34,7 @@ export const TopNavTabs: React.FC<TopNavTabsProps> = ({ activeTab, onTabChange, 
           className={`px-4 py-3 text-sm font-medium transition-colors relative cursor-pointer border-none bg-transparent outline-none whitespace-nowrap ${
             activeTab === tabId
               ? 'text-primary'
-              : 'text-text-secondary hover:text-text-primary hover:bg-gray-50'
+              : 'text-text-secondary hover:text-text-primary hover:bg-bg-default'
           }`}
         >
           {TAB_LABELS[tabId]}

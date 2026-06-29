@@ -94,7 +94,7 @@ export default function FilterSort<
             ref={triggerRef}
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors border-none bg-transparent cursor-pointer text-text-secondary hover:text-primary"
+            className="p-2 rounded-lg hover:bg-bg-default transition-colors border-none bg-transparent cursor-pointer text-text-secondary hover:text-primary"
           >
             <MdFilterList size={20} />
           </button>
@@ -165,13 +165,13 @@ export default function FilterSort<
     >
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 py-3 border-b border-divider cursor-pointer hover:bg-gray-50/50 transition-colors"
+        className="flex items-center justify-between px-4 py-3 border-b border-divider cursor-pointer hover:bg-bg-default transition-colors"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
         <div className="flex items-center gap-2 text-text-secondary">
           <button
             type="button"
-            className={`p-1 rounded-full hover:bg-gray-100 transition-transform duration-200 border-none bg-transparent cursor-pointer flex items-center justify-center ${isCollapsed ? '-rotate-90' : ''}`}
+            className={`p-1 rounded-full hover:bg-bg-default transition-transform duration-200 border-none bg-transparent cursor-pointer flex items-center justify-center ${isCollapsed ? '-rotate-90' : ''}`}
           >
             <MdFilterList size={20} />
           </button>

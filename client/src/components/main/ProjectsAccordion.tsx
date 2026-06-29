@@ -111,7 +111,7 @@ function ColumnHeader({
             <div className="absolute top-full mt-1 start-0 z-[300] bg-bg-paper border border-divider rounded-xl shadow-lg py-1 min-w-[140px]">
               <button
                 onClick={() => { onFilterChange([]); setOpen(false); }}
-                className="flex items-center gap-2 w-full px-3 py-1.5 text-xs font-medium text-text-primary hover:bg-gray-50 bg-transparent border-none cursor-pointer text-start"
+                className="flex items-center gap-2 w-full px-3 py-1.5 text-xs font-medium text-text-primary hover:bg-bg-default bg-transparent border-none cursor-pointer text-start"
               >
                 All
               </button>
@@ -120,7 +120,7 @@ function ColumnHeader({
                 <button
                   key={opt}
                   onClick={() => toggleOption(opt)}
-                  className="flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-gray-50 bg-transparent border-none cursor-pointer text-start"
+                  className="flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-bg-default bg-transparent border-none cursor-pointer text-start"
                 >
                   <input
                     type="checkbox"
@@ -467,7 +467,7 @@ export default function ProjectsAccordion({ selectedCenters, mode = 'active', cr
             return (
               <div key={project.name} className="border-b border-divider last:border-0">
                 <div
-                  className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50/70 ${
+                  className={`flex items-center gap-3 px-4 py-3 transition-colors hover:bg-bg-default ${
                     isExpanded ? 'bg-primary/[0.03]' : ''
                   }`}
                 >

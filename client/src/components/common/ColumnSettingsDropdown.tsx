@@ -53,7 +53,7 @@ function SortableColumnItem({
       ref={setNodeRef}
       style={style}
       className={`flex items-center gap-2 px-2 py-1.5 rounded-lg ${
-        isDragging ? 'bg-primary-light shadow-md z-10' : 'hover:bg-gray-100'
+        isDragging ? 'bg-primary-light shadow-md z-10' : 'hover:bg-bg-default'
       }`}
     >
       <button
@@ -189,7 +189,7 @@ export default function ColumnSettingsDropdown<TKey extends string>({
                 onReset();
                 setOpen(false);
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-primary hover:bg-gray-100 rounded-lg transition-colors bg-transparent border-none cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-text-secondary hover:text-primary hover:bg-bg-default rounded-lg transition-colors bg-transparent border-none cursor-pointer"
             >
               <MdRefresh size={16} />
               {t('table.resetColumns')}

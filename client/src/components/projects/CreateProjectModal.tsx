@@ -481,7 +481,7 @@ export default function CreateProjectModal({
               required
               value={form.name}
               onChange={handleChange}
-              className={isEditMode ? `${inputClass} bg-gray-50 text-text-secondary` : inputClass}
+              className={isEditMode ? `${inputClass} bg-bg-default text-text-secondary` : inputClass}
               readOnly={isEditMode}
               disabled={isEditMode}
             />

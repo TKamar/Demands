@@ -64,7 +64,7 @@ export default function WalletTable({ wallets, onEdit, onDelete, isLoading }: Wa
                                 return (
                                     <React.Fragment key={serviceName}>
                                         {/* Group Header Row */}
-                                        <tr className="bg-gray-100 hover:bg-gray-100">
+                                        <tr className="bg-bg-default hover:bg-bg-default">
                                             <td colSpan={7} className="px-6 py-3">
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-bold text-text-primary">{serviceName}</span>
@@ -77,7 +77,7 @@ export default function WalletTable({ wallets, onEdit, onDelete, isLoading }: Wa
 
                                         {/* Data Rows */}
                                         {serviceWallets.map((wallet) => (
-                                            <tr key={wallet.id} className="bg-white hover:bg-gray-50 transition-colors">
+                                            <tr key={wallet.id} className="bg-bg-paper hover:bg-bg-default transition-colors">
                                                 <td className="px-6 py-4 text-text-secondary">
                                                     {wallet.capacity.resourceName}
                                                 </td>

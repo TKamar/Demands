@@ -60,7 +60,7 @@ export default function CapacityTable({ capacities, onEdit, onDelete, isLoading 
                                     : 0;
 
                                 return (
-                                    <tr key={capacity.id} className="bg-white hover:bg-gray-50 transition-colors">
+                                    <tr key={capacity.id} className="bg-bg-paper hover:bg-bg-default transition-colors">
                                         <td className="px-6 py-4 font-medium text-text-primary">{capacity.resourceService}</td>
                                         <td className="px-6 py-4 text-text-secondary">{capacity.resourceName}</td>
                                         <td className="px-6 py-4 text-center text-text-secondary">{capacity.resource?.unit || '-'}</td>

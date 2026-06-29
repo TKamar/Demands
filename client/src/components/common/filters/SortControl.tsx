@@ -45,7 +45,7 @@ export default function SortControl<T extends string>({
               sortState.direction === 'asc' ? 'desc' : 'asc'
             )
           }
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer border-none bg-transparent text-text-secondary"
+          className="p-2 rounded-lg hover:bg-bg-default transition-colors cursor-pointer border-none bg-transparent text-text-secondary"
           title={sortState.direction === 'asc' ? t('common.ascending') : t('common.descending')}
         >
           {sortState.direction === 'asc' ? (

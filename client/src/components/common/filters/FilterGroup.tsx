@@ -26,7 +26,7 @@ export default function FilterGroup<T extends string>({
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer border-none text-start"
+        className="w-full flex items-center justify-between px-4 py-3 bg-bg-default hover:bg-bg-default transition-colors cursor-pointer border-none text-start"
       >
         <span className="font-medium text-text-primary text-sm">
           {t(group.label)}

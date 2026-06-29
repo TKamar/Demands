@@ -180,7 +180,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
             <button
               type="button"
               onClick={() => setShowTransferPath(false)}
-              className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer border-none"
+              className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
             >
               {t('common.back', 'חזור')}
             </button>
@@ -310,7 +310,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
                         key={u.username}
                         type="button"
                         onClick={() => { setTargetUser(u.username); setTargetUserSearch(u.fullName || u.username); setTargetUserOptions([]); }}
-                        className="w-full px-4 py-2 text-sm text-start hover:bg-gray-50 border-none cursor-pointer bg-transparent"
+                        className="w-full px-4 py-2 text-sm text-start hover:bg-bg-default border-none cursor-pointer bg-transparent"
                       >
                         {u.fullName || u.username}
                         <span className="text-xs text-text-secondary ms-2">{u.username}</span>
@@ -345,7 +345,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
               <button
                 type="button"
                 onClick={() => setSubDecision('')}
-                className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer border-none"
+                className="px-5 py-2.5 bg-gray-100 text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none"
               >
                 {t('common.back', 'חזור')}
               </button>

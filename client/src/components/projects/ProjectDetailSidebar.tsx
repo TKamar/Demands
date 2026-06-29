@@ -69,7 +69,7 @@ export default function ProjectDetailSidebar({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-text-secondary hover:bg-gray-100 hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer ms-2"
+            className="p-1 rounded-lg text-text-secondary hover:bg-bg-default hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer ms-2"
           >
             <MdClose size={22} />
           </button>

@@ -73,7 +73,7 @@ export default function DemandDetailSidebar({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-text-secondary hover:bg-gray-100 hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer ms-2"
+            className="p-1 rounded-lg text-text-secondary hover:bg-bg-default hover:text-text-primary transition-colors bg-transparent border-none cursor-pointer ms-2"
           >
             <MdClose size={22} />
           </button>
@@ -259,7 +259,7 @@ export default function DemandDetailSidebar({
                 <button
                   type="button"
                   onClick={() => onEdit?.(demand)}
-                  className="px-4 py-2.5 bg-bg-default border border-divider text-text-primary rounded-xl text-sm font-medium hover:bg-gray-100 transition-colors cursor-pointer border-none flex items-center justify-center gap-2"
+                  className="px-4 py-2.5 bg-bg-default border border-divider text-text-primary rounded-xl text-sm font-medium hover:bg-bg-default transition-colors cursor-pointer border-none flex items-center justify-center gap-2"
                 >
                   <MdEdit size={18} />
                   {t('common.edit', 'ערוך')}

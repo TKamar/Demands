@@ -35,7 +35,7 @@ export default function NotificationBell() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer bg-transparent border-none"
+        className="relative p-2 rounded-xl hover:bg-bg-default transition-colors cursor-pointer bg-transparent border-none"
         aria-label={unreadCount > 0 ? t('notifications.ariaLabelUnread', { count: unreadCount }) : t('notifications.ariaLabel')}
         aria-expanded={isOpen}
         aria-haspopup="dialog"

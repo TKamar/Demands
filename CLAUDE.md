@@ -18,7 +18,7 @@ You are operating within the "Demands" project repository. You MUST strictly adh
 ## 4. Execution Protocol
 *   **Plan Mode First:** Always utilize your `Plan Mode` before making architectural changes or writing complex logic. 
 *   **Interactive Development:** Proactively ask guiding questions, seek clarifications, and propose your technical approach before modifying files. Do not make blind assumptions.
-*   **Skills:** Utilize your capabilities (e.g., `Superpowers`, UI design skills) to ensure high-quality, responsive, and robust implementations.
+*   **Skills:** Utilize your capabilities - Superpowers (e.g., `Superpowers`, UI design skills) to ensure high-quality, responsive, and robust implementations.
 
 # Resource Demand Management System
 

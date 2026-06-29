@@ -248,7 +248,7 @@ export const UserManagement: React.FC = () => {
                 </tr>
               ) : (
                 filteredUsers.map(user => (
-                  <tr key={user.username} className="bg-white hover:bg-gray-50 transition-colors">
+                  <tr key={user.username} className="bg-bg-paper hover:bg-bg-default transition-colors">
                     <td className="p-2 border text-center">
                       <input
                         type="checkbox"
@@ -363,7 +363,7 @@ export const UserManagement: React.FC = () => {
             <button
               onClick={() => setEditingUser(null)}
               disabled={isSaving}
-              className="px-4 py-2 text-text-secondary hover:bg-gray-100 rounded-xl transition-colors border-none cursor-pointer bg-transparent"
+              className="px-4 py-2 text-text-secondary hover:bg-bg-default rounded-xl transition-colors border-none cursor-pointer bg-transparent"
             >
               {t('common.cancel', 'Cancel')}
             </button>

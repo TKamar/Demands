@@ -73,7 +73,7 @@ export default function MoreActionsMenu({ actions, size = 'sm' }: MoreActionsMen
             setOpen(true);
           }
         }}
-        className="p-1 rounded text-text-secondary hover:text-text-primary hover:bg-gray-100 bg-transparent border-none cursor-pointer transition-colors"
+        className="p-1 rounded text-text-secondary hover:text-text-primary hover:bg-bg-default bg-transparent border-none cursor-pointer transition-colors"
         title="More actions"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -101,7 +101,7 @@ export default function MoreActionsMenu({ actions, size = 'sm' }: MoreActionsMen
               className={`flex items-center gap-2 w-full px-3 py-2 text-xs text-start border-none transition-colors
                 ${action.disabled
                   ? 'opacity-40 cursor-not-allowed bg-transparent'
-                  : 'cursor-pointer hover:bg-gray-50 bg-transparent'
+                  : 'cursor-pointer hover:bg-bg-default bg-transparent'
                 }
                 ${action.danger ? 'text-danger' : 'text-text-primary'}`}
             >
