@@ -3,7 +3,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from 'react-oidc-context';
-import { MdStorage, MdPersonOutline, MdLogout, MdExpandMore, MdOutlineSettings, MdDarkMode, MdLightMode } from 'react-icons/md';
+import { MdStorage, MdPersonOutline, MdLogout, MdExpandMore, MdOutlineSettings, MdDarkMode, MdLightMode, MdDns } from 'react-icons/md';
+import ResourceAvailabilityModal from './ResourceAvailabilityModal';
 import { GiQueenCrown } from 'react-icons/gi';
 import type { UserProfile } from '../../types/navigation';
 import LanguageSwitcher from '../LanguageSwitcher';
@@ -22,6 +23,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
   const { effectiveTheme, toggleTheme } = useTheme();
   const { navigateToHome } = useNavigation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,6 +64,15 @@ export default function TopBar({ userProfile }: TopBarProps) {
           {effectiveTheme === 'dark' ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
         </button>
         <NotificationBell />
+
+        <button
+          onClick={() => setResourceModalOpen(true)}
+          aria-label="זמינות משאבים"
+          title="זמינות משאבים"
+          className="p-1.5 rounded-full text-text-secondary hover:text-text-primary hover:bg-primary-light dark:hover:bg-primary-light transition-colors"
+        >
+          <MdDns size={18} />
+        </button>
 
         {/* Role icon — clicking navigates to settings */}
         {hasSettingsAccess && (
@@ -120,5 +131,9 @@ export default function TopBar({ userProfile }: TopBarProps) {
         </div>
       </div>
     </header>
+    <ResourceAvailabilityModal
+      isOpen={resourceModalOpen}
+      onClose={() => setResourceModalOpen(false)}
+    />
   );
 }
