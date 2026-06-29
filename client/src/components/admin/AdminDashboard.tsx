@@ -93,10 +93,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [], c
   }, [selectedCenters, selectedServices, isAdmin]);
 
   useEffect(() => {
-    if (stats?.byService) {
+    if (stats?.byService && selectedServices.length === 0) {
       setAvailableServices(stats.byService.map((s) => s.service));
     }
-  }, [stats]);
+  }, [stats, selectedServices.length]);
 
   if (loading) {
     return (

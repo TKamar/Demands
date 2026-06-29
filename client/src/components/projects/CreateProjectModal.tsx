@@ -350,7 +350,7 @@ export default function CreateProjectModal({
 
     if (!location) return;
 
-    if (!form.networkLeg) {
+    if (!isEditMode && !form.networkLeg) {
       setError(t('projects.createProject.networkLegRequired'));
       return;
     }
