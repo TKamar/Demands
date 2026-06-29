@@ -426,12 +426,20 @@ export interface AdminStats {
   openConditional: Record<string, number>;
 }
 
-export async function fetchAdminStats(centers?: string[]): Promise<AdminStats> {
-  const params = centers && centers.length > 0
-    ? '?' + centers.map(c => `centers=${encodeURIComponent(c)}`).join('&')
-    : '';
-  const response = await api.get<AdminStats>(`/api/admin/stats${params}`);
-  return response.data;
+export async function fetchAdminStats(
+  centers?: string[],
+  services?: string[],
+): Promise<AdminStats> {
+  const params: string[] = [];
+  if (centers?.length) {
+    params.push(...centers.map((c) => `centers=${encodeURIComponent(c)}`));
+  }
+  if (services?.length) {
+    params.push(...services.map((s) => `services=${encodeURIComponent(s)}`));
+  }
+  const query = params.length ? `?${params.join('&')}` : '';
+  const { data } = await api.get<AdminStats>(`/api/admin/stats${query}`);
+  return data;
 }
 
 export async function fetchUsers(): Promise<AppUser[]> {
