@@ -232,6 +232,12 @@ enum Priority {
   P3
 }
 
+enum ProjectStatus {
+  Active
+  PendingAdminReview
+  FullyApproved
+}
+
 model Project {
   name                String           @id
   purpose             String
@@ -247,6 +253,7 @@ model Project {
   centerName          String
   branchName          String
   sectionName         String
+  projectStatus       ProjectStatus    @default(Active)
   center              Center           @relation(fields: [centerName], references: [name])
   branch              Branch           @relation(fields: [branchName, centerName], references: [name, centerName])
   section             Section          @relation(fields: [sectionName, branchName, centerName], references: [name, branchName, branchCenter])
@@ -301,6 +308,7 @@ model Demand {
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
   notifications      Notification[]
+  historyLogs        DemandHistoryLog[]
 
   @@index([createdBy])
 }
@@ -359,6 +367,7 @@ enum NotificationType {
   NewProject
   ProjectDeleted
   ProjectEdited
+  ProjectNeedsAdminReview
 }
 
 model Notification {
@@ -397,4 +406,20 @@ model CloudResourceStatus {
   cluster Cluster @relation(fields: [clusterName], references: [name])
 
   @@unique([baseName, networkName, clusterName, service])
+}
+
+// ============================================
+// Audit Trail Models
+// ============================================
+
+model DemandHistoryLog {
+  id            Int      @id @default(autoincrement())
+  demandId      Int
+  demand        Demand   @relation(fields: [demandId], references: [id], onDelete: Cascade)
+  action        String
+  actorUsername String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([demandId])
 }
