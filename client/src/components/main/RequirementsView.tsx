@@ -497,14 +497,6 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
       <div className="bg-bg-paper rounded-2xl border border-divider shadow-sm overflow-hidden">
         {/* Table header with button and funnel icon */}
         <div className="relative flex items-center gap-2 px-4 py-2 border-b border-divider" dir="rtl">
-          <button
-            onClick={() => setIsCreatingDemand(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap"
-          >
-            <MdAdd size={15} />
-            {t('requirements.addRequirement', '+ הוסף דרישה')}
-          </button>
-
           {selectedDemandIds.size >= 2 && (
             <>
               <button
@@ -536,6 +528,15 @@ export default function RequirementsView({ selectedCenters, managed }: Requireme
             sortState={sortState}
             onSortChange={handleSortChange}
           />
+          {!managed && (
+            <button
+              onClick={() => setIsCreatingDemand(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity border-none cursor-pointer whitespace-nowrap"
+            >
+              <MdAdd size={15} />
+              {t('requirements.addRequirement', 'הוסף דרישה')}
+            </button>
+          )}
         </div>
 
         {error ? (
