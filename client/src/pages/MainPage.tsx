@@ -5,10 +5,9 @@ import ApprovalRequestsPanel from '../components/main/panels/ApprovalRequestsPan
 import MyRequestsPanel from '../components/main/panels/MyRequestsPanel';
 import HistoryPanel from '../components/main/panels/HistoryPanel';
 import AdminDashboard from '../components/admin/AdminDashboard';
-import CloudMonitorPanel from '../components/main/panels/CloudMonitorPanel';
 import CenterFilter from '../components/main/CenterFilter';
 import { useCurrentUser } from '../hooks/useCurrentUser';
-import { getDefaultTab, isModeratorOrAdmin } from '../utils/roleUtils';
+import { getDefaultTab } from '../utils/roleUtils';
 import type { SubViewId } from '../utils/roleUtils';
 import type { UserRole } from '../types/domain';
 import NavigationContext from '../contexts/NavigationContext';
@@ -19,7 +18,6 @@ const DEFAULT_SUBVIEWS: Record<TopNavTabId, SubViewId> = {
   myRequests: 'projects',
   history: 'requirements',
   dashboard: 'projects' as SubViewId,
-  cloudMonitor: 'projects' as SubViewId,
 };
 
 export default function MainPage() {
@@ -55,7 +53,7 @@ export default function MainPage() {
       <div className="flex flex-col h-full">
         <TopNavTabs activeTab={topNavTab} onTabChange={setTopNavTab} role={role} />
 
-        {currentUser !== null && isModeratorOrAdmin(role) && (
+        {currentUser !== null && role === 'ADMIN' && (
           <div className="bg-bg-paper border-b border-divider px-6 py-3">
             <CenterFilter selectedCenters={selectedCenters} onChange={setSelectedCenters} />
           </div>
@@ -87,7 +85,6 @@ export default function MainPage() {
             />
           )}
           {topNavTab === 'dashboard' && <AdminDashboard selectedCenters={selectedCenters} />}
-          {topNavTab === 'cloudMonitor' && <CloudMonitorPanel />}
         </div>
       </div>
     </NavigationContext.Provider>
