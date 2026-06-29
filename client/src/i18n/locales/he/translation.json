@@ -419,7 +419,9 @@
         "P2": "רגיל - P2",
         "P3": "נמוך - P3"
       },
-      "emergencyOption": "אפשרות חירום"
+      "emergencyOption": "אפשרות חירום",
+      "networkLeg": "רגל",
+      "networkLegRequired": "יש לבחור רגל"
     }
   },
   "projectsTable": {
@@ -442,7 +444,8 @@
     "location": "מיקום",
     "organization": "ארגון",
     "meta": "מידע",
-    "viewDemands": "צפייה בדרישות"
+    "viewDemands": "צפייה בדרישות",
+    "networkLeg": "רגל"
   },
   "demandSidebar": {
     "demandDetails": "פרטי דרישה",
@@ -544,7 +547,8 @@
     "myApprovalRequests": "בקשות לאישור שלי",
     "requestsIOpened": "הבקשות שפתחתי",
     "requestHistory": "היסטוריית דרישות",
-    "resourceAvailability": "זמינות משאבים"
+    "resourceAvailability": "זמינות משאבים",
+    "analytics": "סטטיסטיקות"
   },
   "approvalRequests": { "empty": "אין בקשות ממתינות לאישור" },
   "myRequests": { "empty": "לא פתחת בקשות עדיין" },

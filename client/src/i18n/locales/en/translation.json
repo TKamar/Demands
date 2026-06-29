@@ -419,7 +419,9 @@
       "emergencyOption": "Emergency Option",
       "year": "Year",
       "median": "Median",
-      "section": "Section"
+      "section": "Section",
+      "networkLeg": "Network Leg",
+      "networkLegRequired": "Network leg is required"
     }
   },
   "projectsTable": {
@@ -442,7 +444,8 @@
     "location": "Location",
     "organization": "Organization",
     "meta": "Information",
-    "viewDemands": "View Demands"
+    "viewDemands": "View Demands",
+    "networkLeg": "Network Leg"
   },
   "demandSidebar": {
     "demandDetails": "Demand Details",
@@ -544,7 +547,8 @@
     "myApprovalRequests": "My Approval Requests",
     "requestsIOpened": "Requests I Opened",
     "requestHistory": "Request History",
-    "resourceAvailability": "Resource Availability"
+    "resourceAvailability": "Resource Availability",
+    "analytics": "Analytics"
   },
   "approvalRequests": { "empty": "No pending approval requests" },
   "myRequests": { "empty": "You have not opened any requests yet" },
