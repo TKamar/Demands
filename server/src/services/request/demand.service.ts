@@ -3,6 +3,7 @@ import { DemandType, DemandStatus, ProjectType, Median } from "@prisma/client";
 import { NotFoundError } from "../../lib/errors";
 import { notificationService } from "../notification/notification.service";
 import { syncProjectStatus } from "./projectStatus.service";
+import { demandHistoryService } from "./demandHistory.service";
 
 export const demandService = {
 
@@ -193,6 +194,10 @@ export const demandService = {
       }
     });
 
+    setImmediate(() => {
+      demandHistoryService.log(demand.id, 'Created', data.createdBy, { value: demand.value }).catch(() => {});
+    });
+
     return demand;
   },
 
@@ -313,6 +318,7 @@ export const demandService = {
 
     setImmediate(() => {
       syncProjectStatus(demand.projectName, actorUsername ?? '').catch(() => {});
+      demandHistoryService.log(demand.id, 'Rejected', actorUsername, { reason }).catch(() => {});
     });
 
     return demand;
@@ -457,6 +463,7 @@ export const demandService = {
 
     setImmediate(() => {
       syncProjectStatus(demand.projectName, data.actorUsername ?? '').catch(() => {});
+      demandHistoryService.log(demand.id, demand.status, data.actorUsername, { approvedValue: demand.approvedValue, reason: demand.reason }).catch(() => {});
     });
 
     return demand;
@@ -471,9 +478,9 @@ export const demandService = {
       actorUsername?: string;
     }
   ) => {
-    const projectNames = await prisma.demand.findMany({
+    const affectedDemands = await prisma.demand.findMany({
       where: { ...where, status: "Pending" },
-      select: { projectName: true },
+      select: { id: true, projectName: true },
       distinct: ['projectName'],
     });
 
@@ -488,16 +495,20 @@ export const demandService = {
     });
 
     setImmediate(() => {
-      Promise.all(projectNames.map(p => syncProjectStatus(p.projectName, data.actorUsername ?? ''))).catch(() => {});
+      const projectNames = affectedDemands.map(d => d.projectName);
+      Promise.all(projectNames.map(p => syncProjectStatus(p, data.actorUsername ?? ''))).catch(() => {});
+      affectedDemands.forEach(d => {
+        demandHistoryService.log(d.id, data.status, data.actorUsername, { reason: data.reason }).catch(() => {});
+      });
     });
 
     return result;
   },
 
   bulkReject: async (where: any, reason: string, actorUsername?: string) => {
-    const projectNames = await prisma.demand.findMany({
+    const affectedDemands = await prisma.demand.findMany({
       where: { ...where, status: "Pending" },
-      select: { projectName: true },
+      select: { id: true, projectName: true },
       distinct: ['projectName'],
     });
 
@@ -510,7 +521,11 @@ export const demandService = {
     });
 
     setImmediate(() => {
-      Promise.all(projectNames.map(p => syncProjectStatus(p.projectName, actorUsername ?? ''))).catch(() => {});
+      const projectNames = affectedDemands.map(d => d.projectName);
+      Promise.all(projectNames.map(p => syncProjectStatus(p, actorUsername ?? ''))).catch(() => {});
+      affectedDemands.forEach(d => {
+        demandHistoryService.log(d.id, 'Rejected', actorUsername, { reason }).catch(() => {});
+      });
     });
 
     return result;
@@ -691,7 +706,7 @@ export const demandService = {
     return result;
   },
 
-  approveMatrix: async (decisions: Array<{ id: number; approvedValue: number; status: 'Approved' | 'PartiallyApproved' }>) => {
+  approveMatrix: async (decisions: Array<{ id: number; approvedValue: number; status: 'Approved' | 'PartiallyApproved'; reason?: string }>, actorUsername?: string) => {
     const updates = decisions.map((decision) =>
       prisma.demand.updateMany({
         where: { id: decision.id, status: 'Pending' },
@@ -699,12 +714,19 @@ export const demandService = {
           status: decision.status,
           approvedValue: decision.approvedValue,
           approvedDate: new Date(),
+          ...(decision.reason ? { reason: decision.reason } : {}),
         },
       })
     );
 
     const results = await Promise.all(updates);
     const count = results.reduce((acc, result) => acc + result.count, 0);
+
+    setImmediate(() => {
+      decisions.forEach(d => {
+        demandHistoryService.log(d.id, d.status, actorUsername, { reason: d.reason }).catch(() => {});
+      });
+    });
 
     return { count };
   },

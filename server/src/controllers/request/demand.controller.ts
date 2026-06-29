@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { demandService } from "../../services/request/demand.service";
 import { projectService } from "../../services/request/project.service";
+import { demandHistoryService } from "../../services/request/demandHistory.service";
 import { DemandType, DemandStatus, ProjectType, Median } from "@prisma/client";
 import { settings } from "../../lib/settings";
 import { NotFoundError } from "../../lib/errors";
@@ -933,11 +934,22 @@ export const demandController = {
         }
       }
 
-      const result = await demandService.approveMatrix(decisions);
+      const result = await demandService.approveMatrix(decisions, req.auth?.user.username);
       res.json(result);
     } catch (error) {
       console.error('demandController.approveMatrix error:', error);
       res.status(500).json({ error: 'Failed to approve demands' });
+    }
+  },
+
+  getHistoryLogs: async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const logs = await demandHistoryService.getByDemand(id);
+      res.json(logs);
+    } catch (error) {
+      console.error('demandController.getHistoryLogs error:', error);
+      res.status(500).json({ error: 'Failed to fetch demand history' });
     }
   },
 };
