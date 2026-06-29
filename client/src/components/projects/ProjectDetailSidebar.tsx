@@ -103,6 +103,12 @@ export default function ProjectDetailSidebar({
               label={t('projects.createProject.priority')}
               value={<PriorityBadge priority={project.priority} />}
             />
+            {project.networkLeg && (
+              <DetailRow
+                label={t('projectSidebar.networkLeg')}
+                value={project.networkLeg === 'Leg1' ? 'רגל 1' : 'רגל 2'}
+              />
+            )}
           </DetailSection>
 
           {/* Location Section */}
