@@ -12,8 +12,13 @@ i18n
       he: { translation: he },
       en: { translation: en },
     },
+    lng: 'he',
     fallbackLng: 'he',
     interpolation: { escapeValue: false },
+    detection: {
+      order: ['localStorage', 'sessionStorage', 'navigator'],
+      caches: ['localStorage', 'sessionStorage'],
+    },
   });
 
 export default i18n;
