@@ -1,5 +1,13 @@
 # Work Log — Demands Monorepo
 
+## 2026-06-29 — feature/analytics-scoping-and-ui-revisions
+
+### In progress
+- Analytics expansion, tenant scoping, Project Leg field, Cloud Monitor relocation, theme fixes
+
+### Next
+- Task 2: Theme token fixes in AdminDashboard
+
 ## Sprint: Multi-Center RBAC & Admin CRUD Features
 
 **Branch:** `feature/rbac-multi-center-and-admin-crud` from `dev`  
