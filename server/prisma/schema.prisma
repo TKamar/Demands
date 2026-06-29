@@ -232,6 +232,11 @@ enum Priority {
   P3
 }
 
+enum NetworkLeg {
+  Leg1
+  Leg2
+}
+
 enum ProjectStatus {
   Active
   PendingAdminReview
@@ -250,6 +255,7 @@ model Project {
   year                Int?
   median              Median?
   priority            Priority?
+  networkLeg          NetworkLeg?
   centerName          String
   branchName          String
   sectionName         String
