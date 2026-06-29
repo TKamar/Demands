@@ -46,7 +46,7 @@ export default function TopBar({ userProfile }: TopBarProps) {
       <button
         onClick={navigateToHome}
         className="flex items-center gap-3 cursor-pointer bg-transparent border-none p-0 hover:opacity-80 transition-opacity"
-        aria-label="חזרה לדף הבית"
+        aria-label={t('nav.backToHome')}
       >
         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
           <MdStorage size={20} className="text-white" />
@@ -68,8 +68,8 @@ export default function TopBar({ userProfile }: TopBarProps) {
 
         <button
           onClick={() => setResourceModalOpen(true)}
-          aria-label="זמינות משאבים"
-          title="זמינות משאבים"
+          aria-label={t('tabs.resourceAvailability')}
+          title={t('tabs.resourceAvailability')}
           className="p-1.5 rounded-full text-text-secondary hover:text-text-primary hover:bg-primary-light dark:hover:bg-primary-light transition-colors"
         >
           <MdDns size={18} />

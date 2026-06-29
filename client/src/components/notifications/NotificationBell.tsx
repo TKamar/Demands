@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdNotifications, MdNotificationsNone } from 'react-icons/md';
 import { useNotificationContext } from '../../contexts/NotificationContext';
 import NotificationPanel from './NotificationPanel';
 
 export default function NotificationBell() {
+  const { t } = useTranslation();
   const { unreadCount } = useNotificationContext();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,7 +36,7 @@ export default function NotificationBell() {
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer bg-transparent border-none"
-        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+        aria-label={unreadCount > 0 ? t('notifications.ariaLabelUnread', { count: unreadCount }) : t('notifications.ariaLabel')}
         aria-expanded={isOpen}
         aria-haspopup="dialog"
       >
