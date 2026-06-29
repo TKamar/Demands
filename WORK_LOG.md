@@ -1,5 +1,32 @@
 # Work Log — Demands Monorepo
 
+## 2026-06-29 — feature/excel-format-sync — ✅ COMPLETE
+
+### Completed
+- Analyzed reference template at `פורמטים- איסוף דרישות.xlsx`: 4-sheet structure (main form, required parameters, closed lists, hidden lists)
+- Refactored `exportProjects()`: now generates all 4 sheets with populated project/demand data + validation lists
+- Refactored `importProjects()`: detects and supports both old format (English 'Projects'/'Demands' sheets) and new format (Hebrew 'טופס איסוף דרישות' sheet)
+- New format parser: reads by column indices, validates against closed lists, validates Service-ResourceType combos against hidden sheet
+- Location handling: properly splits base/environment/network/cluster for validation (Location model already has environmentName field)
+- Error handling: detailed per-row error messages with field validation
+- Tested export structure: 4-sheet template generation verified
+- Tested import parsing: service-resource combo parsing, location component extraction verified
+- TypeScript: clean compilation with no errors
+
+### Implementation Details
+- Export generates: Main Form (17 cols, data rows) + Required Parameters + Closed Lists + Hidden Lists (state: hidden)
+- Import: Detects format by sheet name; new format uses column-based cell access (exceljs API constraint)
+- Service-ResourceType validation: checks against predefined combos from resource map
+- Location validation: matches base + environment + network + cluster tuple
+- Backward compatibility: old format (English sheets) still supported
+
+### State
+✅ Ready for merge. Feature branch: feature/excel-format-sync (2 commits, TypeScript clean)
+
+### Commits
+1. 11b947d: Refactor Excel import/export for template format synchronization
+2. 5bda46f: Fix: Use column indices for ExcelJS row cell access in import parser
+
 ## 2026-06-29 — feature/analytics-scoping-and-ui-revisions — ✅ COMPLETE
 
 ### Completed
