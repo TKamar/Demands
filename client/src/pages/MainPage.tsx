@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { TopNavTabs } from '../components/main/TopNavTabs';
 import type { TopNavTabId } from '../components/main/TopNavTabs';
 import ApprovalRequestsPanel from '../components/main/panels/ApprovalRequestsPanel';
@@ -10,7 +11,6 @@ import { useCurrentUser } from '../hooks/useCurrentUser';
 import { getDefaultTab } from '../utils/roleUtils';
 import type { SubViewId } from '../utils/roleUtils';
 import type { UserRole } from '../types/domain';
-import NavigationContext from '../contexts/NavigationContext';
 
 const DEFAULT_TAB: TopNavTabId = 'myRequests';
 const DEFAULT_SUBVIEWS: Record<TopNavTabId, SubViewId> = {
@@ -23,6 +23,7 @@ const DEFAULT_SUBVIEWS: Record<TopNavTabId, SubViewId> = {
 export default function MainPage() {
   const currentUser = useCurrentUser();
   const role: UserRole = currentUser?.role ?? 'REGULAR_USER';
+  const [searchParams] = useSearchParams();
 
   const [topNavTab, setTopNavTab] = useState<TopNavTabId>(DEFAULT_TAB);
   const [subViewByTab, setSubViewByTab] = useState<Record<TopNavTabId, SubViewId>>(DEFAULT_SUBVIEWS);
@@ -36,21 +37,23 @@ export default function MainPage() {
     }
   }, [currentUser]);
 
+  // Reset to default tab when reset query param is present
+  useEffect(() => {
+    if (searchParams.has('reset')) {
+      const homeTab = getDefaultTab(currentUser?.role ?? 'REGULAR_USER');
+      setTopNavTab(homeTab);
+      setSubViewByTab(prev => ({ ...prev, [homeTab]: 'projects' }));
+    }
+  }, [searchParams, currentUser?.role]);
+
   const subView = subViewByTab[topNavTab];
 
   const handleSubViewChange = (view: SubViewId) => {
     setSubViewByTab((prev) => ({ ...prev, [topNavTab]: view }));
   };
 
-  const handleNavigateHome = useCallback(() => {
-    const homeTab = getDefaultTab(currentUser?.role ?? 'REGULAR_USER');
-    setTopNavTab(homeTab);
-    setSubViewByTab(prev => ({ ...prev, [homeTab]: 'projects' }));
-  }, [currentUser?.role]);
-
   return (
-    <NavigationContext.Provider value={{ navigateToHome: handleNavigateHome }}>
-      <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full">
         <TopNavTabs activeTab={topNavTab} onTabChange={setTopNavTab} role={role} />
 
         {currentUser !== null && role === 'ADMIN' && (
@@ -87,6 +90,5 @@ export default function MainPage() {
           {topNavTab === 'dashboard' && <AdminDashboard selectedCenters={selectedCenters} currentUser={currentUser} />}
         </div>
       </div>
-    </NavigationContext.Provider>
-  );
+    );
 }
