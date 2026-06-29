@@ -37,6 +37,7 @@ const initialForm = {
   network: '',
   base: '',
   cluster: '',
+  networkLeg: '',
   purpose: '',
   emergencyOption: '',
   median: '',
@@ -160,6 +161,7 @@ export default function CreateProjectModal({
         network: editingProject.location.network,
         base: editingProject.location.base,
         cluster: editingProject.location.cluster,
+        networkLeg: editingProject.networkLeg ?? '',
         purpose: editingProject.purpose,
         median: editingProject.median || '',
         year: (editingProject.year || '').toString(),
@@ -348,6 +350,11 @@ export default function CreateProjectModal({
 
     if (!location) return;
 
+    if (!form.networkLeg) {
+      setError(t('projects.createProject.networkLegRequired'));
+      return;
+    }
+
     const payload: CreateProjectPayload = {
       name: form.name.trim(),
       purpose: form.purpose.trim(),
@@ -361,6 +368,7 @@ export default function CreateProjectModal({
       priority: form.priority as Priority,
       median: form.median ? (form.median as any) : undefined,
       year: form.year ? Number(form.year) : undefined,
+      networkLeg: form.networkLeg as 'Leg1' | 'Leg2',
     };
 
     if (form.requestType === 'Emergency' && form.emergencyOption) {
@@ -664,6 +672,23 @@ export default function CreateProjectModal({
               placeholder={placeholder}
               disabled={!form.environment}
             />
+          </div>
+
+          {/* Network Leg */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1.5">
+              {t('projects.createProject.networkLeg')}
+              <span className="text-danger ms-1">*</span>
+            </label>
+            <select
+              value={form.networkLeg}
+              onChange={(e) => setForm((prev) => ({ ...prev, networkLeg: e.target.value }))}
+              className={`${inputClass}`}
+            >
+              <option value="">{t('projects.createProject.selectOption')}</option>
+              <option value="Leg1">רגל 1</option>
+              <option value="Leg2">רגל 2</option>
+            </select>
           </div>
 
           {/* Purpose */}
