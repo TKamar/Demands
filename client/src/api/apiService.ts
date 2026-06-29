@@ -468,6 +468,25 @@ export async function updateUser(username: string, payload: UpdateUserPayload): 
   return res.data;
 }
 
+export async function searchUsersAndGroups(query: string): Promise<{ users: {username: string; fullName?: string}[] }> {
+  const res = await api.get('/api/users-groups', { params: { search: query } });
+  return res.data;
+}
+
+export interface DemandHistoryEntry {
+  id: number;
+  demandId: number;
+  action: string;
+  actorUsername: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export async function fetchDemandHistory(demandId: number): Promise<DemandHistoryEntry[]> {
+  const res = await api.get<DemandHistoryEntry[]>(`/api/demands/${demandId}/history`);
+  return res.data;
+}
+
 // --- Service Admin ---
 
 export async function updateService(name: string, data: { moderators: string[] }): Promise<any> {

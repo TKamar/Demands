@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Modal from '../common/Modal';
 import { useToast } from '../common/Toast';
 import { useReferenceData } from '../../hooks/useReferenceData';
-import { transferDemand } from '../../api/apiService';
+import { transferDemand, searchUsersAndGroups } from '../../api/apiService';
 import { SUB_DECISIONS } from '../../constants/demandDecisionOptions';
 import type { Demand } from '../../types/domain';
 import type { ApproveDemandPayload, RejectDemandPayload } from '../../api/types';
@@ -33,6 +33,11 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
   const [targetService, setTargetService] = useState('');
   const [showTransferPath, setShowTransferPath] = useState(false);
 
+  const [targetUser, setTargetUser] = useState('');
+  const [targetUserSearch, setTargetUserSearch] = useState('');
+  const [targetUserOptions, setTargetUserOptions] = useState<{username: string; fullName?: string}[]>([]);
+  const [isSearchingUsers, setIsSearchingUsers] = useState(false);
+
   useEffect(() => {
     if (open) {
       setSubDecision('');
@@ -42,9 +47,31 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
       setAssignedToUser('');
       setTargetService('');
       setShowTransferPath(false);
+      setTargetUser('');
+      setTargetUserSearch('');
+      setTargetUserOptions([]);
     }
     setIsSubmitting(false);
   }, [demand, open]);
+
+  useEffect(() => {
+    if (targetUserSearch.length < 2) {
+      setTargetUserOptions([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setIsSearchingUsers(true);
+      try {
+        const results = await searchUsersAndGroups(targetUserSearch);
+        setTargetUserOptions(results.users ?? []);
+      } catch {
+        setTargetUserOptions([]);
+      } finally {
+        setIsSearchingUsers(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [targetUserSearch]);
 
   if (!demand) return null;
 
@@ -68,7 +95,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
           approvedValue: selectedOption.requiresQuantity ? approvedValue : undefined,
           reason: selectedOption.requiresReason ? reason : undefined,
           procurementDate: selectedOption.requiresDate ? procurementDate : undefined,
-          assignedToUser: selectedOption.requiresUser ? assignedToUser : undefined,
+          assignedToUser: selectedOption.requiresTargetUser ? targetUser : (selectedOption.requiresUser ? assignedToUser : undefined),
         });
       }
       onClose();
@@ -261,6 +288,42 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
               </div>
             )}
 
+            {selectedOption.requiresTargetUser && (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-primary">
+                  {t('decisions.selectTargetUser', 'בחירת משתמש יעד')} <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={targetUserSearch}
+                  onChange={e => { setTargetUserSearch(e.target.value); setTargetUser(''); }}
+                  placeholder={t('decisions.searchUser', 'חפש משתמש...')}
+                  className="px-4 py-2 border border-divider rounded-lg text-sm bg-bg-paper focus:outline-none focus:border-primary"
+                />
+                {isSearchingUsers && (
+                  <p className="text-xs text-text-secondary">{t('common.searching', 'מחפש...')}</p>
+                )}
+                {targetUserOptions.length > 0 && !targetUser && (
+                  <div className="border border-divider rounded-lg overflow-hidden shadow-sm bg-bg-paper max-h-40 overflow-y-auto">
+                    {targetUserOptions.map(u => (
+                      <button
+                        key={u.username}
+                        type="button"
+                        onClick={() => { setTargetUser(u.username); setTargetUserSearch(u.fullName || u.username); setTargetUserOptions([]); }}
+                        className="w-full px-4 py-2 text-sm text-start hover:bg-gray-50 border-none cursor-pointer bg-transparent"
+                      >
+                        {u.fullName || u.username}
+                        <span className="text-xs text-text-secondary ms-2">{u.username}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {targetUser && (
+                  <p className="text-xs text-green-600">{t('decisions.selectedUser', 'נבחר:')} {targetUser}</p>
+                )}
+              </div>
+            )}
+
             {selectedOption.requiresReason && (
               <div>
                 <label className="text-sm font-medium text-text-primary">
@@ -288,7 +351,7 @@ export default function DecisionModal({ open, onClose, onApprove, onReject, dema
               </button>
               <button
                 type="submit"
-                disabled={isLoading || isSubmitting || !subDecision}
+                disabled={isLoading || isSubmitting || !subDecision || (selectedOption.requiresTargetUser && !targetUser)}
                 className={`px-6 py-2.5 text-white rounded-xl text-sm font-medium transition-colors cursor-pointer border-none disabled:opacity-50 disabled:cursor-not-allowed ${
                   selectedOption.status === 'Rejected'
                     ? 'bg-danger hover:bg-red-700'

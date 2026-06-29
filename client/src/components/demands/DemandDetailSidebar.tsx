@@ -5,6 +5,7 @@ import { MdClose, MdEdit, MdCancel, MdCheck } from 'react-icons/md';
 import type { Demand, Project } from '../../types/domain';
 import StatusBadge from '../projects/StatusBadge';
 import PriorityBadge from '../projects/PriorityBadge';
+import DemandHistoryTimeline from './DemandHistoryTimeline';
 
 interface DemandDetailSidebarProps {
   demand: Demand | null;
@@ -125,6 +126,13 @@ export default function DemandDetailSidebar({
                   value={demand.reason}
                 />
               )}
+            </DetailSection>
+          )}
+
+          {/* Flow History Timeline Section */}
+          {demand.id && (
+            <DetailSection title={t('demandSidebar.flowHistory', 'היסטוריית זרימה')}>
+              <DemandHistoryTimeline demandId={demand.id} />
             </DetailSection>
           )}
 

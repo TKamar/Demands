@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { demandService } from "../../services/request/demand.service";
 import { projectService } from "../../services/request/project.service";
+import { demandHistoryService } from "../../services/request/demandHistory.service";
 import { DemandType, DemandStatus, ProjectType, Median } from "@prisma/client";
 import { settings } from "../../lib/settings";
 import { NotFoundError } from "../../lib/errors";
@@ -444,7 +445,7 @@ export const demandController = {
         return res.status(400).json({ error: "reason is required for rejection" });
       }
 
-      const demand = await demandService.reject(Number(req.params.id), reason.trim());
+      const demand = await demandService.reject(Number(req.params.id), reason.trim(), req.auth?.user.username);
       res.json(demand);
     } catch (error) {
       console.error("demandController.reject error:", error);
@@ -576,6 +577,7 @@ export const demandController = {
         status,
         approvedValue: requiresValueAndReason ? approvedValue : undefined,
         reason: requiresValueAndReason ? reason?.trim() : undefined,
+        actorUsername: username,
       });
 
       res.json({ count: result.count });
@@ -639,7 +641,7 @@ export const demandController = {
         return res.status(400).json({ error: "Either ids or selectAll+filters must be provided" });
       }
 
-      const result = await demandService.bulkReject(where, reason.trim());
+      const result = await demandService.bulkReject(where, reason.trim(), username);
       res.json({ count: result.count });
     } catch (error) {
       console.error("demandController.bulkReject error:", error);
@@ -716,6 +718,7 @@ export const demandController = {
         reason,
         procurementDate: procurementDate ? new Date(procurementDate) : undefined,
         assignedToUser,
+        actorUsername: req.auth?.user.username,
       });
       res.json(demand);
     } catch (error) {
@@ -931,11 +934,22 @@ export const demandController = {
         }
       }
 
-      const result = await demandService.approveMatrix(decisions);
+      const result = await demandService.approveMatrix(decisions, req.auth?.user.username);
       res.json(result);
     } catch (error) {
       console.error('demandController.approveMatrix error:', error);
       res.status(500).json({ error: 'Failed to approve demands' });
+    }
+  },
+
+  getHistoryLogs: async (req: Request, res: Response) => {
+    try {
+      const id = Number(req.params.id);
+      const logs = await demandHistoryService.getByDemand(id);
+      res.json(logs);
+    } catch (error) {
+      console.error('demandController.getHistoryLogs error:', error);
+      res.status(500).json({ error: 'Failed to fetch demand history' });
     }
   },
 };

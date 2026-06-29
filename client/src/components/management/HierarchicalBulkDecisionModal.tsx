@@ -7,6 +7,7 @@ export interface MatrixDecision {
   id: number;
   approvedValue: number;
   status: 'Approved' | 'PartiallyApproved';
+  reason?: string;
 }
 
 interface HierarchicalBulkDecisionModalProps {
@@ -25,6 +26,8 @@ export default function HierarchicalBulkDecisionModal({
   const { t } = useTranslation();
 
   const [approvalInputs, setApprovalInputs] = useState<Record<number, string>>({});
+  const [demandReasons, setDemandReasons] = useState<Record<number, string>>({});
+  const [projectConditions, setProjectConditions] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Group demands by project → service
@@ -52,6 +55,17 @@ export default function HierarchicalBulkDecisionModal({
     }));
   };
 
+  const applyConditionToProject = (projectName: string) => {
+    const condition = projectConditions[projectName] ?? '';
+    const projectDemands = Object.values(demandsByProject[projectName])
+      .flat();
+    setDemandReasons((prev) => {
+      const patch: Record<number, string> = {};
+      projectDemands.forEach(d => { patch[d.id] = condition; });
+      return { ...prev, ...patch };
+    });
+  };
+
   const handleSubmit = async () => {
     // Build decisions from inputs
     const decisions: MatrixDecision[] = [];
@@ -66,6 +80,7 @@ export default function HierarchicalBulkDecisionModal({
         id,
         approvedValue,
         status: approvedValue >= demand.value ? 'Approved' : 'PartiallyApproved',
+        reason: demandReasons[id] || undefined,
       });
     });
 
@@ -108,6 +123,25 @@ export default function HierarchicalBulkDecisionModal({
                     </h3>
                   )}
 
+                  {/* Bulk condition row for this project */}
+                  <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-100 rounded-lg">
+                    <input
+                      type="text"
+                      dir="rtl"
+                      placeholder={t('bulkDecision.conditionPlaceholder', 'הזן תנאי / סיבה...')}
+                      value={projectConditions[projectName] ?? ''}
+                      onChange={(e) => setProjectConditions((prev) => ({ ...prev, [projectName]: e.target.value }))}
+                      className="flex-1 text-sm px-3 py-1.5 border border-divider rounded-lg bg-white focus:outline-none focus:border-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => applyConditionToProject(projectName)}
+                      className="text-xs px-3 py-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors border-none cursor-pointer whitespace-nowrap font-medium"
+                    >
+                      {t('bulkDecision.applyToAll', 'החל על הכל')}
+                    </button>
+                  </div>
+
                   {/* Service blocks for this project, stacked vertically */}
                   {Object.entries(demandsByProject[projectName]).map(([serviceName, serviceDemands]) => (
                     <div key={serviceName} className="border border-divider rounded-lg p-4">
@@ -145,15 +179,22 @@ export default function HierarchicalBulkDecisionModal({
                                   {demand.value} {demand.unit}
                                 </td>
                                 <td className="py-2 px-2">
-                                  <input
-                                    type="number"
-                                    min="0"
-                                    step="1"
-                                    value={inputValue}
-                                    onChange={(e) => handleApprovalChange(demand.id, e.target.value)}
-                                    placeholder="0"
-                                    className="w-20 px-2 py-1 text-xs border border-divider rounded bg-white text-text-primary"
-                                  />
+                                  <div className="flex flex-col gap-1">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="1"
+                                      value={inputValue}
+                                      onChange={(e) => handleApprovalChange(demand.id, e.target.value)}
+                                      placeholder="0"
+                                      className="w-20 px-2 py-1 text-xs border border-divider rounded bg-white text-text-primary"
+                                    />
+                                    {demandReasons[demand.id] && (
+                                      <p className="text-xs text-amber-700 italic font-medium">
+                                        {demandReasons[demand.id]}
+                                      </p>
+                                    )}
+                                  </div>
                                 </td>
                                 <td className="py-2 px-2 text-xs text-text-secondary">
                                   {inputValue ? `${percent}%` : '—'}

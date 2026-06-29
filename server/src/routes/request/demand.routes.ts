@@ -16,6 +16,7 @@ router.patch("/bulk/approve", authenticate, requireModerator, demandController.b
 router.patch("/bulk/reject", authenticate, requireModerator, demandController.bulkReject);
 router.patch("/bulk/approve-matrix", authenticate, requireModerator, demandController.approveMatrix);
 router.post("/group", authenticate, requireAuth, demandController.createGroup);
+router.get("/:id/history", authenticate, requireAuth, demandController.getHistoryLogs);
 router.get("/:id", authenticate, requireAuth, demandController.getById);
 router.post("/", authenticate, requireAuth, demandController.create);
 router.patch("/:id", authenticate, requireAuth, demandController.update);
