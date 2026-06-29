@@ -314,7 +314,7 @@ function EditPopover({ popover, onSave, onClose }: EditPopoverProps) {
           <option value="OK">{t('cloudMonitor.tagOk')}</option>
           <option value="CAPACITY">{t('cloudMonitor.tagCapacity')}</option>
           <option value="CLIENT_PROCESS">{t('cloudMonitor.tagClientProcess')}</option>
-          <option value="MAINTENANCE">{t('cloudMonitor.tagMaintenance')}
+          <option value="MAINTENANCE">{t('cloudMonitor.tagMaintenance')}</option>
         </select>
       </div>
       <div className="flex gap-2">
