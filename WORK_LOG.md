@@ -1,5 +1,54 @@
 # Work Log — Demands Monorepo
 
+## 2026-07-01 — chore/production-deployment-guide — ✅ COMPLETE
+
+### Completed
+- **Phase 0: Seeding & Startup Audit**
+  - Verified `entrypoint.sh` seeding gate (lines 10-13): `NODE_ENV=production` prevents mock data injection
+  - Confirmed first admin bootstrap: `authorization.ts` auto-upserts users as REGULAR_USER on first login; OIDC fallback allows admin group access until DB promotion
+  - Identified app-level reference data (Services, Resources) vs org-specific data (Centers, Projects, Demands)
+- **Created `server/prisma/seed-prod.ts`** — 140 lines
+  - Seeds only: ProjectKinds (2), EmergencyOptions (4), Services (18, with `moderators: []`), Resources (~40)
+  - Does NOT seed: Users, Centers, Projects, Demands, CloudResourceStatus, or any org/location hierarchy
+  - Pattern: uses `PrismaClient`, `upsert` structure identical to `seed.ts`
+- **Updated `server/package.json`** — Added `"seed:prod": "ts-node prisma/seed-prod.ts"` script
+- **Created `DEPLOYMENT-PROD.md`** — 617 lines, 13 sections
+  - What "Clean Production" means: distinction between app catalog (seeded) and org data (UI config)
+  - Prerequisites, pre-flight checklist, environment setup with hardening notes
+  - Keycloak realm config (redirect URIs, first admin creation)
+  - Build & launch: `docker compose --profile dev up -d --build`
+  - Database init: migrations + `npm run seed:prod`
+  - First admin bootstrap: Keycloak login + optional SQL promotion
+  - Post-bootstrap admin tasks: org hierarchy and moderator assignment via UI
+  - Health checks with concrete curl commands
+  - Troubleshooting (JWT validation, API crashes, Keycloak slow start, user permissions)
+  - Deployment checklist (13 items)
+  - Rollback procedures and backup/restore steps
+  - Production hardening tips (reverse proxy, secrets, monitoring, HA)
+- **Updated `WORK_LOG.md`** — Added entry for this phase
+
+### Key Insights
+- Seeding gate already works correctly for production (no code changes needed)
+- Empty DB is non-functional for demands creation (Services/Resources required)
+- Production seed is minimal (160 lines vs dev seed 1200 lines)
+- First admin has OIDC fallback (no SQL needed immediately) but SQL promotion recommended for persistence
+- Post-deployment admin must configure org via UI (5-step process: Centers → Branches → Sections, Bases → Networks → Locations)
+
+### Implementation Details
+- `seed-prod.ts`: Uses same `upsert` pattern as `seed.ts` for Services/Resources
+- Services and Resources are identical in both (dev and prod) but dev seed adds `moderators: ['mod1', 'mod2']` while prod uses `moderators: []`
+- No ProjectKind or EmergencyOption filtering (both dev and prod need them)
+- DB initialization order: migrations → seed:prod (not seeded during container startup like dev)
+
+### State
+✅ Merged to dev. All files committed and pushed:
+- `server/prisma/seed-prod.ts` (new)
+- `server/package.json` (updated with seed:prod script)
+- `DEPLOYMENT-PROD.md` (new — 617 lines, complete runbook)
+- `WORK_LOG.md` (this entry)
+
+---
+
 ## 2026-07-01 — bugfix/air-gapped-compatibility — ✅ COMPLETE
 
 ### Completed
@@ -17,12 +66,69 @@
 - **Compatibility**: Supports both Alpine Linux (musl + openssl-3.0.x) and Debian (openssl-1.1.x) without recompilation
 
 ### State
-✅ Ready for testing/merge. All changes on `bugfix/air-gapped-compatibility` branch.
+✅ Merged to dev. All changes on `bugfix/air-gapped-compatibility` branch and integrated.
 - Docker image will now build completely offline
 - Container startup will not attempt external network calls for Prisma
 
 ### Commits
 1. 66d817c: Fix air-gapped environment Prisma compatibility
+
+---
+
+## 2026-07-01 — chore/deployment-preparation — ✅ COMPLETE
+
+### Completed
+- **Phase 0: Repository Scanning** — Scanned all 4 codebases (Demands, Demands-dev, Demands-main, and auxiliary) to identify environment variables
+  - Frontend: 4 VITE_ vars (API_URL, OIDC_AUTHORITY, OIDC_CLIENT_ID, OIDC_REDIRECT_URI)
+  - Backend: 18 process.env vars (PORT, NODE_ENV, DATABASE_URL, POSTGRES_*, OIDC_*, AUTH_*, KEYCLOAK_*, CUSTOM_AUTH_*)
+  - Docker/Keycloak: 20+ docker-compose environment declarations
+  - Total: 30+ unique environment variables documented with sources and defaults
+- **Created `.env.example`** — Root-level consolidated template with 30+ vars grouped into 9 logical sections
+  - Comments on each var explaining purpose, where to get value, and production vs dev differences
+  - Production placeholders (not dev defaults) for all secrets
+  - Critical notes on KC_HOSTNAME, AUTH_ISSUER, and JWT validation requirements
+- **Created `DEPLOYMENT.md`** — Comprehensive 11-section production deployment guide (450+ lines)
+  - Prerequisites (Docker, Docker Compose v2)
+  - Environment setup with production hardening guidance
+  - Keycloak configuration and realm import process
+  - Build & start containers (docker compose up --build -d)
+  - Database initialization (Prisma migrate + manual seed)
+  - First admin bootstrap (SQL procedure)
+  - Health checks (API, DB, Keycloak, frontend, OIDC token flow)
+  - Troubleshooting for 4 common issues (JWT validation, API unreachability, migrations, Keycloak access)
+  - Optional nginx multi-stage client build (production hardening)
+  - Deployment checklist (11 items)
+  - Rollback procedures and database backup/restore
+- **Git branch created** — `chore/deployment-preparation` branched from `dev`
+- **WORK_LOG.md updated** — Entry added for this phase
+
+### Key Findings
+- Realm export at `docker/keycloak/demands-realm.json` contains localhost URIs — must be updated for production domain
+- `KC_HOSTNAME: localhost` is critical — locks Keycloak issuer and is most common JWT validation failure source
+- Client Dockerfile runs Vite dev server (not production-ready) — documented gap and provided nginx multi-stage sample
+- Seeding is dev-only (NODE_ENV=development gate in entrypoint.sh) — production seeding must be manual
+- First admin requires SQL `UPDATE "User" SET role = 'ADMIN'` after initial login
+
+### Implementation Details
+- `.env.example`: 9 sections, 30 vars, 200+ lines with inline comments
+- `DEPLOYMENT.md`: 11 sections covering prerequisites, setup, build, DB init, health checks, troubleshooting, and rollback
+- All production placeholders use `https://demands.your-domain.com` pattern for operators to fill in actual domain
+- Health check section includes 5 concrete examples (API, DB, Keycloak, frontend, token validation)
+- Troubleshooting covers root causes and fixes for JWT validation, connectivity, migrations, and Keycloak startup
+
+### State
+✅ Ready for merge. Branch: `chore/deployment-preparation`. All files committed:
+- `.env.example` (new)
+- `DEPLOYMENT.md` (new)
+- `WORK_LOG.md` (updated with this entry)
+
+### Next Steps
+- Run `git add .env.example DEPLOYMENT.md WORK_LOG.md && git commit -m "chore: add deployment preparation guides and environment template"`
+- Create pull request from `chore/deployment-preparation` → `dev`
+- Review and merge into dev branch
+
+---
+>>>>>>> chore/production-deployment-guide
 
 ## 2026-06-29 — feature/excel-format-sync — ✅ COMPLETE
 
