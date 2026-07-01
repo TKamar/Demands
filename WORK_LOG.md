@@ -1,5 +1,31 @@
 # Work Log — Demands Monorepo
 
+## 2026-07-01 — bugfix/frontend-tsc-build-errors — ✅ COMPLETE
+
+### Completed
+- **Phase 0: Investigation** — Identified 5 TypeScript build errors blocking offline CI/CD deployment
+- **AdminDashboard.tsx**: Typed recharts `Tooltip` formatter param as `any` to satisfy strict generic constraints (ValueType compatibility)
+- **CloudMonitorPanel.tsx**: 
+  - Added `t` parameter to `EditPopoverProps` interface
+  - Passed `t` through to `EditPopover` component to resolve undefined translation function
+- **DemandDetailSidebar.tsx**:
+  - Added `onMakeDecision?: (demand: Demand) => void;` prop to interface
+  - Prefixed parameter with underscore to mark as intentionally unused: `onMakeDecision: _onMakeDecision`
+- **DemandHistoryTimeline.tsx**: Changed `&&` conditional to ternary for proper type narrowing of `unknown` metadata type
+- **MainPage.tsx**: Removed unused `useCallback` import
+- **Build verification**: `npm run build` (tsc -b + vite build) completes successfully with no TypeScript errors ✓
+
+### Technical Details
+- Root cause: Strict TypeScript compilation (`tsc -b`) combined with generic recharts types and unknown JSON metadata types required explicit handling
+- Solution approach: Type assertions for known type mismatches, proper conditional logic for type narrowing, unused parameter marking
+- Compatibility: Changes maintain full backward compatibility; no runtime behavior changes
+
+### State
+✅ Ready for offline CI/CD deployment. Branch `bugfix/frontend-tsc-build-errors` merged to `dev` and pushed.
+
+### Commits
+1. e10f1a3: Fix TypeScript build errors for offline CI/CD deployment
+
 ## 2026-07-01 — chore/production-deployment-guide — ✅ COMPLETE
 
 ### Completed
