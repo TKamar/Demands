@@ -52,6 +52,14 @@
 
 ### Commits
 1. 3 files created (PowerShell scripts + Windows documentation)
+2. Fixed encoding issues in PowerShell scripts (special characters)
+3. Added simplified packaging script (scripts/package-offline-simple.ps1)
+
+### Bundle Creation
+- **Successfully created:** offline-deployment-v1.0.0-20260701_113537.tar.gz (702 MB)
+- **Contents:** All 4 Docker images + docker-compose.yml + .env.example + deploy scripts
+- **Status:** Ready for transfer to offline Windows machines
+- **Validation:** Bundle verified with tar listing
 
 ## 2026-07-01 — feature/offline-packaging-suite — ✅ COMPLETE
 
