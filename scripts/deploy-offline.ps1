@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Offline Deployment Script for Windows
@@ -74,7 +74,7 @@ try {
 # Check Docker daemon
 try {
     $null = docker info
-    Write-LogInfo "✓ Docker daemon is running"
+    Write-LogInfo "âœ“ Docker daemon is running"
 } catch {
     Write-LogError "Docker daemon is not running or not accessible"
     Write-Host "Please start Docker Desktop and try again"
@@ -101,7 +101,7 @@ $MissingFiles = @()
 
 foreach ($File in $RequiredFiles) {
     if (Test-Path $File) {
-        Write-LogInfo "✓ Found $File"
+        Write-LogInfo "âœ“ Found $File"
     } else {
         $MissingFiles += $File
     }
@@ -149,7 +149,7 @@ if ($UnconfiguredVars.Count -gt 0) {
     }
 }
 
-Write-LogInfo "✓ Environment configuration looks good"
+Write-LogInfo "âœ“ Environment configuration looks good"
 
 # ============================================================================
 # Step 4: Load Docker Images
@@ -167,7 +167,7 @@ Write-LogInfo "Loading images..."
 
 try {
     docker load -i images.tar
-    Write-LogInfo "✓ Docker images loaded successfully"
+    Write-LogInfo "âœ“ Docker images loaded successfully"
 } catch {
     Write-LogError "Failed to load Docker images"
     Write-LogError $_.Exception.Message
@@ -188,7 +188,7 @@ $ExpectedImages = @(
 foreach ($Image in $ExpectedImages) {
     try {
         $null = docker image inspect $Image
-        Write-LogInfo "✓ Found $Image"
+        Write-LogInfo "âœ“ Found $Image"
     } catch {
         Write-LogWarn "Image $Image not found in local registry"
     }
@@ -199,7 +199,7 @@ try {
     $CustomImages = docker images --format "{{.Repository}}:{{.Tag}}" | Where-Object { $_ -match "(server|client)" }
     if ($CustomImages) {
         $CustomImages | ForEach-Object {
-            Write-LogInfo "✓ Found custom image: $_"
+            Write-LogInfo "âœ“ Found custom image: $_"
         }
     }
 } catch {
@@ -216,7 +216,7 @@ Write-LogInfo "Running: docker-compose up -d"
 
 try {
     docker-compose up -d
-    Write-LogInfo "✓ Services started"
+    Write-LogInfo "âœ“ Services started"
 } catch {
     Write-LogError "Failed to start services"
     Write-LogError "Check docker-compose logs for details:"
@@ -240,7 +240,7 @@ while ($Attempt -lt $MaxAttempts) {
     try {
         $Response = Invoke-WebRequest -Uri "http://localhost:3000/health" -ErrorAction SilentlyContinue
         if ($Response.StatusCode -eq 200) {
-            Write-LogInfo "✓ API server is healthy"
+            Write-LogInfo "âœ“ API server is healthy"
             $ServiceReady = $true
             break
         }
@@ -289,4 +289,5 @@ Write-Host "  2. Set up monitoring and alerting" -ForegroundColor $ColorInfo
 Write-Host "  3. Configure backup procedures" -ForegroundColor $ColorInfo
 Write-Host "  4. See DEPLOYMENT-PROD.md for detailed guidance" -ForegroundColor $ColorInfo
 Write-Host ""
-Write-Host "✓ Done!" -ForegroundColor $ColorInfo
+Write-Host "âœ“ Done!" -ForegroundColor $ColorInfo
+

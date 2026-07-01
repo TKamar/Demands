@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Offline Package Builder for Windows
@@ -93,7 +93,7 @@ try {
 # Check Docker daemon
 try {
     $null = docker info
-    Write-LogInfo "✓ Docker daemon is running"
+    Write-LogInfo "[OK] Docker daemon is running"
 } catch {
     Write-LogError "Docker daemon is not running or not accessible"
     exit 1
@@ -111,7 +111,7 @@ try {
 # Check tar command
 try {
     $TarVersion = tar --version
-    Write-LogInfo "✓ tar.exe is available"
+    Write-LogInfo "âœ“ tar.exe is available"
 } catch {
     Write-LogError "tar.exe not found. Windows 10+ includes native tar.exe"
     Write-LogError "If using older Windows, install Git Bash or WSL"
@@ -127,7 +127,7 @@ Write-LogInfo "Building server and client images..."
 
 try {
     docker-compose build server client
-    Write-LogInfo "✓ Custom images built successfully"
+    Write-LogInfo "[OK] Custom images built successfully"
 } catch {
     Write-LogError "Failed to build custom images"
     Write-LogError $_.Exception.Message
@@ -149,7 +149,7 @@ foreach ($Image in $ExternalImages) {
     Write-LogInfo "Pulling $Image..."
     try {
         docker pull $Image
-        Write-LogInfo "✓ Pulled $Image"
+        Write-LogInfo "âœ“ Pulled $Image"
     } catch {
         Write-LogError "Failed to pull $Image"
         exit 1
@@ -168,7 +168,7 @@ if (Test-Path $BundleDir) {
 }
 
 New-Item -Path $BundleDir -ItemType Directory -Force | Out-Null
-Write-LogInfo "✓ Created $BundleDir"
+Write-LogInfo "âœ“ Created $BundleDir"
 
 # ============================================================================
 # Step 5: Export Docker Images
@@ -191,7 +191,7 @@ try {
         "postgres:16-alpine" `
         "quay.io/keycloak/keycloak:26.0"
 
-    Write-LogInfo "✓ Images exported to $ImagesPath"
+    Write-LogInfo "âœ“ Images exported to $ImagesPath"
 } catch {
     Write-LogError "Failed to export Docker images"
     Write-LogError $_.Exception.Message
@@ -211,7 +211,7 @@ Write-LogHeader "Copying Configuration Files"
 # Copy docker-compose.yml
 if (Test-Path "docker-compose.yml") {
     Copy-Item -Path "docker-compose.yml" -Destination $BundleDir
-    Write-LogInfo "✓ Copied docker-compose.yml"
+    Write-LogInfo "âœ“ Copied docker-compose.yml"
 } else {
     Write-LogError "docker-compose.yml not found in current directory"
     exit 1
@@ -220,7 +220,7 @@ if (Test-Path "docker-compose.yml") {
 # Copy DEPLOYMENT-PROD.md if it exists
 if (Test-Path "DEPLOYMENT-PROD.md") {
     Copy-Item -Path "DEPLOYMENT-PROD.md" -Destination $BundleDir
-    Write-LogInfo "✓ Copied DEPLOYMENT-PROD.md"
+    Write-LogInfo "âœ“ Copied DEPLOYMENT-PROD.md"
 } else {
     Write-LogWarn "DEPLOYMENT-PROD.md not found (optional)"
 }
@@ -269,7 +269,7 @@ PRISMA_HIDE_UPDATE_MESSAGE=1
 "@
 
 $EnvContent | Out-File -FilePath (Join-Path $BundleDir ".env.example") -Encoding UTF8
-Write-LogInfo "✓ Created .env.example"
+Write-LogInfo "âœ“ Created .env.example"
 
 # ============================================================================
 # Step 7: Copy Deployment Script
@@ -279,7 +279,7 @@ Write-LogHeader "Including Deployment Script"
 
 if (Test-Path "scripts/deploy-offline.ps1") {
     Copy-Item -Path "scripts/deploy-offline.ps1" -Destination $BundleDir
-    Write-LogInfo "✓ Copied deploy-offline.ps1"
+    Write-LogInfo "âœ“ Copied deploy-offline.ps1"
 } else {
     Write-LogWarn "scripts/deploy-offline.ps1 not found (will be created separately)"
 }
@@ -364,7 +364,7 @@ See ``OFFLINE-WINDOWS-README.md`` for comprehensive deployment documentation.
 "@
 
 $ReadmeContent | Out-File -FilePath (Join-Path $BundleDir "README.md") -Encoding UTF8
-Write-LogInfo "✓ Created README.md"
+Write-LogInfo "âœ“ Created README.md"
 
 # ============================================================================
 # Step 9: Compress Bundle with tar
@@ -377,7 +377,7 @@ Write-LogInfo "Compressing with tar (this may take a minute)..."
 try {
     # Use native Windows tar command (PowerShell will handle paths)
     & tar -czf $BundleName $BundleDir
-    Write-LogInfo "✓ Bundle created: $BundleName"
+    Write-LogInfo "âœ“ Bundle created: $BundleName"
 } catch {
     Write-LogError "Failed to create compressed bundle"
     Write-LogError $_.Exception.Message
@@ -414,4 +414,5 @@ Write-Host "3. Run: cd $(Split-Path $BundleDir -Leaf) ; .\deploy-offline.ps1" -F
 Write-Host ""
 Write-Host "For detailed instructions, see OFFLINE-WINDOWS-README.md" -ForegroundColor $ColorInfo
 Write-Host ""
-Write-Host "✓ Done!" -ForegroundColor $ColorInfo
+Write-Host "[OK] Done!" -ForegroundColor $ColorInfo
+
