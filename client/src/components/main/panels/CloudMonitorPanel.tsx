@@ -247,9 +247,10 @@ interface EditPopoverProps {
   popover: PopoverState;
   onSave:  (id: number, data: { status: string; reason: string; tag: string }) => Promise<void>;
   onClose: () => void;
+  t:       (key: string) => string;
 }
 
-function EditPopover({ popover, onSave, onClose }: EditPopoverProps) {
+function EditPopover({ popover, onSave, onClose, t }: EditPopoverProps) {
   const [status, setStatus] = useState<CloudStatus>(popover.entry.status);
   const [reason, setReason] = useState(popover.entry.reason);
   const [tag,    setTag]    = useState<CloudTag>(popover.entry.tag);
@@ -438,6 +439,7 @@ export default function CloudMonitorPanel() {
           popover={popover}
           onSave={handleSave}
           onClose={() => setPopover(null)}
+          t={t}
         />
       )}
     </div>

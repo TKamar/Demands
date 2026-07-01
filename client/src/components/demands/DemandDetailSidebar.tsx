@@ -16,6 +16,7 @@ interface DemandDetailSidebarProps {
   onCancel?: (demand: Demand) => void;
   onApprove?: (demand: Demand) => void;
   onDeny?: (demand: Demand) => void;
+  onMakeDecision?: (demand: Demand) => void;
   isModerator?: boolean;
 }
 
@@ -28,6 +29,7 @@ export default function DemandDetailSidebar({
   onCancel,
   onApprove,
   onDeny,
+  onMakeDecision: _onMakeDecision,
   isModerator = false,
 }: DemandDetailSidebarProps) {
   const { t, i18n } = useTranslation();

@@ -208,7 +208,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [], c
                       />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => value} />
+                  <Tooltip formatter={(value: any) => value} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -254,7 +254,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ selectedCenters = [], c
                       <Cell key={`svc-cell-${index}`} fill={SERVICE_COLORS[index % SERVICE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => value} />
+                  <Tooltip formatter={(value: any) => value} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>

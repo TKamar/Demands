@@ -64,11 +64,11 @@ export default function DemandHistoryTimeline({ demandId }: Props) {
           {entry.actorUsername && (
             <p className="text-xs text-text-secondary">{entry.actorUsername}</p>
           )}
-          {entry.metadata?.reason && (
+          {entry.metadata?.reason ? (
             <p className="text-xs text-text-secondary italic">
-              "{String(entry.metadata.reason)}"
+              {`"${String(entry.metadata.reason as any)}"`}
             </p>
-          )}
+          ) : null}
           <time className="text-xs text-text-secondary">
             {new Date(entry.createdAt).toLocaleString('he-IL')}
           </time>
