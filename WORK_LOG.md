@@ -1,5 +1,61 @@
 # Work Log — Demands Monorepo
 
+## 2026-07-01 — chore/production-deployment-guide — ✅ COMPLETE
+
+### Completed
+- **Phase 0: Seeding & Startup Audit**
+  - Verified `entrypoint.sh` seeding gate (lines 10-13): `NODE_ENV=production` prevents mock data injection
+  - Confirmed first admin bootstrap: `authorization.ts` auto-upserts users as REGULAR_USER on first login; OIDC fallback allows admin group access until DB promotion
+  - Identified app-level reference data (Services, Resources) vs org-specific data (Centers, Projects, Demands)
+- **Created `server/prisma/seed-prod.ts`** — 140 lines
+  - Seeds only: ProjectKinds (2), EmergencyOptions (4), Services (18, with `moderators: []`), Resources (~40)
+  - Does NOT seed: Users, Centers, Projects, Demands, CloudResourceStatus, or any org/location hierarchy
+  - Pattern: uses `PrismaClient`, `upsert` structure identical to `seed.ts`
+- **Updated `server/package.json`** — Added `"seed:prod": "ts-node prisma/seed-prod.ts"` script
+- **Created `DEPLOYMENT-PROD.md`** — 550+ lines, 13 sections
+  - What "Clean Production" means: distinction between app catalog (seeded) and org data (UI config)
+  - Prerequisites, pre-flight checklist, environment setup with hardening notes
+  - Keycloak realm config (redirect URIs, first admin creation)
+  - Build & launch: `docker compose up -d --build`
+  - Database init: migrations + `npm run seed:prod`
+  - First admin bootstrap: Keycloak login + optional SQL promotion
+  - Post-bootstrap admin tasks: org hierarchy and moderator assignment via UI
+  - Health checks with concrete curl commands
+  - Troubleshooting (JWT validation, API crashes, Keycloak slow start, user permissions)
+  - Deployment checklist (13 items)
+  - Rollback procedures and backup/restore steps
+  - Production hardening tips (reverse proxy, secrets, monitoring, HA)
+- **Updated `WORK_LOG.md`** — Added entry for this phase
+- **Git branch created** — `chore/production-deployment-guide` from `dev`
+
+### Key Insights
+- Seeding gate already works correctly for production (no code changes needed)
+- Empty DB is non-functional for demands creation (Services/Resources required)
+- Production seed is minimal (40 lines vs dev seed 1200 lines)
+- First admin has OIDC fallback (no SQL needed immediately) but SQL promotion recommended for persistence
+- Post-deployment admin must configure org via UI (5-step process: Centers → Branches → Sections, Bases → Networks → Locations)
+
+### Implementation Details
+- `seed-prod.ts`: Uses same `upsert` pattern as `seed.ts` for Services/Resources
+- Services and Resources are identical in both (dev and prod) but dev seed adds `moderators: ['mod1', 'mod2']` while prod uses `moderators: []`
+- No ProjectKind or EmergencyOption filtering (both dev and prod need them)
+- DB initialization order: migrations → seed:prod (not seeded during container startup like dev)
+
+### State
+✅ Ready for merge. Branch: `chore/production-deployment-guide`. All files committed:
+- `server/prisma/seed-prod.ts` (new)
+- `server/package.json` (updated)
+- `DEPLOYMENT-PROD.md` (new)
+- `WORK_LOG.md` (this entry)
+
+### Next Steps
+- Run `git add server/prisma/seed-prod.ts server/package.json DEPLOYMENT-PROD.md WORK_LOG.md`
+- Run `git commit -m "chore: add production deployment guide and minimal reference seed"`
+- Create pull request from `chore/production-deployment-guide` → `dev`
+- Merge into dev branch
+
+---
+
 ## 2026-07-01 — chore/deployment-preparation — ✅ COMPLETE
 
 ### Completed
