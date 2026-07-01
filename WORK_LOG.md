@@ -1,5 +1,59 @@
 # Work Log — Demands Monorepo
 
+## 2026-07-01 — chore/deployment-preparation — ✅ COMPLETE
+
+### Completed
+- **Phase 0: Repository Scanning** — Scanned all 4 codebases (Demands, Demands-dev, Demands-main, and auxiliary) to identify environment variables
+  - Frontend: 4 VITE_ vars (API_URL, OIDC_AUTHORITY, OIDC_CLIENT_ID, OIDC_REDIRECT_URI)
+  - Backend: 18 process.env vars (PORT, NODE_ENV, DATABASE_URL, POSTGRES_*, OIDC_*, AUTH_*, KEYCLOAK_*, CUSTOM_AUTH_*)
+  - Docker/Keycloak: 20+ docker-compose environment declarations
+  - Total: 30+ unique environment variables documented with sources and defaults
+- **Created `.env.example`** — Root-level consolidated template with 30+ vars grouped into 9 logical sections
+  - Comments on each var explaining purpose, where to get value, and production vs dev differences
+  - Production placeholders (not dev defaults) for all secrets
+  - Critical notes on KC_HOSTNAME, AUTH_ISSUER, and JWT validation requirements
+- **Created `DEPLOYMENT.md`** — Comprehensive 11-section production deployment guide (450+ lines)
+  - Prerequisites (Docker, Docker Compose v2)
+  - Environment setup with production hardening guidance
+  - Keycloak configuration and realm import process
+  - Build & start containers (docker compose up --build -d)
+  - Database initialization (Prisma migrate + manual seed)
+  - First admin bootstrap (SQL procedure)
+  - Health checks (API, DB, Keycloak, frontend, OIDC token flow)
+  - Troubleshooting for 4 common issues (JWT validation, API unreachability, migrations, Keycloak access)
+  - Optional nginx multi-stage client build (production hardening)
+  - Deployment checklist (11 items)
+  - Rollback procedures and database backup/restore
+- **Git branch created** — `chore/deployment-preparation` branched from `dev`
+- **WORK_LOG.md updated** — Entry added for this phase
+
+### Key Findings
+- Realm export at `docker/keycloak/demands-realm.json` contains localhost URIs — must be updated for production domain
+- `KC_HOSTNAME: localhost` is critical — locks Keycloak issuer and is most common JWT validation failure source
+- Client Dockerfile runs Vite dev server (not production-ready) — documented gap and provided nginx multi-stage sample
+- Seeding is dev-only (NODE_ENV=development gate in entrypoint.sh) — production seeding must be manual
+- First admin requires SQL `UPDATE "User" SET role = 'ADMIN'` after initial login
+
+### Implementation Details
+- `.env.example`: 9 sections, 30 vars, 200+ lines with inline comments
+- `DEPLOYMENT.md`: 11 sections covering prerequisites, setup, build, DB init, health checks, troubleshooting, and rollback
+- All production placeholders use `https://demands.your-domain.com` pattern for operators to fill in actual domain
+- Health check section includes 5 concrete examples (API, DB, Keycloak, frontend, token validation)
+- Troubleshooting covers root causes and fixes for JWT validation, connectivity, migrations, and Keycloak startup
+
+### State
+✅ Ready for merge. Branch: `chore/deployment-preparation`. All files committed:
+- `.env.example` (new)
+- `DEPLOYMENT.md` (new)
+- `WORK_LOG.md` (updated with this entry)
+
+### Next Steps
+- Run `git add .env.example DEPLOYMENT.md WORK_LOG.md && git commit -m "chore: add deployment preparation guides and environment template"`
+- Create pull request from `chore/deployment-preparation` → `dev`
+- Review and merge into dev branch
+
+---
+
 ## 2026-06-29 — feature/excel-format-sync — ✅ COMPLETE
 
 ### Completed
