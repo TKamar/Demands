@@ -1,5 +1,58 @@
 # Work Log — Demands Monorepo
 
+## 2026-07-01 — feature/windows-offline-packaging — ✅ COMPLETE
+
+### Completed
+- **Phase 0: Windows Architecture Review** — Identified Windows-specific requirements, planned PowerShell strategy
+- **scripts/package-offline.ps1** (340 lines) — Windows internet-connected packaging script
+  - PowerShell 5.1+ with strict error handling (`$ErrorActionPreference = 'Stop'`)
+  - Verifies Docker Desktop/Engine, Docker Compose, tar.exe (Windows 10+)
+  - Builds custom images: demands:server, demands:client
+  - Pulls external images: postgres:16-alpine, quay.io/keycloak/keycloak:26.0
+  - Exports all images to `images.tar` (native tar for compression to .tar.gz)
+  - Bundles with docker-compose.yml, .env.example, deploy-offline.ps1, README.md
+  - Full color output with `Write-Host -ForegroundColor`
+  - Graceful error messages with recovery hints
+- **scripts/deploy-offline.ps1** (280 lines) — Windows offline deployment script
+  - Verifies Docker daemon, required files, .env configuration
+  - Loads Docker images from tarball
+  - Validates environment variables (warns on defaults)
+  - Starts services with docker-compose up -d
+  - Polls http://localhost:3000/health (up to 60s) using `Invoke-WebRequest`
+  - Displays operational endpoints and PowerShell commands
+  - Comprehensive error handling with Windows guidance
+- **OFFLINE-WINDOWS-README.md** (580 lines) — Windows-specific deployment guide
+  - Prerequisites for both machine types (OS, software, hardware)
+  - Windows 10+ build 2004+ requirement (for native tar.exe)
+  - PowerShell execution policy handling (Set-ExecutionPolicy guidance)
+  - Docker Desktop installation and verification
+  - Phase 1: Build process (Build → Package → Transfer)
+  - Phase 2: Deploy process (Extract → Configure → Deploy → Verify)
+  - Windows-specific troubleshooting (execution policy, Docker Desktop)
+  - Windows operations (Get-Volume, netstat, logs)
+  - Backup/restore using PowerShell
+  - Advanced config and performance tuning
+
+### Technical Details
+- **Platform**: Windows 10 (build 2004+), Windows 11, Windows Server 2019+
+- **Runtime**: PowerShell 5.1+ (native to Windows 10+)
+- **Compression**: Native `tar.exe` (included in Windows 10+ build 2004+)
+- **Error Handling**: `$ErrorActionPreference = 'Stop'` + try/catch blocks
+- **Fallback**: Users without tar.exe can install Git for Windows
+
+### Design Decisions
+1. **PowerShell not Bash** — Native Windows support without WSL/Git Bash
+2. **Execution policy guidance** — Include `-Scope Process -ExecutionPolicy Bypass` instructions
+3. **Native tar.exe** — No external tools, included in Windows 10+
+4. **Match Bash scripts** — Feature parity for consistency across platforms
+5. **Comprehensive Windows docs** — Docker Desktop, admin rights, path handling
+
+### State
+✅ Windows-native offline deployment complete. Both Bash and PowerShell scripts available.
+
+### Commits
+1. 3 files created (PowerShell scripts + Windows documentation)
+
 ## 2026-07-01 — feature/offline-packaging-suite — ✅ COMPLETE
 
 ### Completed
