@@ -1,5 +1,54 @@
 # Work Log — Demands Monorepo
 
+## 2026-07-01 — feature/offline-packaging-suite — ✅ COMPLETE
+
+### Completed
+- **Phase 0: Architecture Review** — Identified 4 Docker images (2 custom, 2 external), planned single-tarball strategy
+- **scripts/package-offline.sh** (480 lines) — Internet-connected machine packaging script
+  - Verifies Docker/Docker Compose installation and connectivity
+  - Builds custom images: demands:server, demands:client
+  - Pulls external images: postgres:16-alpine, quay.io/keycloak/keycloak:26.0
+  - Exports all images to `images.tar.gz` with gzip compression
+  - Bundles with docker-compose.yml, .env.example, deploy-offline.sh, README.md
+  - Outputs `offline-deployment-<version>-<timestamp>.tar.gz` (~1.5GB)
+  - Full color logging with progress tracking
+- **scripts/deploy-offline.sh** (320 lines) — Offline machine deployment script
+  - Verifies Docker/Docker Compose and bundle file integrity
+  - Validates .env configuration (warns on defaults, allows override)
+  - Loads Docker images from `images.tar.gz`
+  - Starts services with docker-compose up -d
+  - Polls health endpoint (up to 60s) for service readiness
+  - Displays endpoints and troubleshooting commands
+  - Full error handling with recovery suggestions
+- **OFFLINE-README.md** (480 lines) — Comprehensive deployment guide
+  - Two-phase workflow (Build → Deploy)
+  - Prerequisites checklist for both machines
+  - Step-by-step deployment instructions with code examples
+  - Troubleshooting section (images, services, DB, manual fallback)
+  - Operations guide (logs, backup/restore, monitoring)
+  - Advanced config (reverse proxy, custom Keycloak, networks)
+  - Performance tips and complete checklist
+
+### Technical Details
+- **Package Strategy**: Single-tarball approach (vs individual images) for simpler transfer/verification
+- **Image Compression**: gzip applied to images.tar for ~50% size reduction
+- **Health Checks**: HTTP polling on /health endpoint (not raw startup)
+- **Error Recovery**: Scripts provide fallback commands for manual intervention
+- **Air-Gap Compliance**: Zero internet calls post-extraction on target machine
+
+### Design Decisions
+1. **Single tarball** - Easier to transfer, one checksum to verify vs. multiple
+2. **Gzip compression** - Reduces from ~3GB to ~1.5GB for transfer
+3. **Health polling** - Waits for actual service readiness, not container start
+4. **User-friendly .env** - Example includes all vars, warnings for unchanged defaults
+5. **Bundled deploy script** - No need to keep scripts directory in production
+
+### State
+✅ Ready for offline deployment testing. Scripts handle both success and failure paths gracefully.
+
+### Commits
+1. 5 files created (scripts + documentation)
+
 ## 2026-07-01 — bugfix/frontend-tsc-build-errors — ✅ COMPLETE
 
 ### Completed
