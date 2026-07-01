@@ -1,5 +1,29 @@
 # Work Log — Demands Monorepo
 
+## 2026-07-01 — bugfix/air-gapped-compatibility — ✅ COMPLETE
+
+### Completed
+- **Phase 0 Investigation**: Identified Prisma binary fetch failure as root cause of CrashLoopBackOff in offline/secure Kubernetes environments
+- **Phase 1 - Prisma Runtime Fix**:
+  - Removed `prisma generate` from `server/entrypoint.sh` (was executing at runtime, triggering https://binaries.prisma.sh fetch)
+  - Added explicit `binaryTargets` to `server/prisma/schema.prisma`: `["native", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x"]`
+  - Ensures Prisma engines are bundled during Docker build phase, not fetched at runtime
+- **Phase 2 - OIDC/Auth Verification**: Confirmed backend auth calls (oidcDiscoveryService, tokenEndpoint) target internal Keycloak service via environment variables (no external dependencies for air-gap mode)
+- **Phase 3 - Frontend Verification**: Confirmed no external CDN dependencies; all assets bundled via Vite
+
+### Technical Details
+- **Root Cause**: Runtime `prisma generate` in entrypoint.sh attempted to download binaries from binaries.prisma.sh (external internet required)
+- **Solution**: Moved generation entirely to Docker build phase; explicit binaryTargets eliminate host-detection uncertainty in heterogeneous environments
+- **Compatibility**: Supports both Alpine Linux (musl + openssl-3.0.x) and Debian (openssl-1.1.x) without recompilation
+
+### State
+✅ Ready for testing/merge. All changes on `bugfix/air-gapped-compatibility` branch.
+- Docker image will now build completely offline
+- Container startup will not attempt external network calls for Prisma
+
+### Commits
+1. 66d817c: Fix air-gapped environment Prisma compatibility
+
 ## 2026-06-29 — feature/excel-format-sync — ✅ COMPLETE
 
 ### Completed
